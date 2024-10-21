@@ -53,6 +53,7 @@
                                             <th>Description</th>
                                             <th>Offer</th>
                                             <th class="text-end">Action</th>
+                                            <th>status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -77,6 +78,24 @@
                                                             <a href="#" class="text-white d-block text-center" onclick="removeOffer('<%= category._id %>')">Remove Offer</a>
                                                         </button>
                                                     <% } %>
+                                                </td>
+                                                <td>
+                                                    <%if(category.isListed){%>
+                                                        <span class="badge rounded-pill alert-success">Listed</span>
+                                                    <%}else{%>
+                                                        <span class="badge rounded-pill alert-danger">Unlisted</span>
+                                                    <%}%>
+                                                </td>
+                                                <td>
+                                                   <%if(category.isListed){%>
+                                                    <button class="btn btn-danger">
+                                                        <a href="/admin/listcategory?id=<%=category._id%>" class="text-white">Unlist</a>
+                                                    </button>
+                                                   <%} else {%>
+                                                    <button class="btn btn-success">
+                                                        <a href="/admin/unlistcategory?id=<%=category._id%>" class="text-white">List</a>
+                                                    </button>
+                                                   <%}%>
                                                 </td>
                                                 
                                                 
