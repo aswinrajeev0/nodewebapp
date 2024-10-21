@@ -1,0 +1,34 @@
+<%- include("../../views/partials/admin/header") %>
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Update Category</h2>
+            <p>Modify the details of the selected category</p>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <form method="post" action="/admin/editcategory/<%= category._id %>">
+                        <div class="mb-4">
+                            <label for="categoryName" class="form-label">Name</label>
+                            <input type="text" name="categoryName" class="form-control border" value="<%= category.name %>"/>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea name="description" class="form-control border"><%= category.description %></textarea>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button class="btn btn-primary" type="submit">Update Category</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<%- include("../../views/partials/admin/footer") %>
