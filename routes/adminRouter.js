@@ -4,6 +4,7 @@ const adminController = require('../controllers/admin/adminController')
 const customerController = require('../controllers/admin/customerController')
 const categoryController = require('../controllers/admin/categoryController')
 const brandController = require('../controllers/admin/brandController')
+const productController = require('../controllers/admin/productController')
 const {userAuth,adminAuth} = require('../middlewares/auth')
 const multer = require('multer');
 const storage = require('../helpers/multer')
@@ -38,5 +39,20 @@ router.post('/editcategory/:id',adminAuth,categoryController.editCategory)
 //brand management
 
 router.get('/brands',adminAuth,brandController.getBrandPage)
+router.post('/addbrand',adminAuth,upload.single('image'),brandController.addBrand)
+router.get('/blockbrand',adminAuth,brandController.blockBrand);
+router.get('/unblockbrand',adminAuth,brandController.unblockBrand);
+router.get('/deletebrand',adminAuth,brandController.deleteBrand);
+
+//product management
+
+router.get('/addproduct',adminAuth,productController.getProductAddPage);
+router.post('/addproduct',adminAuth,upload.array('images',4),productController.addProducts);
+router.get('/products',adminAuth,productController.getAllProducts);
+router.post('/addproductoffer',adminAuth,productController.addProductOffer);
+router.post('/removeproductoffer',adminAuth,productController.removeProductOffer);
+router.get('/blockproduct',adminAuth,productController.blockProduct);
+router.get('/unblockproduct',adminAuth,productController.unBlockProduct);
+router.get('/editproduct',adminAuth,productController.getEditProduct);
 
 module.exports = router

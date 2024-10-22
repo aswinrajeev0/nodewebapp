@@ -19,20 +19,7 @@
                                     <input type="text" placeholder="Type here" class="form-control" id="name" />
                                     <small id="nameError" style="color: red; display: none;">Name is required</small>
                                 </div>
-                                <!-- <div class="mb-4">
-                                    <label for="product_slug" class="form-label">Slug</label>
-                                    <input type="text" placeholder="Type here" class="form-control" id="product_slug" />
-                                    <small id="slugError" style="color: red; display: none;">Slug should contain only letters, numbers, and dashes</small>
-                                </div>
-                                <div class="mb-4">
-                                    <label class="form-label">Parent</label>
-                                    <select class="form-select" id="parent">
-                                        <option value="">Select parent category</option>
-                                        <option>Clothes</option>
-                                        <option>T-Shirts</option>
-                                    </select>
-                                    <small id="parentError" style="color: red; display: none;">Please select a parent category</small>
-                                </div> -->
+                                
                                 <div class="mb-4">
                                     <label class="form-label">Description</label>
                                     <textarea placeholder="Type here" class="form-control" id="description"></textarea>
@@ -52,8 +39,10 @@
                                             <th>Name</th>
                                             <th>Description</th>
                                             <th>Offer</th>
-                                            <th class="text-end">Action</th>
+                                            <th></th>
                                             <th>status</th>
+                                            <th></th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -63,7 +52,7 @@
                                                 <td><%= category.description%></td>
                                                 <td>
                                                     <%if(category.categoryOffer){%>
-                                                        <%= category.categoryOffer%>
+                                                        <%= category.categoryOffer%>%
                                                     <%}else{%>
                                                         0%
                                                     <%}%>
@@ -302,4 +291,4 @@ async function removeOffer(categoryId) {
 
 
 </script>
-<%- include('../partials/admin/footer') %>  
+<%- include('../partials/admin/footer') %> 

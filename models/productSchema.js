@@ -26,7 +26,7 @@ const productSchema = new Schema(
     },
     salePrice: {
       type: Number,
-      required: true,
+      required: false,
     },
     productOffer: {
       type: Number,
@@ -34,7 +34,7 @@ const productSchema = new Schema(
     },
     quantity: {
       type: Number,
-      default: true,
+      default: 1,
     },
     color: {
       type: String,
