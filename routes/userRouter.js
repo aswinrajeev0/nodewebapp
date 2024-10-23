@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const userControler = require('../controllers/user/userController');
+const userController = require('../controllers/user/userController');
+const profileController = require('../controllers/user/profileController.js')
 const passport = require('passport');
 
 
@@ -9,21 +10,25 @@ router.use(express.static('public'));
 
 
 
-router.get('/page-not-found',userControler.pageNotFound)
-router.get('/',userControler.loadHomepage)
-router.get('/signup',userControler.loadSignup)
-router.post('/signup',userControler.signup)
-router.post('/verify-otp',userControler.verifyOtp)
-router.post('/resend-otp',userControler.resendOtp);
+router.get('/page-not-found',userController.pageNotFound)
+router.get('/',userController.loadHomepage)
+router.get('/signup',userController.loadSignup)
+router.post('/signup',userController.signup)
+router.post('/verify-otp',userController.verifyOtp)
+router.post('/resend-otp',userController.resendOtp);
 router.get('/auth/google',passport.authenticate('google',{scope:['profile','email']}))
 router.get('/auth/google/callback',passport.authenticate('google',{failureRedirect:'/signup'}),(req,res)=>{
     res.redirect('/')
 })
-router.get('/login',userControler.loadLogin)
-router.post('/login',userControler.login);
-router.get('/logout',userControler.logout)
-
-
+router.get('/login',userController.loadLogin)
+router.post('/login',userController.login);
+router.get('/logout',userController.logout);
+router.get('/forgot-password',profileController.getForgotPassword);
+router.post('/forgot-email-valid',profileController.forgotEmailValid);
+router.post('/verify-forgotpass-otp',profileController.verifyForgotOtp);
+router.get('/reset-password',profileController.getResetPassPage);
+router.post('/resend-forgot-otp',profileController.resendOtp);
+router.post('/reset-password',profileController.resetPassword)
 
 
 

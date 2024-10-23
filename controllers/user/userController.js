@@ -60,7 +60,7 @@ async function sendVerificationEmail(email, otp) {
         to: email,
         subject: "Verify your account",
         text: `Your OTP is ${otp}`,
-        html: `<b>Your OTP: ${otp}</b>`,
+        html: `<b><h4>Your OTP: ${otp}</h4></b>`,
       });
   
       return info.accepted.length > 0;
