@@ -171,8 +171,10 @@ const resendOtp = async (req,res) => {
 const loadLogin = async (req, res) => {
   try {
 
+    const message = req.query.message || ""
+
     if(!req.session.user){
-        return res.render('login')
+        return res.render('login',{message})
     }else{
         res.redirect('/');
     }
@@ -194,7 +196,7 @@ const login = async (req,res) => {
         })
 
         if(!findUser){
-            return res.render('login',{message:"User not found"});
+            return res.redirect('/login?message=User not found')
         }
 
         if(findUser.isBlocked){

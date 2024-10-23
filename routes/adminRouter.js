@@ -54,5 +54,8 @@ router.post('/removeproductoffer',adminAuth,productController.removeProductOffer
 router.get('/blockproduct',adminAuth,productController.blockProduct);
 router.get('/unblockproduct',adminAuth,productController.unBlockProduct);
 router.get('/editproduct',adminAuth,productController.getEditProduct);
+router.post('/editproduct/:id',adminAuth,upload.array('images',4),productController.editProduct);
+router.post('/deleteimage',adminAuth,productController.deleteSingleImage);
+  
 
 module.exports = router
