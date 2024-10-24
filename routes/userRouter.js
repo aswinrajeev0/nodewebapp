@@ -28,7 +28,9 @@ router.post('/forgot-email-valid',profileController.forgotEmailValid);
 router.post('/verify-forgotpass-otp',profileController.verifyForgotOtp);
 router.get('/reset-password',profileController.getResetPassPage);
 router.post('/resend-forgot-otp',profileController.resendOtp);
-router.post('/reset-password',profileController.resetPassword)
+router.post('/reset-password',profileController.resetPassword);
+
+router.get('/productdetails',userController.getProductDetails);
 
 
 

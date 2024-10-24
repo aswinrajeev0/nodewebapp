@@ -103,12 +103,17 @@
                 </div> <!-- card body .// -->
             </div> <!-- card .// -->
         </section> <!-- content-main end// -->
-        <div class="pagination-container">
-            <a href="#">&laquo; Previous</a>
-            <span class="current-page"></span>
-            <a href="#"></a>
-            <a href="#">Next &raquo;</a>
-          </div>
+        <div class="pagination-area mt-30 mb-50">
+            <nav aria-label="Page navigation example justify-content-center">
+                <ul class="pagination justify-content-center">
+                    <%for(let i=1;i<=totalPages;i++){%>
+                        <li class="page-item">
+                            <a class="page-link <%= (i===currentPage) ? 'active' : '' %>" href="?page=<%=i%>"><%=i%></a>
+                        </li>
+                    <%}%>
+                </ul>
+            </nav>
+        </div>
           <br>
       
 <script>

@@ -39,7 +39,6 @@
                         <th scope="col"><b>Offer Price</b></th>
                         <th scope="col"><b>Offer Status</b></th>
                         <th scope="col"><b></b></th>
-                        <td></td>
                         <th scope="col"><b>Action</b></th>
                         <th scope="col"><b>Edit</b></th>
                     </tr>
@@ -67,20 +66,16 @@
                                 <%}%>
                             </td>
                             <td>
-                                <td>
-                                    <%if(data[i].productOffer){%>
-                                        <button class="btn btn-primary" style="width: 150px;" onclick="removeOffer('<%=data[i]._id%>')">
-                                            <a href="#" class="text-white">Remove</a>
-                                        </button>
-                                    <%}else{%>
-                                        <button class="btn btn-primary" style="width: 150px;" onclick="addOffer('<%=data[i]._id%>')">
-                                            <a href="#" class="text-white">Add Offer</a>
-                                        </button>
-                                    <%}%>
-                                </td>
-                                
+                                <%if(data[i].productOffer){%>
+                                    <button class="btn btn-primary" style="width: 150px;" onclick="removeOffer('<%=data[i]._id%>')">
+                                        <a href="#" class="text-white">Remove</a>
+                                    </button>
+                                <%}else{%>
+                                    <button class="btn btn-primary" style="width: 150px;" onclick="addOffer('<%=data[i]._id%>')">
+                                        <a href="#" class="text-white">Add Offer</a>
+                                    </button>
+                                <%}%>
                             </td>
-                            
                             <td>
                                 <%if(data[i].isBlocked){%>
                                     <button class="btn btn-success" style="width: 150px;">
@@ -93,7 +88,7 @@
                                 <%}%>
                             </td>
                             <td>
-                                <button class="btn btn-info" style="width: 80px;">
+                                <button class="btn" style="width: 150px; background-color: blue;">
                                     <a href="/admin/editproduct?id=<%=data[i]._id%>" class="text-white" style="text-decoration: none;">Edit</a>
                                 </button>
                             </td>
@@ -107,13 +102,12 @@
 
     <div class="pagination-area mt-30 mb-50">
         <nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-start">
-                <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                <li class="page-item"><a class="page-link" href="#">02</a></li>
-                <li class="page-item"><a class="page-link" href="#">03</a></li>
-                <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                <li class="page-item"><a class="page-link" href="#">16</a></li>
-                <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
+            <ul class="pagination justify-content-center">
+                <%for(let i=1;i<=totalPages;i++){%>
+                    <li class="page-item">
+                        <a class="page-link <%= (i===currentPage) ? 'active' : '' %>" href="?page=<%=i%>"><%=i%></a>
+                    </li>
+                <%}%>
             </ul>
         </nav>
     </div>

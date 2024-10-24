@@ -104,15 +104,16 @@ const getAllProducts = async (req,res) => {
                 data:productData,
                 currentPage:page,
                 totalPages:Math.ceil(count/limit),
-                cat:category,
-                brand:brand
+                // cat:category,
+                // brand:brand
             });
         }else{
             res.render("")
         }
 
     } catch (error) {
-        
+        res.redirect('/admin/pageerror');
+        res.status(500).json({status:false,message:"Internal server error"})
     }
 }
 
