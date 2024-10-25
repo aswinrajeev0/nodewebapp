@@ -15,10 +15,11 @@ const pageError = async (req,res) => {
 const loadLogin = async (req,res) => {
     try {
 
+        const message = req.query.msg || ""
         if(req.session.admin){
             return res.redirect('/admin/dashboard')
         }
-        res.render('admin-login',{message:null})
+        res.render('admin-login',{message})
     } catch (error) {
         
     }
@@ -35,10 +36,10 @@ const login = async (req,res) => {
                 req.session.admin = true;
                 return res.redirect('/admin')
             }else{
-                return res.redirect('/admin/login')
+                return res.redirect('/admin/login?msg=Incorrect Password')
             }
         }else{
-            return res.redirect('/admin/login')
+            return res.redirect('/admin/login?msg=Admin not found')
         }
 
     } catch (error) {

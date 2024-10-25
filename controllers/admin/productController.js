@@ -187,6 +187,7 @@ const getEditProduct = async (req,res) => {
         const category = await Category.find({});
         const brand = await Brand.find({});
         res.render('edit-product',{
+            message:"",
             product:product,
             cat:category,
             brand:brand,
@@ -209,6 +210,7 @@ const editProduct = async (req,res) => {
 
         if(existingProduct){
             res.status(400).json({error:"Product with this name already exists. Please try with another name"})
+            res.render('edit-product',{message:"Product with this name already exists. Please try with another name"})
         }
 
         const images = [];

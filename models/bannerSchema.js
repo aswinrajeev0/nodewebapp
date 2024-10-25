@@ -21,7 +21,7 @@ const bannerSchema = new Schema({
     type: Date,
     required: true,
   },
-  enddate: {
+  endDate: {
     type: Date,
     required: true,
   },

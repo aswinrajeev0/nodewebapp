@@ -25,7 +25,7 @@ const loadHomepage = async (req, res) => {
     productData = productData.slice(0, 4);
 
     if (user) {
-      const userData = await User.findOne({ _id: user._id });
+      const userData = await User.findOne({ _id: user });
       return res.render('home', { user: userData, products: productData, cat:categories });
     } else {
       return res.render('home', { products: productData, cat: categories});
@@ -112,7 +112,7 @@ const signup = async (req, res) => {
     console.log("OTP sent", otp);
   } catch (error) {
     console.error("Signup eror", error);
-    res.redirect("/pageNotFound");
+    res.redirect("/page-not-found");
   }
 };
 
@@ -183,7 +183,7 @@ const resendOtp = async (req, res) => {
 const loadLogin = async (req, res) => {
   try {
 
-    const message = req.query.message || ""
+    const message = req.query.msg || ""
 
     if (!req.session.user) {
       return res.render('login', { message })
@@ -192,9 +192,7 @@ const loadLogin = async (req, res) => {
     }
 
   } catch (error) {
-    res.redirect('/pageNotFound')
-    // console.log("Login page not loading :", error);
-    // res.status(500).send("Server Error");
+    res.redirect('/page-not-found')
   }
 };
 
@@ -208,11 +206,11 @@ const login = async (req, res) => {
     })
 
     if (!findUser) {
-      return res.redirect('/login?message=User not found')
+      return res.redirect('/login',{message:"User not found"})
     }
 
     if (findUser.isBlocked) {
-      return res.render('login', { message: "User is blocked by admin" })
+      return res.redirect('/login', { message: "User is blocked by admin" })
     }
 
     const passwordMatch = await bcrypt.compare(password, findUser.password);
@@ -236,14 +234,14 @@ const logout = async (req, res) => {
     req.session.destroy((err) => {
       if (err) {
         console.log("Session destruction error", err);
-        return res.redirect('/pageNotFound')
+        return res.redirect('/page-not-found')
       }
       return res.redirect('/login')
     })
 
   } catch (error) {
     console.log("Logout error", error);
-    res.redirect('/pageNotFound');
+    res.redirect('/page-not-found');
   }
 }
 
