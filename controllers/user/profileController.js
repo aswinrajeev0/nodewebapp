@@ -1,4 +1,5 @@
 const User = require('../../models/userSchema');
+const Address = require('../../models/addressSchema');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const env = require('dotenv').config();
@@ -41,12 +42,12 @@ async function sendVerificationEmail(email, otp) {
 
 const securePassword = async (password) => {
     try {
-        
-        const passwordHash = await bcrypt.hash(password,10);
+
+        const passwordHash = await bcrypt.hash(password, 10);
         return passwordHash;
 
     } catch (error) {
-        
+
     }
 }
 
@@ -54,7 +55,7 @@ const getForgotPassword = async (req, res) => {
     try {
 
         const message = req.query.msg || ""
-        res.render('forgot-password',{message})
+        res.render('forgot-password', { message })
 
     } catch (error) {
         res.redirect('/page-not-found')
@@ -70,15 +71,15 @@ const forgotEmailValid = async (req, res) => {
         if (findUser) {
             const otp = generateOtp();
             const emailSent = await sendVerificationEmail(email, otp);
-            if(emailSent){
+            if (emailSent) {
                 req.session.forgOtp = otp;
                 req.session.email = email;
                 res.render("forgotPass-otp")
-                console.log("OTP: "+otp);
-            }else{
-                res.json({success:false,message:"Failed to send OTP. Please try again"})
+                console.log("OTP: " + otp);
+            } else {
+                res.json({ success: false, message: "Failed to send OTP. Please try again" })
             }
-        }else{
+        } else {
             res.redirect("/forgot-password?msg=User with this email does not exist")
         }
 
@@ -106,46 +107,46 @@ const verifyForgotOtp = async (req, res) => {
 };
 
 
-const getResetPassPage = async (req,res) => {
+const getResetPassPage = async (req, res) => {
     try {
-        
+
         const message = req.query.msg || ""
-        res.render('reset-password',message);
+        res.render('reset-password', message);
 
     } catch (error) {
         res.redirect('/page-not-found');
     }
 }
 
-const resendOtp = async (req,res) => {
+const resendOtp = async (req, res) => {
     try {
-        
+
         const otp = generateOtp();
         req.session.forgOtp = otp;
         const email = req.session.email;
-        console.log("Resending OTP to email: "+otp);
-        const emailSent = await sendVerificationEmail(email,otp);
-        if(emailSent){
-            console.log("Resemd OTP:",otp);
-            res.status(200).json({success:true,message:"Resend OTP Successful"})
+        console.log("Resending OTP to email: " + otp);
+        const emailSent = await sendVerificationEmail(email, otp);
+        if (emailSent) {
+            console.log("Resemd OTP:", otp);
+            res.status(200).json({ success: true, message: "Resend OTP Successful" })
         }
 
     } catch (error) {
-        console.error("Error in resend OTP ",error);
-        res.status(500).json({success:false,message:"Internal server error"});
+        console.error("Error in resend OTP ", error);
+        res.status(500).json({ success: false, message: "Internal server error" });
     }
 }
 
-const resetPassword = async (req,res) => {
+const resetPassword = async (req, res) => {
     try {
-        
-        const {newPass1,newPass2} = req.body;
+
+        const { newPass1, newPass2 } = req.body;
         const email = req.session.email;
-        if(newPass1 === newPass2){
+        if (newPass1 === newPass2) {
             const passwordHash = await securePassword(newPass1);
-            await User.updateOne({email:email},{$set:{password:passwordHash}})
+            await User.updateOne({ email: email }, { $set: { password: passwordHash } })
             res.redirect('/login')
-        }else{
+        } else {
             res.redirect('/reset-password?msg=Password do not match')
         }
 
@@ -154,11 +155,113 @@ const resetPassword = async (req,res) => {
     }
 }
 
+const getUserProfile = async (req, res) => {
+    try {
+        const user = req.session.user;
+        if (!user) {
+            return res.redirect('/login');
+        }
+
+        const userData = await User.findOne({ _id: user });
+        const address = await Address.findOne({userId:user})
+
+        res.render('user-profile', { user: userData, address:address });
+
+    } catch (error) {
+        console.error("Error fetching user profile:", error);
+        res.status(500).send("An error occurred while fetching the user profile.");
+    }
+};
+
+const updateProfile = async (req, res) => {
+    try {
+        const id = req.query.id;
+        const data = req.body;
+
+        const updatedUser = await User.findByIdAndUpdate({_id:id},
+            {
+                username: data.dname,
+                phone: data.phone,
+            },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.redirect('/userprofile')
+
+        // res.status(200).json({ message: "Profile updated successfully" });
+
+    } catch (error) {
+        res.status(500).json({
+            message: "An error occurred while updating the profile",error: error.message, });
+    }
+};
+
+
+const getAddAddress = async (req,res) => {
+    try {
+        
+        const user = req.session.user;
+        if(!user){
+            return res.redirect('/login') 
+        }
+        return res.render('add-address',{user})
+
+    } catch (error) {
+        res.redirect('/page-not-found')
+    }
+}
+
+const saveAddress = async (req, res) => {
+    try {
+        const { id } = req.query;
+        const { addressType, name, city, streetAddress, state, pincode, phone, altPhone } = req.body;
+
+        const newAddress = {
+            addressType,
+            name,
+            state,
+            city,
+            streetAddress,
+            pincode,
+            phone,
+            altPhone,
+        };
+
+        let addressDoc = await Address.findOne({ userId: id });
+
+        if (addressDoc) {
+            addressDoc.addresses.push(newAddress);
+            await addressDoc.save();
+        } else {
+            addressDoc = new Address({
+                userId: id,
+                addresses: [newAddress],
+            });
+            await addressDoc.save();
+        }
+
+        res.status(201).json({ message: "Address saved successfully", address: addressDoc });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error saving address" });
+    }
+};
+
+
+
 module.exports = {
     getForgotPassword,
     forgotEmailValid,
     verifyForgotOtp,
     getResetPassPage,
     resendOtp,
-    resetPassword
+    resetPassword,
+    getUserProfile,
+    updateProfile,
+    getAddAddress,
+    saveAddress
 }

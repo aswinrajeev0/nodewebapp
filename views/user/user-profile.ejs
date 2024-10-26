@@ -1,0 +1,320 @@
+<%- include('../partials/user/header') %>
+    <div class="mobile-header-active mobile-header-wrapper-style">
+        <div class="mobile-header-wrapper-inner">
+            <div class="mobile-header-top">
+                <div class="mobile-header-logo">
+                    <a href="index.html"><img src="evara-frontend/assets/imgs/theme/logo.svg" alt="logo"></a>
+                </div>
+                <div class="mobile-menu-close close-style-wrap close-style-position-inherit">
+                    <button class="close-style search-close">
+                        <i class="icon-top"></i>
+                        <i class="icon-bottom"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="mobile-header-content-area">
+                <div class="mobile-search search-style-3 mobile-header-border">
+                    <form action="#">
+                        <input type="text" placeholder="Search for items…">
+                        <button type="submit"><i class="fi-rs-search"></i></button>
+                    </form>
+                </div>
+                <div class="mobile-menu-wrap mobile-header-border">
+                    <div class="main-categori-wrap mobile-header-border">
+                        <a class="categori-button-active-2" href="#">
+                            <span class="fi-rs-apps"></span> Browse Categories
+                        </a>
+                        <div class="categori-dropdown-wrap categori-dropdown-active-small">
+                            <ul>
+                                <li><a href="shop-grid-right.html"><i class="evara-font-dress"></i>Women's Clothing</a>
+                                </li>
+                                <li><a href="shop-grid-right.html"><i class="evara-font-tshirt"></i>Men's Clothing</a>
+                                </li>
+                                <li> <a href="shop-grid-right.html"><i class="evara-font-smartphone"></i> Cellphones</a>
+                                </li>
+                                <li><a href="shop-grid-right.html"><i class="evara-font-desktop"></i>Computer &
+                                        Office</a></li>
+                                <li><a href="shop-grid-right.html"><i class="evara-font-cpu"></i>Consumer
+                                        Electronics</a></li>
+                                <li><a href="shop-grid-right.html"><i class="evara-font-home"></i>Home & Garden</a></li>
+                                <li><a href="shop-grid-right.html"><i class="evara-font-high-heels"></i>Shoes</a></li>
+                                <li><a href="shop-grid-right.html"><i class="evara-font-teddy-bear"></i>Mother &
+                                        Kids</a></li>
+                                <li><a href="shop-grid-right.html"><i class="evara-font-kite"></i>Outdoor fun</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- mobile menu start -->
+
+                    <!-- mobile menu end -->
+                </div>
+                <div class="mobile-header-info-wrap mobile-header-border">
+                    <div class="single-mobile-header-info mt-30">
+                        <a href="page-contact.html"> Our location </a>
+                    </div>
+                    <div class="single-mobile-header-info">
+                        <a href="page-login-register.html">Log In / Sign Up </a>
+                    </div>
+                    <div class="single-mobile-header-info">
+                        <a href="#">(+01) - 2345 - 6789 </a>
+                    </div>
+                </div>
+                <div class="mobile-social-icon">
+                    <h5 class="mb-15 text-grey-4">Follow Us</h5>
+                    <a href="#"><img src="evara-frontend/assets/imgs/theme/icons/icon-facebook.svg" alt=""></a>
+                    <a href="#"><img src="evara-frontend/assets/imgs/theme/icons/icon-twitter.svg" alt=""></a>
+                    <a href="#"><img src="evara-frontend/assets/imgs/theme/icons/icon-instagram.svg" alt=""></a>
+                    <a href="#"><img src="evara-frontend/assets/imgs/theme/icons/icon-pinterest.svg" alt=""></a>
+                    <a href="#"><img src="evara-frontend/assets/imgs/theme/icons/icon-youtube.svg" alt=""></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <main class="main">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="index.html" rel="nofollow">Home</a>
+                    <span></span> Pages
+                    <span></span> Account
+                </div>
+            </div>
+        </div>
+        <section class="pt-150 pb-150">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-10 m-auto">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="dashboard-menu">
+                                    <ul class="nav flex-column" role="tablist">
+
+                                        <!-- <li class="nav-item">
+                                            <a class="nav-link active" id="dashboard-tab" data-bs-toggle="tab"
+                                                href="#dashboard" role="tab" aria-controls="dashboard"
+                                                aria-selected="false"><i
+                                                    class="fi-rs-settings-sliders mr-10"></i>Dashboard</a>
+                                        </li> -->
+                                        <li class="nav-item">
+                                            <a class="nav-link active" id="account-detail-tab" data-bs-toggle="tab"
+                                                href="#account-detail" role="tab" aria-controls="account-detail"
+                                                aria-selected="true"><i class="fi-rs-settings-sliders mr-10"></i>Account
+                                                details</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#orders"
+                                                role="tab" aria-controls="orders" aria-selected="false"><i
+                                                    class="fi-rs-shopping-bag mr-10"></i>Orders</a>
+                                        </li>
+                                        <!-- <li class="nav-item">
+                                            <a class="nav-link" id="track-orders-tab" data-bs-toggle="tab"
+                                                href="#track-orders" role="tab" aria-controls="track-orders"
+                                                aria-selected="false"><i
+                                                    class="fi-rs-shopping-cart-check mr-10"></i>Track Your Order</a>
+                                        </li> -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address"
+                                                role="tab" aria-controls="address" aria-selected="true"><i
+                                                    class="fi-rs-marker mr-10"></i>My Address</a>
+                                        </li>
+
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="page-login-register.html"><i
+                                                    class="fi-rs-sign-out mr-10"></i>Logout</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="col-md-8">
+                                <div class="tab-content dashboard-content">
+
+                                    <!-- <div class="tab-pane fade active show" id="dashboard" role="tabpanel"
+                                        aria-labelledby="dashboard-tab">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">Hello <%=user.username%>! </h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <p>From your account dashboard. you can easily check &amp; view your <a
+                                                        href="#">recent orders</a>, manage your <a href="#">shipping and
+                                                        billing addresses</a> and <a href="#account-detail">edit your
+                                                        account details.</a></p>
+                                            </div>
+                                        </div>
+                                    </div> -->
+                                    <div class="tab-pane fade active show" id="account-detail" role="tabpanel"
+                                        aria-labelledby="account-detail-tab">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5>Account Details</h5>
+                                            </div>
+                                            <div class="card-body">
+
+                                                <form id="myForm" method="post"
+                                                    action="/updateprofile?id=<%=user._id%>">
+                                                    <label for="dname">Display Name</label>
+                                                    <input type="text" id="dname" name="dname"
+                                                        value="<%=user.username%>">
+                                                    <span id="nameErr" style="color:red;"></span><br>
+
+                                                    <label for="dname">Phone</label>
+                                                    <input type="text" id="phone" name="phone" value="<%=user.phone%>">
+                                                    <span id="phoneErr" style="color:red;"></span><br>
+
+                                                    <label for="email">Email</label>
+                                                    <input type="email" id="email" name="email" value="<%=user.email%>"
+                                                        readonly>
+                                                    <span id="emailErr" style="color:red;"></span><br>
+
+                                                    <br><button type="submit">Save</button>
+                                                </form>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">Your Orders</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="table-responsive">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Order</th>
+                                                                <th>Date</th>
+                                                                <th>Status</th>
+                                                                <th>Total</th>
+                                                                <th>Actions</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>#1357</td>
+                                                                <td>March 45, 2020</td>
+                                                                <td>Processing</td>
+                                                                <td>$125.00 for 2 item</td>
+                                                                <td><a href="#" class="btn-small d-block">View</a></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- <div class="tab-pane fade" id="track-orders" role="tabpanel"
+                                        aria-labelledby="track-orders-tab">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">Orders tracking</h5>
+                                            </div>
+                                            <div class="card-body contact-from-area">
+                                                <p>To track your order please enter your OrderID in the box below and
+                                                    press "Track" button. This was given to you on your receipt and in
+                                                    the confirmation email you should have received.</p>
+                                                <div class="row">
+                                                    <div class="col-lg-8">
+                                                        <form class="contact-form-style mt-30 mb-50" action="#"
+                                                            method="post">
+                                                            <div class="input-style mb-20">
+                                                                <label>Order ID</label>
+                                                                <input name="order-id"
+                                                                    placeholder="Found in your order confirmation email"
+                                                                    type="text" class="square">
+                                                            </div>
+                                                            <div class="input-style mb-20">
+                                                                <label>Billing email</label>
+                                                                <input name="billing-email"
+                                                                    placeholder="Email you used during checkout"
+                                                                    type="email" class="square">
+                                                            </div>
+                                                            <button class="submit submit-auto-width"
+                                                                type="submit">Track</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> -->
+                                    <div class="tab-pane fade" id="address" role="tabpanel"
+                                        aria-labelledby="address-tab">
+                                        <div class="row">
+                                            <%for(let i=0;i<address.addresses.length;i++){%>
+                                                <div class="col-lg-6">
+                                                    <div class="card mb-3 mb-lg-0">
+                                                        <div class="card-header">
+                                                            <h5 class="mb-0">Billing Address</h5>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <address>
+                                                                <strong><%=address.addresses[i].addressType%></strong><br>
+                                                                <br>
+                                                                <%= address.addresses[i].name %>
+                                                                    <br>
+                                                                    <%= address.addresses[i].streetAddress %>
+                                                                        <br>
+                                                                        <%= address.addresses[i].city %>
+                                                                            <br>
+                                                                            <%= address.addresses[i].pincode %>
+                                                                                <br>
+                                                                                <%= address.addresses[i].state %>
+                                                                                <br>
+                                                                                <%=address.addresses[i].phone%>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%=address.addresses[i].altPhone%>
+                                                            </address>
+                                                            <a href="/edit-address" class="btn-small">Edit</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <% } %>
+
+
+
+                                        </div>
+                                        <br>
+                                        <a href="/add-address" class="btn btn-success">Add Address</a>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <%- include('../partials/user/footer') %>
+
+
+        <script>
+            document.getElementById("myForm").addEventListener("submit", function (event) {
+                // Reset errors
+                document.getElementById("nameErr").textContent = "";
+                document.getElementById("phoneErr").textContent = "";
+
+                // Flag for valid form
+                let isValid = true;
+
+                // Validate Display Name
+                const dname = document.getElementById("dname").value.trim();
+                if (dname.length < 3) {
+                    document.getElementById("nameErr").textContent = "Display Name must be at least 3 characters long.";
+                    isValid = false;
+                }
+
+                // Validate Phone
+                const phone = document.getElementById("phone").value.trim();
+                const phonePattern = /^[0-9]{10}$/;
+                if (!phonePattern.test(phone)) {
+                    document.getElementById("phoneErr").textContent = "Phone number must be exactly 10 digits.";
+                    isValid = false;
+                }
+
+                // If form is invalid, prevent submission
+                if (!isValid) {
+                    event.preventDefault();
+                }
+            });
+        </script>

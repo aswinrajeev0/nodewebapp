@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/user/userController');
 const profileController = require('../controllers/user/profileController.js')
+const productController = require('../controllers/user/productController.js')
 const passport = require('passport');
 
 
@@ -30,7 +31,13 @@ router.get('/reset-password',profileController.getResetPassPage);
 router.post('/resend-forgot-otp',profileController.resendOtp);
 router.post('/reset-password',profileController.resetPassword);
 
-router.get('/productdetails',userController.getProductDetails);
+router.get('/userprofile',profileController.getUserProfile);
+router.post('/updateprofile',profileController.updateProfile);
+router.get('/add-address',profileController.getAddAddress);
+router.post('/save-address',profileController.saveAddress);
+
+router.get('/productdetails',productController.getProductDetails);
+
 
 
 

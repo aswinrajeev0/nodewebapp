@@ -7,7 +7,7 @@ const addressSchema = new Schema({
     ref: "User",
     required: true,
   },
-  address: [
+  addresses: [
     {
       addressType: {
         type: String,
@@ -21,7 +21,7 @@ const addressSchema = new Schema({
         type: String,
         required: true,
       },
-      landMark: {
+      streetAddress: {
         type: String,
         required: true,
       },
@@ -30,7 +30,7 @@ const addressSchema = new Schema({
         required: true,
       },
       pincode: {
-        type: Number,
+        type: String,
         required: true,
       },
       phone: {
@@ -39,7 +39,7 @@ const addressSchema = new Schema({
       },
       altPhone: {
         type: String,
-        required: true,
+        required: false,
       },
     },
   ],
