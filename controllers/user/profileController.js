@@ -162,16 +162,21 @@ const getUserProfile = async (req, res) => {
             return res.redirect('/login');
         }
 
-        const userData = await User.findOne({ _id: user });
-        const address = await Address.findOne({userId:user})
+        const userData = await User.findById(user);
+        const addressDoc = await Address.findOne({ userId: user });
 
-        res.render('user-profile', { user: userData, address:address });
+        const addresses = addressDoc ? addressDoc.addresses : [];
+
+        res.render('user-profile', { user: userData, address: addresses });
 
     } catch (error) {
         console.error("Error fetching user profile:", error);
         res.status(500).send("An error occurred while fetching the user profile.");
     }
 };
+
+
+
 
 const updateProfile = async (req, res) => {
     try {

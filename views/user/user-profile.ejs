@@ -74,7 +74,7 @@
         <div class="page-header breadcrumb-wrap">
             <div class="container">
                 <div class="breadcrumb">
-                    <a href="index.html" rel="nofollow">Home</a>
+                    <a href="/" rel="nofollow">Home</a>
                     <span></span> Pages
                     <span></span> Account
                 </div>
@@ -241,28 +241,30 @@
                                     <div class="tab-pane fade" id="address" role="tabpanel"
                                         aria-labelledby="address-tab">
                                         <div class="row">
-                                            <%for(let i=0;i<address.addresses.length;i++){%>
+                                            <%for(let i=0;i<address.length;i++){%>
                                                 <div class="col-lg-6">
                                                     <div class="card mb-3 mb-lg-0">
                                                         <div class="card-header">
                                                             <h5 class="mb-0">Billing Address</h5>
                                                         </div>
                                                         <div class="card-body">
-                                                            <address>
-                                                                <strong><%=address.addresses[i].addressType%></strong><br>
-                                                                <br>
-                                                                <%= address.addresses[i].name %>
+                                                            <% if (address.length > 0) { %>
+                                                                <% for (let i = 0; i < address.length; i++) { %>
+                                                                    <address>
+                                                                        <strong><%= address[i].addressType %></strong><br>
+                                                                        <%= address[i].name %><br>
+                                                                        <%= address[i].streetAddress %><br>
+                                                                        <%= address[i].city %><br>
+                                                                        <%= address[i].pincode %><br>
+                                                                        <%= address[i].state %><br>
+                                                                        <%= address[i].phone %> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <%= address[i].altPhone %>
+                                                                    </address>
                                                                     <br>
-                                                                    <%= address.addresses[i].streetAddress %>
-                                                                        <br>
-                                                                        <%= address.addresses[i].city %>
-                                                                            <br>
-                                                                            <%= address.addresses[i].pincode %>
-                                                                                <br>
-                                                                                <%= address.addresses[i].state %>
-                                                                                <br>
-                                                                                <%=address.addresses[i].phone%>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%=address.addresses[i].altPhone%>
-                                                            </address>
+                                                                <% } %>
+                                                            <% } else { %>
+                                                                <p>No addresses available.</p>
+                                                            <% } %>                                                            
+                                                            
                                                             <a href="/edit-address" class="btn-small">Edit</a>
                                                         </div>
                                                     </div>

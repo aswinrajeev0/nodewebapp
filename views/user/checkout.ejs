@@ -1,0 +1,139 @@
+<%- include('../partials/user/header') %>
+    <style>
+        input[type="radio"] {
+            transform: scale(0.4);
+            margin-right: 10px;
+        }
+    </style>
+    <main class="main">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="/" rel="nofollow">Home</a>
+                    <span></span> Shop
+                    <span></span> Checkout
+                </div>
+            </div>
+        </div>
+        <section class="mt-50 mb-50">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-25">
+                            <h4>Select Your Address</h4>
+                            <% if (address.length> 0) { %>
+                                <% for (let i=0; i < address.length; i++) { %>
+                                    <div class="card">
+                                        <input type="radio" name="selectedAddress" id="address-<%= i %>"
+                                            value="<%= JSON.stringify(address[i]) %>" required>
+
+                                        <label for="address-<%= i %>">
+                                            <div class="card-body">
+                                                <strong>
+                                                    <%= address[i].addressType %>
+                                                </strong><br>
+                                                <%= address[i].name %><br>
+                                                <%= address[i].streetAddress %><br>
+                                                <%= address[i].city %><br>
+                                                <%= address[i].pincode %><br>
+                                                <%= address[i].state %><br>
+                                                <%= address[i].phone %> &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; <%= address[i].altPhone %>
+                                            </div>
+                                        </label>
+
+                                    </div>
+                                    <br>
+                                    <% } %>
+                                        <% } else { %>
+                                            <p>No addresses available.</p>
+                                            <% } %>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="order_review">
+                            <div class="mb-20">
+                                <h4>Your Orders</h4>
+                            </div>
+                            <div class="table-responsive order_table text-center">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="2">Product</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% let subtotal = 0;
+                                        for (let i=0; i < cart.items.length; i++) { 
+                                            subtotal += cart.items[i].totalPrice
+                                            %>
+                                            <tr>
+                                                <td class="image product-thumbnail">
+                                                    <img src="/uploads/re-image/<%= cart.items[i].productId.productImage[0] %>"
+                                                        alt="<%= cart.items[i].productId.productName %>">
+                                                </td>
+                                                <td>
+                                                    <h5>
+                                                        <a href="/productdetails?<%= cart.items[i].productId %>">
+                                                            <%= cart.items[i].productId.productName %>
+                                                        </a>
+                                                    </h5><br>
+                                                    <span class="product-qty">
+                                                        Units: <%= cart.items[i].quantity %>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <%= cart.items[i].totalPrice.toLocaleString() %>
+                                                </td>
+                                            </tr>
+                                            <% } %>
+                                                <tr>
+                                                    <th>SubTotal</th>
+                                                    <td class="product-subtotal" colspan="2"><%=subtotal.toLocaleString()%></td>
+                                                </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="bt-1 border-color-1 mt-30 mb-30"></div>
+                            <div class="payment_method">
+                                <div class="mb-25">
+                                    <h5>Payment</h5>
+                                </div>
+                                <div class="payment_option">
+                                    <div class="custome-radio">
+                                        <input class="form-check-input" required type="radio" name="payment_option"
+                                            id="exampleRadios3" checked="">
+                                        <label class="form-check-label" for="exampleRadios3" data-bs-toggle="collapse"
+                                            data-target="#bankTranfer" aria-controls="bankTranfer">COD</label>
+                                        <div class="form-group collapse in" id="bankTranfer">
+                                            <p class="text-muted mt-5">There are many variations of passages of Lorem
+                                                Ipsum available, but the majority have suffered alteration.</p>
+                                        </div>
+                                    </div>
+                                    <div class="custome-radio">
+                                        <input class="form-check-input" required type="radio" name="payment_option"
+                                            id="exampleRadios5">
+                                        <label class="form-check-label" for="exampleRadios5" data-bs-toggle="collapse"
+                                            data-target="#paypal" aria-controls="paypal">Paypal</label>
+                                        <div class="form-group collapse in" id="paypal">
+                                            <p class="text-muted mt-5">Pay via PayPal; you can pay with your credit card
+                                                if you don't have a PayPal account.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Form for placing the order -->
+                            <form action="/place-order" method="POST">
+                                <input type="hidden" name="cart" value='<%= JSON.stringify(cart.items) %>'>
+                                <input type="hidden" name="totalPrice" value="280.00">
+                                <!-- Replace with the actual total -->
+                                <a href="#" class="btn btn-fill-out btn-block mt-30">Place Order</a>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <%- include('../partials/user/footer') %>

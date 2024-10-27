@@ -1,6 +1,7 @@
 const User = require("../../models/userSchema");
 const Category = require('../../models/categorySchema')
 const Product = require('../../models/productSchema');
+const Banner = require('../../models/bannerSchema')
 const env = require("dotenv").config();
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
@@ -8,11 +9,18 @@ const bcrypt = require("bcrypt");
 const pageNotFound = async (req, res) => {
   try {
     return res.render("page-404");
-  } catch (error) { }
+  } catch (error) {
+    res.status(500).send("Server error")
+  }
 };
 
 const loadHomepage = async (req, res) => {
   try {
+    const today = new Date().toISOString();
+    const findBanner = await Banner.find({
+      startDate:{$lt:new Date(today)},
+      endDate:{$gt: new Date(today)}
+    })
     const user = req.session.user;
     const categories = await Category.find({ isListed: true });
     let productData = await Product.find({
@@ -26,9 +34,9 @@ const loadHomepage = async (req, res) => {
 
     if (user) {
       const userData = await User.findOne({ _id: user });
-      return res.render('home', { user: userData, products: productData, cat:categories });
+      return res.render('home', { user: userData, products: productData, cat:categories, banner:findBanner || []});
     } else {
-      return res.render('home', { products: productData, cat: categories});
+      return res.render('home', { products: productData, cat: categories, banner:findBanner || []});
     }
   } catch (error) {
     console.log("Home page not found:", error);
