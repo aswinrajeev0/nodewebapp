@@ -163,19 +163,14 @@ const getUserProfile = async (req, res) => {
         }
 
         const userData = await User.findById(user);
-        const addressDoc = await Address.findOne({ userId: user });
 
-        const addresses = addressDoc ? addressDoc.addresses : [];
-
-        res.render('user-profile', { user: userData, address: addresses });
+        res.render('profile', { user: userData});
 
     } catch (error) {
         console.error("Error fetching user profile:", error);
         res.status(500).send("An error occurred while fetching the user profile.");
     }
 };
-
-
 
 
 const updateProfile = async (req, res) => {
@@ -204,6 +199,25 @@ const updateProfile = async (req, res) => {
             message: "An error occurred while updating the profile",error: error.message, });
     }
 };
+
+
+const getAddress = async (req,res) => {
+    try {
+        
+        const user = req.session.user;
+        if (!user) {
+            return res.redirect('/login');
+        }
+
+        const addressDoc = await Address.findOne({ userId: user });
+
+        const addresses = addressDoc ? addressDoc.addresses : [];
+        res.render('address',{address:addresses})
+
+    } catch (error) {
+        
+    }
+}
 
 
 const getAddAddress = async (req,res) => {
@@ -256,6 +270,32 @@ const saveAddress = async (req, res) => {
     }
 };
 
+const deleteAddress = async (req,res) => {
+    try {
+        
+        const user = req.session.user;
+        const addressId = req.query.id;
+
+        if (!user) {
+            return res.redirect('/login');
+        }
+
+        const addressDoc = await Address.findOne({ userId: user });
+
+        if (addressDoc) {
+            addressDoc.addresses = addressDoc.addresses.filter(addr => addr._id.toString() !== addressId);
+            await addressDoc.save();
+            res.redirect('/address');
+        } else {
+            res.status(404).send("Address not found");
+        }
+
+    } catch (error) {
+        console.error("Error deleting address:", error);
+        res.status(500).send("An error occurred while deleting the address.");
+    }
+}
+
 
 
 module.exports = {
@@ -268,5 +308,7 @@ module.exports = {
     getUserProfile,
     updateProfile,
     getAddAddress,
-    saveAddress
+    saveAddress,
+    getAddress,
+    deleteAddress
 }

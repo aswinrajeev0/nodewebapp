@@ -1,5 +1,24 @@
 <%- include('../partials/user/header') %>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-quantity {
+            padding: 0 8px;
+            font-size: 16px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+
+        .quantity-display {
+            font-weight: bold;
+        }
+    </style>
 
     <main class="main">
         <div class="page-header breadcrumb-wrap">
@@ -30,41 +49,63 @@
                                 <tbody>
                                     <%for(let i=0;i<cart.items.length;i++){%>
                                         <tr>
-                                            <td class="image product-thumbnail"><img src="/uploads/re-image/<%= cart.items[i].productId.productImage[0] %>" alt="<%=cart.items[i].productId.productName%>"></td>
+                                            <td class="image product-thumbnail"><img
+                                                    src="/uploads/re-image/<%= cart.items[i].productId.productImage[0] %>"
+                                                    alt="<%=cart.items[i].productId.productName%>"></td>
                                             <td class="product-des product-name">
-                                                <h5 class="product-name"><a href="/"><%=cart.items[i].productId.productName%></a></h5>
+                                                <h5 class="product-name"><a href="/">
+                                                        <%=cart.items[i].productId.productName%>
+                                                    </a></h5>
                                             </td>
-                                            <td class="price" data-title="Price"><span>₹ <%= cart.items[i].price.toLocaleString() %></span></td>
-                                            <td class="text-center" data-title="Stock"><%=cart.items[i].quantity%></td>
+                                            <td class="price" data-title="Price"><span>₹ <%=
+                                                        cart.items[i].price.toLocaleString() %></span></td>
+                                            <td class="text-center" data-title="Stock">
+                                                <div class="quantity-control">
+                                                    <button type="button"
+                                                        onclick="updateQuantity('<%= cart.items[i].productId._id %>', -1)"
+                                                        class="btn-quantity">-</button>
+                                                    <span id="quantity-<%= cart.items[i].productId._id %>"
+                                                        class="quantity-display">
+                                                        <%= cart.items[i].quantity %>
+                                                    </span>
+                                                    <button type="button"
+                                                        onclick="updateQuantity('<%= cart.items[i].productId._id %>', 1)"
+                                                        class="btn-quantity">+</button>
+                                                </div>
+                                            </td>
                                             <td class="text-right" data-title="Cart">
-                                                <span>₹ <%=cart.items[i].totalPrice.toLocaleString()%></span>
+                                                <span id="subtotal-<%= cart.items[i].productId._id %>">₹ <%=
+                                                        cart.items[i].totalPrice.toLocaleString() %></span>
                                             </td>
+
                                             <td class="action" data-title="Remove">
-                                                <form id="remove-form-<%= cart.items[i].productId._id %>" action="/remove-cart-item" method="POST">
-                                                  <input type="hidden" name="productId" value="<%= cart.items[i].productId._id %>">
-                                                  <button type="button" class="btn" onclick="confirmRemove('<%= cart.items[i].productId._id %>')">
-                                                    <i class="fi-rs-trash"></i>
-                                                  </button>
+                                                <form id="remove-form-<%= cart.items[i].productId._id %>"
+                                                    action="/remove-cart-item" method="POST">
+                                                    <input type="hidden" name="productId"
+                                                        value="<%= cart.items[i].productId._id %>">
+                                                    <button type="button" class="btn"
+                                                        onclick="confirmRemove('<%= cart.items[i].productId._id %>')">
+                                                        <i class="fi-rs-trash"></i>
+                                                    </button>
                                                 </form>
-                                              </td>                                              
+                                            </td>
                                         </tr>
-                                    <%}%>
-                                        <td colspan="6" class="text-end">
-                                            <a href="#" class="text-muted"> <i class="fi-rs-cross-small"></i> Clear Cart</a>
-                                        </td>
-                                    </tr>
+                                        <%}%>
+                                            <td colspan="6" class="text-end">
+                                                <a href="#" class="text-muted"> <i class="fi-rs-cross-small"></i> Clear
+                                                    Cart</a>
+                                            </td>
+                                            </tr>
                                 </tbody>
                             </table>
                         </div>
                         <div class="cart-action text-end">
                             <a class="btn " href="/"><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
                         </div>
-                        <br><hr><br>
+                        <br>
+                        <hr><br>
                         <div class="row mb-50">
                             <div class="col-lg-6 col-md-12">
-                                <div class="heading_s1 mb-3">
-                                    <h4>Calculate Shipping</h4>
-                                </div>
                                 <div class="mb-30 mt-50">
                                     <div class="heading_s1 mb-3">
                                         <h4>Apply Coupon</h4>
@@ -75,10 +116,12 @@
                                                 <form action="#" target="_blank">
                                                     <div class="form-row row justify-content-center">
                                                         <div class="form-group col-lg-6">
-                                                            <input class="font-medium" name="Coupon" placeholder="Enter Your Coupon">
+                                                            <input class="font-medium" name="Coupon"
+                                                                placeholder="Enter Your Coupon">
                                                         </div>
                                                         <div class="form-group col-lg-6">
-                                                            <button class="btn  btn-sm"><i class="fi-rs-label mr-10"></i>Apply</button>
+                                                            <button class="btn  btn-sm"><i
+                                                                    class="fi-rs-label mr-10"></i>Apply</button>
                                                         </div>
                                                     </div>
                                                 </form>
@@ -97,20 +140,14 @@
                                             <tbody>
                                                 <tr>
                                                     <td class="cart_total_label">Cart Subtotal</td>
-                                                    <td class="cart_total_amount"><span class="font-lg fw-900 text-brand">$240.00</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="cart_total_label">Shipping</td>
-                                                    <td class="cart_total_amount"> <i class="ti-gift mr-5"></i> Free Shipping</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="cart_total_label">Total</td>
-                                                    <td class="cart_total_amount"><strong><span class="font-xl fw-900 text-brand">$240.00</span></strong></td>
+                                                    <td class="cart_total_amount"><span class="font-lg fw-900 text-brand">₹ <%= totalAmount.toLocaleString() %></span></td>
                                                 </tr>
                                             </tbody>
+                                            
                                         </table>
                                     </div>
-                                    <a href="/checkout" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut</a>
+                                    <a href="/checkout" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To
+                                        CheckOut</a>
                                 </div>
                             </div>
                         </div>
@@ -123,21 +160,49 @@
 
     <script>
         function confirmRemove(productId) {
-          Swal.fire({
-            title: "Are you sure?",
-            text: "Do you want to remove this item from the cart?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Yes, remove it!"
-          }).then((result) => {
-            if (result.isConfirmed) {
-              // Submit the form with the corresponding product ID
-              document.getElementById(`remove-form-${productId}`).submit();
-            }
-          });
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Do you want to remove this item from the cart?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, remove it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(`remove-form-${productId}`).submit();
+                }
+            });
         }
-      </script>
 
-<%- include('../partials/user/footer') %>  
+
+        function updateQuantity(productId, change) {
+            fetch(`/update-cart-quantity`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ productId, change }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById(`quantity-${productId}`).textContent = data.newQuantity;
+                        document.getElementById(`subtotal-${productId}`).textContent = `₹ ${data.newSubtotal.toLocaleString()}`;
+                        document.getElementById("total-price").textContent = `₹ ${data.totalPrice.toLocaleString()}`;
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: data.message,
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                });
+        }
+
+    </script>
+
+    <%- include('../partials/user/footer') %>

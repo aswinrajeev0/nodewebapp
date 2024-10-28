@@ -53,15 +53,18 @@ const getCart = async (req, res) => {
         const cartItems = await Cart.findOne({ userId: userId }).populate('items.productId');
 
         if (!cartItems) {
-            return res.render('cart', { cart: null, products: [] });
+            return res.render('cart', { cart: null, products: [], totalAmount: 0 });
         }
 
-        res.render('cart', { cart: cartItems, products: cartItems.items });
+        const totalAmount = cartItems.items.reduce((sum, item) => sum + item.totalPrice, 0);
+
+        res.render('cart', { cart: cartItems, products: cartItems.items, totalAmount });
     } catch (error) {
         console.error(error);
         res.redirect('/page-not-found');
     }
 };
+
 
 const removeCartItem = async (req, res) => {
     try {
@@ -82,9 +85,53 @@ const removeCartItem = async (req, res) => {
     }
 }
 
+const updateCart = async (req, res) => {
+    const { productId, change } = req.body;
+    try {
+
+        const userId = req.session.user;
+        if (!userId) {
+            return res.json({ success: false, message: "User not logged in" });
+        }
+
+        const cart = await Cart.findOne({ userId: userId });
+        if (!cart) {
+            return res.json({ success: false, message: "Cart not found" });
+        }
+
+        const item = cart.items.find((item) => item.productId.toString() === productId);
+        if (item) {
+            item.quantity += change;
+            item.totalPrice = item.quantity * item.price;
+
+            if (item.quantity <= 0) {
+                cart.items = cart.items.filter((item) => item.productId.toString() !== productId);
+            }
+
+            cart.totalPrice = cart.items.reduce((total, item) => total + item.totalPrice, 0);
+            await cart.save();
+
+            res.json({
+                success: true,
+                newQuantity: item.quantity,
+                newSubtotal: item.totalPrice,
+                totalPrice: cart.totalPrice,
+            });
+        } else {
+            res.json({ success: false, message: "Item not found in cart" });
+        }
+
+    } catch (error) {
+        console.error(error);
+        res.json({ success: false, message: "Failed to update quantity" });
+    }
+};
+
+
 
 module.exports = {
     addToCart,
     getCart,
-    removeCartItem
+    removeCartItem,
+    updateCart
 }

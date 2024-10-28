@@ -54,10 +54,20 @@ const productSchema = new Schema(
       required: true,
       default: "Available",
     },
+    popularity: {
+      type: Number,
+      default: 0,
+    },
+      rating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5,
+    },
   },
   { timestamps: true }
 );
 
-const Product = mongoose.model("Product",productSchema)
+const Product = mongoose.model("Product", productSchema)
 
 module.exports = Product;

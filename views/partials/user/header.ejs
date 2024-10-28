@@ -8,11 +8,39 @@
     <link rel="shortcut icon" type="image/x-icon" href="evara-frontend/assets/imgs/theme/favicon.svg">
     <link rel="stylesheet" href="evara-frontend/assets/css/main.css">
     <style>
-        .header-bottom .container { display: flex; justify-content: center; }
-        .header-nav { display: flex; justify-content: center; align-items: center; width: 100%; }
-        .main-menu nav ul { display: flex; justify-content: center; gap: 20px; padding: 0; margin: 0; list-style-type: none; }
-        .main-menu nav ul li a { text-decoration: none; color: #333; font-weight: bold; padding: 10px 15px; }
-        .notification-badge { position: relative; }
+        /* Move these styles to an external CSS file if possible */
+        .header-bottom .container {
+            display: flex;
+            justify-content: center;
+        }
+
+        .header-nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .main-menu nav ul {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 0;
+            margin: 0;
+            list-style-type: none;
+        }
+
+        .main-menu nav ul li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            padding: 10px 15px;
+        }
+
+        .notification-badge {
+            position: relative;
+        }
+
         .notification-badge::after {
             content: "3"; /* Example count */
             position: absolute;
@@ -24,9 +52,90 @@
             padding: 2px 5px;
             font-size: 10px;
         }
-        .dropdown-content { display: none; position: absolute; background-color: #f9f9f9; min-width: 160px; box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2); z-index: 1; }
-        .dropdown:hover .dropdown-content { display: block; }
-        .promo-banner { background-color: #ff9800; color: white; text-align: center; padding: 5px; }
+
+        .dropdown-content {
+            display: none; /* Hide by default */
+            position: absolute;
+            background-color: #ffffff; /* Background color */
+            min-width: 160px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 10; /* Higher z-index to overlay other elements */
+            border-radius: 4px; /* Rounded corners */
+            padding: 10px; /* Padding around dropdown items */
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block; /* Show dropdown on hover */
+        }
+
+        .dropdown-content a {
+            display: block; /* Display links as block elements */
+            padding: 10px; /* Add padding for better spacing */
+            color: #333; /* Text color */
+            text-decoration: none; /* Remove underline */
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1; /* Highlight on hover */
+        }
+
+        .promo-banner {
+            background-color: #ff9800;
+            color: white;
+            text-align: center;
+            padding: 5px;
+        }
+
+        .mobile-menu-toggle {
+            display: none; /* Hide by default, show on smaller screens */
+        }
+
+        .hamburger {
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px; /* Adjust as necessary */
+            height: 21px; /* Adjust as necessary */
+        }
+
+        .hamburger .line {
+            height: 3px;
+            background: #333; /* Line color */
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        /* Show hamburger menu on small screens */
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .mobile-header-content-area {
+                display: none; /* Hide mobile menu initially */
+            }
+
+            .mobile-header-content-area.show {
+                display: block; /* Show mobile menu when toggled */
+            }
+
+            .main-menu {
+                display: none; /* Hide main menu on small screens */
+            }
+
+            .main-menu.show {
+                display: flex;
+                flex-direction: column;
+                background-color: white; /* Background color of mobile menu */
+                position: absolute;
+                top: 60px; /* Adjust based on header height */
+                left: 0;
+                right: 0;
+                z-index: 999; /* Ensure it appears above other elements */
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 
@@ -51,10 +160,12 @@
                             <ul>
                                 <% if (locals.user) { %>
                                     <li class="dropdown">
-                                        <a href="/userprofile"><%= locals.user.username %> <i class="fi-rs-user"></i></a>
+                                        <a href="/userprofile" aria-haspopup="true" aria-expanded="false">
+                                            <%= locals.user.username %> <i class="fi-rs-user"></i>
+                                        </a>
                                         <div class="dropdown-content">
-                                            <a href="/userprofile">Profile</a>
-                                            <a href="/orderhistory">Order History</a>
+                                            <a href="/profile">Profile</a>
+                                            <a href="/orders">Order History</a>
                                             <a href="/logout">Logout</a>
                                         </div>
                                     </li>
@@ -91,6 +202,7 @@
                                 <input type="text" placeholder="Search for items...">
                             </form>
                         </div>
+                        
                         <div class="header-action-right">
                             <div class="header-action-2">
                                 <div class="header-action-icon-2">
@@ -102,12 +214,6 @@
                                     <a href="/cart">
                                         <img alt="Cart" src="evara-frontend/assets/imgs/theme/icons/icon-cart.svg">
                                     </a>
-                                    <!-- Mini cart preview -->
-                                    <div class="dropdown-content">
-                                        <p>Recently added item:</p>
-                                        <p>Item Name - $29.99</p>
-                                        <a href="/cart">View Cart</a>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -127,80 +233,36 @@
                             <nav>
                                 <ul>
                                     <li><a class="active" href="/">Home</a></li>
-                                    <li><a href="shop-grid-right.html">Shop</a></li>
+                                    <li class="dropdown"><a href="#">Shop</a>
+                                        <div class="dropdown-content">
+                                            <a href="/categories">Categoies</a>
+                                            <a href="/brands">Brands</a>
+                                            <a href="/cart">Cart</a>
+                                        </div></li>
+                                    <li><a href="/about">About Us</a></li>
+                                    <li><a href="/contact">Contact</a></li>
                                 </ul>
                             </nav>
+                        </div>
+                    </div>
+                    <div class="mobile-menu-toggle d-block d-lg-none">
+                        <div class="hamburger" onclick="toggleMobileMenu()">
+                            <div class="line"></div>
+                            <div class="line"></div>
+                            <div class="line"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </header>
-    <div class="mobile-header-active mobile-header-wrapper-style">
-        <div class="mobile-header-wrapper-inner">
-            <div class="mobile-header-top">
-                <div class="mobile-header-logo">
-                    <a href="index.html"><img src="evara-frontend/assets/imgs/theme/mobile-king.png" alt="logo"></a>
-                </div>
-                <div class="mobile-menu-close close-style-wrap close-style-position-inherit">
-                    <button class="close-style search-close">
-                        <i class="icon-top"></i>
-                        <i class="icon-bottom"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="mobile-header-content-area">
-                <div class="mobile-search search-style-3 mobile-header-border">
-                    <form action="#">
-                        <input type="text" placeholder="Search for items…">
-                        <button type="submit"><i class="fi-rs-search"></i></button>
-                    </form>
-                </div>
-                <div class="mobile-menu-wrap mobile-header-border">
-                    
-                    <!-- mobile menu start -->
-                    <nav>
-                        <ul class="mobile-menu">
-                            <li class="menu-item-has-children"><a href="/">Home</a>
-                            </li>
-                            <li class="menu-item-has-children"></span><a href="shop-grid-right.html">shop</a>
-                            </li>
-                            
-                        </ul>
-                    </nav>
-                    <!-- mobile menu end -->
-                </div>
-                <div class="mobile-header-info-wrap mobile-header-border">
-                    <div class="single-mobile-header-info mt-30">
-                        <a  href="page-contact.html"> Our location </a>
-                    </div>
-                    <%if(locals.user){%>
-                        <div class="dropdown">
-                            <div class="dropdown-content">
-                                <a href="/userProfile"><%=locals.user.name%></a>
-                                <a href="/logout">Logout</a>
-                            </div>
-                        </div>
-                    <%}else{%>
-                        <div class="single-mobile-header-info">
-                            <a href="login">Log In</a>
-                        </div>
-                        <div class="single-mobile-header-info">
-                            <a href="/signup">Sign Up</a>
-                        </div>
-                    <%}%>
-                </div>
-                <div class="mobile-social-icon">
-                    <h5 class="mb-15 text-grey-4">Follow Us</h5>
-                    <a href="#"><img src="evara-frontend/assets/imgs/theme/icons/icon-facebook.svg" alt=""></a>
-                    <a href="#"><img src="evara-frontend/assets/imgs/theme/icons/icon-twitter.svg" alt=""></a>
-                    <a href="#"><img src="evara-frontend/assets/imgs/theme/icons/icon-instagram.svg" alt=""></a>
-                    <a href="#"><img src="evara-frontend/assets/imgs/theme/icons/icon-pinterest.svg" alt=""></a>
-                    <a href="#"><img src="evara-frontend/assets/imgs/theme/icons/icon-youtube.svg" alt=""></a>
-                </div>
-            </div>
-        </div>
-    </div>
+
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.querySelector('.main-menu');
+            menu.classList.toggle('show'); // Toggle visibility of mobile menu
+        }
+    </script>
 </body>
 
 </html>
