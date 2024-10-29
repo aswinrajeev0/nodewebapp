@@ -12,8 +12,12 @@ const getProductDetails = async (req, res) => {
     const id = req.query.id;
     const productData = await Product.findOne({ _id: id });
     const category = await Category.findOne({ _id: productData.category });
+    const recommendedProducts = await Product.find({
+      category: productData.category,
+      _id: { $ne: productData._id }
+    }).limit(4);
 
-    res.render('product-details', { product: productData, cat: category });
+    res.render('product-details', { product: productData, cat: category, recProducts:recommendedProducts });
 
   } catch (error) {
     res.redirect('/page-not-found')
@@ -115,14 +119,14 @@ const getOrders = async (req, res) => {
     const { user: userId } = req.session;
 
     if (userId) {
-      const orders = await Order.find({ user: userId }).sort({ createdOn: -1 }); // Newest orders first
+      const orders = await Order.find({ user: userId }).sort({ createdOn: -1 });
       if (orders.length > 0) {
         res.render('orders', { orders });
       } else {
-        res.render('orders', { orders: [], message: "No orders found." }); // Message if no orders exist
+        res.render('orders', { orders: [], message: "No orders found." });
       }
     } else {
-      res.redirect('/login');
+      return res.redirect('/login');
     }
   } catch (error) {
     console.error("Error loading orders page", error);
@@ -143,6 +147,30 @@ const cancelOrder = async (req,res) => {
   }
 }
 
+const orderDetails = async (req, res) => {
+  try {
+    const orderId = req.query.id;
+    const user = req.session.user;
+
+    if (!user) {
+      return res.redirect('/login');
+    }
+
+    const order = await Order.findOne({ _id: orderId });
+    const address = await Address.findOne({ "addresses._id": order.address }, { "addresses.$": 1 });
+    
+    const products = await Promise.all(
+      order.orderedItems.map(async (item) => {
+        return await Product.findOne({ _id: item.product });
+      })
+    );
+
+    res.render('order-details', { order, products, address: address.addresses[0] });
+  } catch (error) {
+    console.error("Error getting order details",error);
+    res.redirect('/page-not-found');
+  }
+};
 
 
 module.exports = {
@@ -151,5 +179,6 @@ module.exports = {
   placeOrder,
   orderConfirm,
   getOrders,
-  cancelOrder
+  cancelOrder,
+  orderDetails
 }

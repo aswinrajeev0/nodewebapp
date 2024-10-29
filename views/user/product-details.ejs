@@ -261,6 +261,28 @@
         </div>
     </div>
 
+    <div class="recommended-products container mt-5">
+        <h4 class="text-center mb-4">Recommended Products</h4>
+        <div class="row">
+            <% recProducts.forEach(recommended => { %>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="card">
+                        <a href="/productdetails?id=<%= recommended._id %>">
+                            <img src="/uploads/re-image/<%= recommended.productImage[0] %>" 
+                                 class="card-img-top" alt="<%= recommended.productName %>">
+                        </a>
+                        <div class="card-body text-center">
+                            <h5 class="card-title"><%= recommended.productName %></h5>
+                            <p class="card-text text-primary">₹ <%= recommended.salePrice.toLocaleString() %></p>
+                            <a href="/productdetails?id=<%= recommended._id %>" class="btn btn-outline-success">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+    
+
     <%- include('../partials/user/footer') %>
 
 

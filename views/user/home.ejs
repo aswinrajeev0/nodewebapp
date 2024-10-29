@@ -31,7 +31,6 @@
             <div class="slider-arrow hero-slider-1-arrow"></div>
         </section><br>
         <section class="product-tabs section-padding position-relative wow fadeIn animated">
-            <div class="bg-square"></div>
             <div class="container">
                 <div class="tab-header">
                     <div class="sorting-container">
@@ -67,7 +66,8 @@
                                         </div>
                                         <div class="product-content-wrap">
                                             <h6><%= products[i].productName %></h6>
-                                            <h5>$<%= products[i].salePrice.toLocaleString() %></h5>
+                                            <h5>₹<%= products[i].salePrice.toLocaleString() %></h5>
+                                            <span class="text-danger">Stock: <%=products[i].quantity%></span>
                                             <p>Rating: <%= products[i].rating !== undefined ? products[i].rating : 'N/A' %></p>
                                         </div>
                                     </div>
@@ -143,7 +143,7 @@
                             </div>
                             <div class="product-content-wrap">
                                 <h6>${product.productName}</h6>
-                                <h5>$${product.salePrice.toLocaleString()}</h5>
+                                <h5>₹${product.salePrice.toLocaleString()}</h5>
                                 <p>Rating: ${product.rating !== undefined ? product.rating : 'N/A'}</p>
                             </div>
                         </div>

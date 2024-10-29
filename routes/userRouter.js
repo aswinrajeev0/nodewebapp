@@ -27,6 +27,7 @@ router.get('/auth/google/callback',passport.authenticate('google',{failureRedire
 //user authentication
 router.get('/login',userController.loadLogin)
 router.post('/login',userController.login);
+router.get('/logout-user',userController.getLogoutPage);
 router.get('/logout',userController.logout);
 router.get('/forgot-password',profileController.getForgotPassword);
 router.post('/forgot-email-valid',profileController.forgotEmailValid);
@@ -59,6 +60,7 @@ router.post('/place-order',productController.placeOrder);
 router.get('/order-confirmation',productController.orderConfirm);
 router.get('/orders',productController.getOrders);
 router.get('/cancel-order',productController.cancelOrder);
+router.get('/order-details',productController.orderDetails);
 
 
 

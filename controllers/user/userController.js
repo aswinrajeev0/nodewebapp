@@ -30,7 +30,7 @@ const loadHomepage = async (req, res) => {
     });
 
     productData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    productData = productData.slice(0, 4);
+    productData = productData.slice(0);
 
     if (user) {
       const userData = await User.findOne({ _id: user });
@@ -236,6 +236,21 @@ const login = async (req, res) => {
   }
 }
 
+const getLogoutPage = async (req,res) => {
+  try {
+    
+    const user = req.session.user;
+    if(!user){
+    }else{
+      res.render('logout-user');
+    }
+
+  } catch (error) {
+    console.error("Eroor loading logout page",error);
+    res.status(500).json("Server Error")
+  }
+}
+
 const logout = async (req, res) => {
   try {
 
@@ -304,6 +319,7 @@ module.exports = {
   resendOtp,
   loadLogin,
   login,
+  getLogoutPage,
   logout,
   sortProducts
 };
