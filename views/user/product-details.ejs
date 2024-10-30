@@ -99,6 +99,41 @@
         .action-btn:hover {
             color: #e74c3c;
         }
+
+        .product-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .cart-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .btn-buy-now {
+        background-color: #28a745;
+        color: white;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-radius: 4px;
+        width: 100%;
+        max-width: 300px;
+        transition: background-color 0.2s ease;
+    }
+
+    .btn-buy-now:hover {
+        background-color: #218838;
+        color: white;
+        text-decoration: none;
+    }
     </style>
 
 
@@ -178,10 +213,10 @@
                         <div class="clearfix product-price-cover text-center">
                             <div class="product-price primary-color">
                                 <ins><span class="text-brand">
-                                    ₹ <%=product.salePrice.toLocaleString()%>
+                                        ₹ <%=product.salePrice.toLocaleString()%>
                                     </span></ins>
                                 <ins><span class="old-price font-md ml-15">
-                                    ₹ <%=product.regularPrice.toLocaleString()%>
+                                        ₹ <%=product.regularPrice.toLocaleString()%>
                                     </span></ins>
                                 <span class="save-price font-md color3 ml-15">
                                     <%=product.productOffer%>%
@@ -198,11 +233,10 @@
                         <div class="attr-detail attr-color mb-15 text-center">
                             <strong class="mr-10">Color: <%=product.color%></strong>
                         </div>
-                        <% if(product.quantity> 0) { %>
+                        <% if(product.quantity > 0) { %>
                             <div class="bt-1 border-color-1 mt-30 mb-30"></div>
-                            <div class="detail-extralink text-center">
-                                <form action="/add-to-cart?id=<%= product._id %>" method="POST"
-                                    style="display: flex; align-items: center;">
+                            <div class="product-actions">
+                                <div class="cart-actions">
                                     <div class="detail-qty">
                                         <input type="text" name="quantity" value="1" class="qty-val" id="qty-val" readonly>
                                         <div class="qty-controls">
@@ -214,34 +248,26 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <div class="product-extra-link2">
+                                    <form action="/add-to-cart?id=<%= product._id %>" method="POST" style="display: inline;">
+                                        <input type="hidden" name="quantity" value="1">
                                         <button type="submit" class="btn btn-success">Add to cart</button>
-                                    </div>
-                                </form>
-
-                                <button type="button" aria-label="Add To Wishlist" class="action-btn hover-up"
-                                    onclick="addToWishlist()">
-                                    <i class="fi-rs-heart"></i>
-                                </button>
-                                
-                            </div><br>
-                            <div class="product-extra-link2 d-flex justify-content-center">
-                                <a href="/checkout?id=<%= product._id %>" class="btn btn-success w-100" style="max-width: 300px;">Buy Now</a>
-                            </div>
-                            
-
-                            <% } else { %>
-                                <div class="bt-1 border-color-1 mt-30 mb-30"></div>
-                                <div class="detail-extralink text-center">
-                                    <p class="text-danger font-weight-bold">Sold Out</p>
-                                    <div class="product-extra-link2 d-inline-block">
-                                        <button type="button" class="button button-add-to-cart" disabled
-                                            style="background-color: #d3d3d3; cursor: not-allowed;">Sold Out</button>
-                                        <a aria-label="Add To Wishlist" class="action-btn hover-up" href="#"><i
-                                                class="fi-rs-heart"></i></a>
-                                    </div>
+                                    </form>
+                                    <button type="button" aria-label="Add To Wishlist" class="action-btn hover-up" onclick="addToWishlist()">
+                                        <i class="fi-rs-heart"></i>
+                                    </button>
                                 </div>
-                                <% } %>
+                                <a href="/checkout?id=<%= product._id %>" class="btn-buy-now">Buy Now</a>
+                            </div>
+                        <% } else { %>
+                            <div class="bt-1 border-color-1 mt-30 mb-30"></div>
+                            <div class="detail-extralink text-center">
+                                <p class="text-danger font-weight-bold">Sold Out</p>
+                                <div class="product-extra-link2 d-inline-block">
+                                    <button type="button" class="button button-add-to-cart" disabled style="background-color: #d3d3d3; cursor: not-allowed;">Sold Out</button>
+                                    <a aria-label="Add To Wishlist" class="action-btn hover-up" href="#"><i class="fi-rs-heart"></i></a>
+                                </div>
+                            </div>
+                        <% } %>
 
                                     <%if(product.quantity> 0){%>
                                         <ul class="product-meta font-xs color-grey mt-50 text-center"><br>
@@ -264,33 +290,39 @@
     <div class="recommended-products container mt-5">
         <h4 class="text-center mb-4">Recommended Products</h4>
         <div class="row">
-            <% recProducts.forEach(recommended => { %>
+            <% recProducts.forEach(recommended=> { %>
                 <div class="col-md-3 col-sm-6 mb-4">
                     <div class="card">
                         <a href="/productdetails?id=<%= recommended._id %>">
-                            <img src="/uploads/re-image/<%= recommended.productImage[0] %>" 
-                                 class="card-img-top" alt="<%= recommended.productName %>">
+                            <img src="/uploads/re-image/<%= recommended.productImage[0] %>" class="card-img-top"
+                                alt="<%= recommended.productName %>">
                         </a>
                         <div class="card-body text-center">
-                            <h5 class="card-title"><%= recommended.productName %></h5>
-                            <p class="card-text text-primary">₹ <%= recommended.salePrice.toLocaleString() %></p>
-                            <a href="/productdetails?id=<%= recommended._id %>" class="btn btn-outline-success">View Details</a>
+                            <h5 class="card-title">
+                                <%= recommended.productName %>
+                            </h5>
+                            <p class="card-text text-primary">₹ <%= recommended.salePrice.toLocaleString() %>
+                            </p>
+                            <a href="/productdetails?id=<%= recommended._id %>" class="btn btn-outline-success">View
+                                Details</a>
                         </div>
                     </div>
                 </div>
-            <% }) %>
+                <% }) %>
         </div>
     </div>
-    
+
 
     <%- include('../partials/user/footer') %>
 
 
         <script>
+            const maxQuantity = '<%= product.quantity %>';
+
             function updateQuantity(change) {
                 const qtyInput = document.getElementById('qty-val');
                 let currentQty = parseInt(qtyInput.value);
-                currentQty = Math.max(1, currentQty + change); // Ensure quantity is at least 1
+                currentQty = Math.max(1, Math.min(maxQuantity, currentQty + change));
                 qtyInput.value = currentQty;
             }
 

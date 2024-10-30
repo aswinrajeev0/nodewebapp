@@ -23,9 +23,21 @@ const updateOrderStatus = async (req, res) => {
     try {
         const { orderId, newStatus } = req.body;
 
-        await Order.findByIdAndUpdate(orderId, { status: newStatus });
+        const order = await Order.findById(orderId);
+        if (order) {
+            if (newStatus === 'canceled') {
+                for (const item of order.items) {
+                    await Product.findByIdAndUpdate(item.productId, {
+                        $inc: { stock: item.quantity }
+                    });
+                }
+            }
+            await Order.findByIdAndUpdate(orderId, { status: newStatus });
 
-        res.json({ success: true });
+            return res.json({ success: true });
+        } else {
+            res.json({ success: false, message: 'Order not found' });
+        }
     } catch (error) {
         console.error('Error updating order status:', error);
         res.json({ success: false });

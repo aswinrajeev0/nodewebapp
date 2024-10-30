@@ -236,10 +236,12 @@ const getAddAddress = async (req,res) => {
 
 const saveAddress = async (req, res) => {
     try {
-        const { id } = req.query;
+        const userId = req.session.user;
+        const { addressId } = req.body;
+        console.log(addressId);
         const { addressType, name, city, streetAddress, state, pincode, phone, altPhone } = req.body;
 
-        const newAddress = {
+        const updatedAddress = {
             addressType,
             name,
             state,
@@ -250,25 +252,35 @@ const saveAddress = async (req, res) => {
             altPhone,
         };
 
-        let addressDoc = await Address.findOne({ userId: id });
+        let addressDoc = await Address.findOne({ userId: userId });
 
         if (addressDoc) {
-            addressDoc.addresses.push(newAddress);
+            if (addressId) {
+                const addressIndex = addressDoc.addresses.findIndex(addr => addr._id.toString() === addressId);
+                if (addressIndex !== -1) {
+                    addressDoc.addresses[addressIndex] = { ...addressDoc.addresses[addressIndex], ...updatedAddress };
+                } else {
+                    return res.status(404).json({ message: "Address not found" });
+                }
+            } else {
+                addressDoc.addresses.push(updatedAddress);
+            }
             await addressDoc.save();
+            res.status(200).json({ message: "Address saved successfully", address: addressDoc });
         } else {
             addressDoc = new Address({
-                userId: id,
-                addresses: [newAddress],
+                userId: userId,
+                addresses: [updatedAddress],
             });
             await addressDoc.save();
+            res.status(201).json({ message: "Address saved successfully", address: addressDoc });
         }
-
-        res.status(201).json({ message: "Address saved successfully", address: addressDoc });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Error saving address" });
     }
 };
+
 
 const deleteAddress = async (req,res) => {
     try {
@@ -296,6 +308,34 @@ const deleteAddress = async (req,res) => {
     }
 }
 
+const editAddress = async (req, res) => {
+    const userId = req.session.user;
+    const addressId = req.query.id;
+
+    try {
+        if (!userId) {
+            return res.redirect('/login');
+        }
+
+        const addressDoc = await Address.findOne({ userId: userId });
+
+        if (addressDoc) {
+            const address = addressDoc.addresses.find(addr => addr._id.toString() === addressId);
+            if (address) {
+                res.render('edit-address', { address });
+            } else {
+                res.status(404).send('Address not found');
+            }
+        } else {
+            res.status(404).send('Address document not found');
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server error');
+    }
+};
+
+
 
 
 module.exports = {
@@ -310,5 +350,6 @@ module.exports = {
     getAddAddress,
     saveAddress,
     getAddress,
-    deleteAddress
+    deleteAddress,
+    editAddress
 }

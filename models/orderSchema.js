@@ -72,6 +72,16 @@ const orderSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  paymentMethod: {
+    type: String,
+    enum: ['COD', 'Online'],
+    required: true
+},
+paymentStatus: {
+    type: String,
+    enum: ['Pending', 'Processing', 'Completed', 'Failed'],
+    default: 'Pending'
+}
 });
 
 const Order = mongoose.model("Order", orderSchema);

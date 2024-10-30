@@ -42,7 +42,7 @@ router.post('/updateprofile',profileController.updateProfile);
 router.get('/add-address',profileController.getAddAddress);
 router.post('/save-address',profileController.saveAddress);
 router.get('/address',profileController.getAddress);
-// router.get('/edit-address',profileController.editAddress);
+router.get('/edit-address',profileController.editAddress);
 router.get('/delete-address',profileController.deleteAddress);
 
 //product details

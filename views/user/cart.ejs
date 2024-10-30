@@ -140,10 +140,12 @@
                                             <tbody>
                                                 <tr>
                                                     <td class="cart_total_label">Cart Subtotal</td>
-                                                    <td class="cart_total_amount"><span class="font-lg fw-900 text-brand">₹ <%= totalAmount.toLocaleString() %></span></td>
+                                                    <td class="cart_total_amount"><span
+                                                            class="font-lg fw-900 text-brand">₹ <%=
+                                                                totalAmount.toLocaleString() %></span></td>
                                                 </tr>
                                             </tbody>
-                                            
+
                                         </table>
                                     </div>
                                     <a href="/checkout" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To
@@ -177,6 +179,18 @@
 
 
         function updateQuantity(productId, change) {
+            const quantityElement = document.getElementById(`quantity-${productId}`);
+            const currentQuantity = parseInt(quantityElement.textContent);
+
+            if (currentQuantity + change < 1) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Minimum Quantity Reached",
+                    text: "The minimum quantity is 1.",
+                });
+                return;
+            }
+
             fetch(`/update-cart-quantity`, {
                 method: "POST",
                 headers: {
@@ -187,7 +201,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        document.getElementById(`quantity-${productId}`).textContent = data.newQuantity;
+                        quantityElement.textContent = data.newQuantity;
                         document.getElementById(`subtotal-${productId}`).textContent = `₹ ${data.newSubtotal.toLocaleString()}`;
                         document.getElementById("total-price").textContent = `₹ ${data.totalPrice.toLocaleString()}`;
                     } else {
@@ -202,6 +216,7 @@
                     console.error("Error:", error);
                 });
         }
+
 
     </script>
 

@@ -1,70 +1,148 @@
-<!DOCTYPE html>
-<html class="no-js" lang="en">
+<%- include('../partials/user/header') %>
 
-<head>
-    <meta charset="utf-8">
-    <title>Evara - Order Confirmation</title>
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="description" content="Order Confirmation Page">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" type="image/x-icon" href="evara-frontend/assets/imgs/theme/favicon.svg">
-    <link rel="stylesheet" href="evara-frontend/assets/css/main.css?v=3.4">
-</head>
+<style>
+    .page-confirmation {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        padding: 40px 0;
+        background-color: #f8f9fa;
+    }
 
-<body>
-    <main class="main page-confirmation">
-        <div class="container">
-            <div class="row align-items-center height-100vh text-center">
-                <div class="col-lg-8 m-auto">
-                    <p class="mb-50"><img src="evara-frontend/assets/imgs/theme/success.png" alt="Success" class="hover-up"></p>
-                    <h2 class="mb-30">Order Confirmed!</h2>
-                    <p class="font-lg text-grey-700 mb-30">
-                        Thank you for your order! Your order number is <strong>#12345</strong>.<br> 
-                        You will receive an email confirmation shortly. 
-                    </p>
-                    <a class="btn btn-default submit-auto-width font-xs hover-up" href="/">Back To Home Page</a>
-                    <a class="btn btn-default submit-auto-width font-xs hover-up" href="/orders">View Your Orders</a>
-                </div>
-            </div>
-        </div>
-    </main>
-    <!-- Preloader Start -->
-    <div id="preloader-active">
-        <div class="preloader d-flex align-items-center justify-content-center">
-            <div class="preloader-inner position-relative">
-                <div class="text-center">
-                    <h5 class="mb-5">Now Loading</h5>
-                    <div class="loader">
-                        <div class="bar bar1"></div>
-                        <div class="bar bar2"></div>
-                        <div class="bar bar3"></div>
-                    </div>
+    .confirmation-card {
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .success-icon {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 25px;
+        animation: bounce 1s ease-in-out;
+    }
+
+    .order-number {
+        color: #28a745;
+        font-weight: 600;
+        font-size: 1.2em;
+    }
+
+    .confirmation-title {
+        color: #333;
+        font-size: 2.2em;
+        margin-bottom: 20px;
+        font-weight: 700;
+    }
+
+    .confirmation-message {
+        color: #666;
+        font-size: 1.1em;
+        line-height: 1.6;
+        margin-bottom: 30px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 30px;
+    }
+
+    .action-button {
+        padding: 12px 30px;
+        border-radius: 5px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        min-width: 180px;
+    }
+
+    .btn-home {
+        background-color: #28a745;
+        color: white;
+        border: 2px solid #28a745;
+    }
+
+    .btn-home:hover {
+        background-color: #218838;
+        border-color: #218838;
+        color: white;
+    }
+
+    .btn-orders {
+        background-color: white;
+        color: #28a745;
+        border: 2px solid #28a745;
+    }
+
+    .btn-orders:hover {
+        background-color: #f8f9fa;
+        color: #218838;
+        border-color: #218838;
+    }
+
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+        }
+        40% {
+            transform: translateY(-20px);
+        }
+        60% {
+            transform: translateY(-10px);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .confirmation-card {
+            padding: 30px 20px;
+            margin: 0 15px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .action-button {
+            width: 100%;
+        }
+
+        .confirmation-title {
+            font-size: 1.8em;
+        }
+
+        .confirmation-message {
+            font-size: 1em;
+        }
+    }
+</style>
+
+<main class="main page-confirmation">
+    <div class="container">
+        <div class="confirmation-card">
+            <div class="text-center">
+                <img src="evara-frontend/assets/imgs/theme/success.png" alt="Success" class="success-icon">
+                
+                <h1 class="confirmation-title">Order Confirmed!</h1>
+                
+                <p class="confirmation-message">
+                    Thank you for your order! <br>
+                    Your order number is <span class="order-number">#12345</span><br>
+                    You will receive an email confirmation shortly.
+                </p>
+
+                <div class="action-buttons">
+                    <a href="/" class="action-button btn-home">Back To Home</a>
+                    <a href="/orders" class="action-button btn-orders">View Orders</a>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Vendor JS-->
-    <script src="evara-frontend/assets/js/vendor/modernizr-3.6.0.min.js"></script>
-    <script src="evara-frontend/assets/js/vendor/jquery-3.6.0.min.js"></script>
-    <script src="evara-frontend/assets/js/vendor/jquery-migrate-3.3.0.min.js"></script>
-    <script src="evara-frontend/assets/js/vendor/bootstrap.bundle.min.js"></script>
-    <script src="evara-frontend/assets/js/plugins/slick.js"></script>
-    <script src="evara-frontend/assets/js/plugins/jquery.syotimer.min.js"></script>
-    <script src="evara-frontend/assets/js/plugins/wow.js"></script>
-    <script src="evara-frontend/assets/js/plugins/jquery-ui.js"></script>
-    <script src="evara-frontend/assets/js/plugins/perfect-scrollbar.js"></script>
-    <script src="evara-frontend/assets/js/plugins/magnific-popup.js"></script>
-    <script src="evara-frontend/assets/js/plugins/select2.min.js"></script>
-    <script src="evara-frontend/assets/js/plugins/waypoints.js"></script>
-    <script src="evara-frontend/assets/js/plugins/counterup.js"></script>
-    <script src="evara-frontend/assets/js/plugins/jquery.countdown.min.js"></script>
-    <script src="evara-frontend/assets/js/plugins/images-loaded.js"></script>
-    <script src="evara-frontend/assets/js/plugins/isotope.js"></script>
-    <script src="evara-frontend/assets/js/plugins/scrollup.js"></script>
-    <script src="evara-frontend/assets/js/plugins/jquery.vticker-min.js"></script>
-    <script src="evara-frontend/assets/js/plugins/jquery.theia.sticky.js"></script>
-    <!-- Template JS -->
-    <script src="./evara-frontend/assets/js/main.js?v=3.4"></script>
-</body>
+</main>
 
-</html>
+<%- include('../partials/user/footer') %>

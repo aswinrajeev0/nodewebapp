@@ -9,6 +9,8 @@ const Order = require('../../models/orderSchema');
 const getProductDetails = async (req, res) => {
   try {
 
+    const userId = req.session.user;
+    const user = await User.findById(userId);
     const id = req.query.id;
     const productData = await Product.findOne({ _id: id });
     const category = await Category.findOne({ _id: productData.category });
@@ -17,7 +19,12 @@ const getProductDetails = async (req, res) => {
       _id: { $ne: productData._id }
     }).limit(4);
 
-    res.render('product-details', { product: productData, cat: category, recProducts:recommendedProducts });
+    res.render('product-details', {
+            product: productData,
+            cat: category,
+            recProducts: recommendedProducts,
+            user: user
+        });
 
   } catch (error) {
     res.redirect('/page-not-found')
@@ -61,44 +68,59 @@ const getCheckout = async (req, res) => {
 
 const placeOrder = async (req, res) => {
   try {
-    const { cart, totalPrice, addressId, singleProduct } = req.body;
-    const userId = req.session.user;
+      const { cart, totalPrice, addressId, singleProduct, payment_method } = req.body;
+      const userId = req.session.user;
 
-    let orderedItems = [];
+      let orderedItems = [];
+      let paymentStatus = payment_method === 'COD' ? 'Pending' : 'Processing';
 
-    if (singleProduct) {
-      const product = JSON.parse(singleProduct);
-      orderedItems.push({
-        product: product._id,
-        quantity: 1,
-        price: product.salePrice,
+      if (singleProduct) {
+          const product = JSON.parse(singleProduct);
+          orderedItems.push({
+              product: product._id,
+              quantity: 1,
+              price: product.salePrice,
+          });
+      } else {
+          const cartItems = JSON.parse(cart);
+          orderedItems = cartItems.map(item => ({
+              product: item.productId,
+              quantity: item.quantity,
+              price: item.totalPrice / item.quantity,
+          }));
+      }
+
+      const discount = 0;
+      const finalAmount = totalPrice - discount;
+
+      const newOrder = new Order({
+          orderedItems,
+          totalPrice,
+          finalAmount,
+          user: userId,
+          address: addressId,
+          status: 'Pending',
+          paymentMethod: payment_method,
+          paymentStatus: paymentStatus,
       });
-    } else {
-      const cartItems = JSON.parse(cart);
-      orderedItems = cartItems.map(item => ({
-        product: item.productId,
-        quantity: item.quantity,
-        price: item.totalPrice / item.quantity,
-      }));
-    }
 
-    const discount = 0;
-    const finalAmount = totalPrice - discount;
+      await newOrder.save();
 
-    const newOrder = new Order({
-      orderedItems,
-      totalPrice,
-      finalAmount,
-      user:userId,
-      address: addressId,
-      status: 'Pending',
-    });
+      for (const item of orderedItems) {
+          await Product.findByIdAndUpdate(item.product, {
+              $inc: { quantity: -item.quantity }
+          });
+      }
 
-    await newOrder.save();
-    res.redirect('/order-confirmation');
+      if (payment_method === 'Online') {
+          res.redirect('/payment-gateway?orderId=' + newOrder._id);
+      } else {
+          res.redirect('/order-confirmation');
+      }
+
   } catch (error) {
-    console.error("Error placing order:", error);
-    res.redirect('/checkout');
+      console.error("Error placing order:", error);
+      res.redirect('/checkout');
   }
 };
 

@@ -6,6 +6,35 @@
         margin-right: 10px;
         cursor: pointer;
     }
+    
+    .payment_option {
+        margin: 15px 0;
+    }
+    
+    .custome-radio {
+        margin-bottom: 10px;
+        padding: 10px;
+        border: 1px solid #e2e2e2;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+    
+    .custome-radio:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .custome-radio input[type="radio"] {
+        margin-right: 10px;
+    }
+    
+    .custome-radio label {
+        cursor: pointer;
+        font-weight: 500;
+    }
+    
+    .form-check-input:checked + label {
+        color: #28a745;
+    }
 </style>
 
     <main class="main">
@@ -36,20 +65,21 @@
                                                 <%= addr.addressType %>
                                             </strong><br>
                                             <%= addr.name %><br>
-                                                <%= addr.streetAddress %><br>
-                                                    <%= addr.city %>, <%= addr.state %><br>
-                                                            <%= addr.pincode %><br>
-                                                                <%= addr.phone %>
-                                                                    <% if (addr.altPhone) { %>&nbsp; | &nbsp; <%=
-                                                                            addr.altPhone %>
-                                                                            <% } %>
+                                            <%= addr.streetAddress %><br>
+                                            <%= addr.city %>, <%= addr.state %><br>
+                                            <%= addr.pincode %><br>
+                                            <%= addr.phone %>
+                                            <% if (addr.altPhone) { %>&nbsp; | &nbsp; 
+                                                <%= addr.altPhone %>
+                                           <% } %>
                                         </div>
                                     </label>
                                 </div>
                                 <% }); %>
                                     <% } else { %>
                                         <p>No addresses available.</p>
-                                        <% } %>
+                                        <a href="/add-address" class="btn">Add one</a>
+                                    <% } %>
                     </div>
 
                     <div class="col-md-6">
@@ -84,35 +114,35 @@
                                                 <%= totalPrice.toLocaleString() %>
                                             </td>
                                         </tr>
-                                        <% } else if (cart && cart.items.length> 0) { %>
+                                    <% } else if (cart && cart.items.length> 0) { %>
                                             <!-- Cart Items Case -->
-                                            <% cart.items.forEach(item=> { %>
-                                                <tr>
-                                                    <td class="image product-thumbnail"><img
-                                                            src="/uploads/re-image/<%= item.productId.productImage[0] %>"
-                                                            alt="<%= item.productId.productName %>"></td>
-                                                    <td>
-                                                        <h5>
-                                                            <%= item.productId.productName %>
-                                                        </h5>
-                                                        <span>Units: <%= item.quantity %></span>
-                                                    </td>
-                                                    <td>
-                                                        <%= item.totalPrice.toLocaleString() %>
-                                                    </td>
-                                                </tr>
-                                                <% }); %>
-                                                    <tr>
-                                                        <th>SubTotal</th>
-                                                        <td colspan="2">
-                                                            <%= totalPrice.toLocaleString() %>
-                                                        </td>
-                                                    </tr>
-                                                    <% } else { %>
-                                                        <tr>
-                                                            <td colspan="3">No items in cart or product selection.</td>
-                                                        </tr>
-                                                        <% } %>
+                                       <% cart.items.forEach(item=> { %>
+                                        <tr>
+                                            <td class="image product-thumbnail"><img
+                                                src="/uploads/re-image/<%= item.productId.productImage[0] %>"
+                                                alt="<%= item.productId.productName %>"></td>
+                                            <td>
+                                                <h5>
+                                                        <%= item.productId.productName %>
+                                                </h5>
+                                            <span>Units: <%= item.quantity %></span>
+                                            </td>
+                                            <td>
+                                                <%= item.totalPrice.toLocaleString() %>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                        <tr>
+                                            <th>SubTotal</th>
+                                            <td colspan="2">
+                                                <%= totalPrice.toLocaleString() %>
+                                            </td>
+                                        </tr>
+                                    <% } else { %>
+                                       <tr>
+                                            <td colspan="3">No items in cart or product selection.</td>
+                                        </tr>
+                                    <% } %>
                                 </tbody>
                             </table>
 
@@ -122,14 +152,13 @@
                                     <h4>Select Payment Method</h4><br>
                                     <div class="payment_option">
                                         <div class="custome-radio">
-                                            <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios3" checked="">
-                                            <label class="form-check-label" for="exampleRadios3" data-bs-toggle="collapse" data-target="#COD" aria-controls="bankTranfer">COD</label>
-                                            
+                                            <input class="form-check-input" required type="radio" name="payment_method" value="COD" id="cod" checked>
+                                            <label class="form-check-label" for="cod">Cash On Delivery (COD)</label>
                                         </div>
                                         
                                         <div class="custome-radio">
-                                            <input class="form-check-input" required="" type="radio" name="payment_option" id="exampleRadios5" checked="">
-                                            <label class="form-check-label" for="exampleRadios5" data-bs-toggle="collapse" data-target="#paypal" aria-controls="paypal">Paypal</label>
+                                            <input class="form-check-input" required type="radio" name="payment_method" value="Online" id="online">
+                                            <label class="form-check-label" for="online">Online Payment</label>
                                         </div>
                                     </div>
                                 </div>

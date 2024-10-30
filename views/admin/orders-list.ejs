@@ -44,15 +44,16 @@
                             <thead>
                                 <tr>
                                     <th>#ID</th>
-                                    <th scope="col">Product</th>
                                     <th scope="col">Date</th>
+                                    <th scope="col">Product</th>
+                                    <th scope="col">Quantity</th>
                                     <th scope="col">Name</th>
                                     <th scope="col">Total</th>
                                     <th scope="col">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <%for(let i=0;i<orders.length;i++){%>
+                                <%for(let i=orders.length-1;i>=0;i--){%>
                                     <tr>
                                         <td><%=orders[i].orderId%></td>
                                         <td><%=orders[i].createdOn.toLocaleDateString()%></td>
@@ -61,6 +62,13 @@
                                                 <% orders[i].orderedItems.forEach(item => { %>
                                                     <li><%= item.product.productName %></li>
                                                 <% }) %>
+                                            </ul>
+                                        </td>
+                                        <td>
+                                            <ul>
+                                                <%orders[i].orderedItems.forEach(item => {%>
+                                                   <li><%= item.quantity %></li> 
+                                                <%})%>
                                             </ul>
                                         </td>
                                         <td><b><%= orders[i].user ? orders[i].user.username : 'User not found' %></b></td>

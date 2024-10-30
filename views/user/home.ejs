@@ -51,33 +51,48 @@
                 <div class="tab-content wow fadeIn animated" id="myTabContent">
                     <div class="tab-pane fade show active" id="tab-one" role="tabpanel" aria-labelledby="tab-one">
                         <div class="row product-grid-4" id="products-container">
-                            <% for (let i = 0; i < products.length; i++) { %>
+                            <% for (let i=0; i < products.length; i++) { %>
                                 <div class="col-lg-3 col-md-4 col-12 col-sm-6">
                                     <div class="product-cart-wrap mb-30">
                                         <div class="product-img-action-wrap">
                                             <div class="product-img product-img-zoom">
                                                 <a href="/productdetails?id=<%= products[i]._id %>">
-                                                    <img class="default-img" src="/uploads/re-image/<%= products[i].productImage[0] %>" alt="<%= products[i].productName %>">
+                                                    <img class="default-img"
+                                                        src="/uploads/re-image/<%= products[i].productImage[0] %>"
+                                                        alt="<%= products[i].productName %>">
                                                 </a>
                                             </div>
                                             <div class="product-action-1">
-                                                <a aria-label="Add To Cart" class="action-btn hover-up" href="/add-to-cart?id=<%= products[i]._id %>"><i class="fi-rs-shopping-bag-add"></i></a>
+                                                <a aria-label="Add To Cart" class="action-btn hover-up"
+                                                    href="/add-to-cart?id=<%= products[i]._id %>"><i
+                                                        class="fi-rs-shopping-bag-add"></i></a>
                                             </div>
                                         </div>
                                         <div class="product-content-wrap">
-                                            <h6><%= products[i].productName %></h6>
-                                            <h5>₹<%= products[i].salePrice.toLocaleString() %></h5>
-                                            <span class="text-danger">Stock: <%=products[i].quantity%></span>
-                                            <p>Rating: <%= products[i].rating !== undefined ? products[i].rating : 'N/A' %></p>
+                                            <h6>
+                                                <%= products[i].productName %>
+                                            </h6>
+                                            <h5>₹<%= products[i].salePrice.toLocaleString() %>
+                                            </h5>
+                                            <%if(products[i].quantity>0){%>
+                                                <span class="text-success">
+                                                    <%=products[i].quantity%> stocks left
+                                                </span>
+                                                <%}else{%>
+                                                    <span class="text-danger">Out of Stock</span>
+                                                    <%}%>
+                                                        <p>Rating: <%= products[i].rating !==undefined ?
+                                                                products[i].rating : 'N/A' %>
+                                                        </p>
                                         </div>
                                     </div>
                                 </div>
-                            <% } %>
+                                <% } %>
                         </div>
                     </div>
                 </div>
-                
-                
+
+
                 <!--End tab-content-->
             </div>
         </section>
@@ -128,7 +143,7 @@
             }
 
             products.forEach(product => {
-                const productHTML =`
+                const productHTML = `
                     <div class="col-lg-3 col-md-4 col-12 col-sm-6">
                         <div class="product-cart-wrap mb-30">
                             <div class="product-img-action-wrap">
@@ -144,6 +159,10 @@
                             <div class="product-content-wrap">
                                 <h6>${product.productName}</h6>
                                 <h5>₹${product.salePrice.toLocaleString()}</h5>
+                                ${product.quantity > 0
+                                        ? `<span class="text-success">${product.quantity} stocks left</span>`
+                                        : `<span class="text-danger">Out of Stock</span>`
+                                    }
                                 <p>Rating: ${product.rating !== undefined ? product.rating : 'N/A'}</p>
                             </div>
                         </div>
