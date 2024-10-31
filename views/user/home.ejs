@@ -62,28 +62,28 @@
                                                         alt="<%= products[i].productName %>">
                                                 </a>
                                             </div>
-                                            <div class="product-action-1">
+                                            <!-- <div class="product-action-1">
                                                 <a aria-label="Add To Cart" class="action-btn hover-up"
                                                     href="/add-to-cart?id=<%= products[i]._id %>"><i
                                                         class="fi-rs-shopping-bag-add"></i></a>
-                                            </div>
+                                            </div> -->
                                         </div>
                                         <div class="product-content-wrap">
-                                            <h6>
+                                            <h4>
                                                 <%= products[i].productName %>
-                                            </h6>
-                                            <h5>₹<%= products[i].salePrice.toLocaleString() %>
+                                            </h4><br>
+                                            <h5 class="text-">₹<%= products[i].salePrice.toLocaleString() %>
                                             </h5>
+                                            <p>Rating: <%= products[i].rating !==undefined ?
+                                                    products[i].rating : 'N/A' %>
+                                            </p>
                                             <%if(products[i].quantity>0){%>
                                                 <span class="text-success">
                                                     <%=products[i].quantity%> stocks left
                                                 </span>
-                                                <%}else{%>
-                                                    <span class="text-danger">Out of Stock</span>
-                                                    <%}%>
-                                                        <p>Rating: <%= products[i].rating !==undefined ?
-                                                                products[i].rating : 'N/A' %>
-                                                        </p>
+                                            <%}else{%>
+                                                <span class="text-danger">Out of Stock</span>
+                                            <%}%>
                                         </div>
                                     </div>
                                 </div>

@@ -272,10 +272,45 @@
                 isValid = false;
             }
 
-            // Password validation
+            // Password validation with strength checks
             if (password === "") {
                 document.getElementById('passwordError').textContent = "Password is required";
                 isValid = false;
+            } else {
+                // Password strength criteria
+                const minLength = 8;
+                const hasUpperCase = /[A-Z]/.test(password);
+                const hasLowerCase = /[a-z]/.test(password);
+                const hasNumbers = /\d/.test(password);
+                const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+                let strengthErrors = [];
+
+                // Check each criteria
+                if (password.length < minLength) {
+                    strengthErrors.push("at least 8 characters");
+                }
+                if (!hasUpperCase) {
+                    strengthErrors.push("an uppercase letter");
+                }
+                if (!hasLowerCase) {
+                    strengthErrors.push("a lowercase letter");
+                }
+                if (!hasNumbers) {
+                    strengthErrors.push("a number");
+                }
+                if (!hasSpecialChar) {
+                    strengthErrors.push("a special character");
+                }
+
+                // If any criteria failed, show error message
+                if (strengthErrors.length > 0) {
+                    document.getElementById('passwordError').textContent =
+                        `Password must contain ${strengthErrors.join(", ")}`;
+                    isValid = false;
+                } else {
+                    document.getElementById('passwordError').textContent = "";
+                }
             }
 
             // Confirm Password validation
@@ -285,6 +320,8 @@
             } else if (password !== cpassword) {
                 document.getElementById('cpasswordError').textContent = "Passwords do not match";
                 isValid = false;
+            } else {
+                document.getElementById('cpasswordError').textContent = "";
             }
 
             // Terms checkbox validation

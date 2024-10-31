@@ -46,7 +46,7 @@
                                     <td>
                                         <%= products[i].productName %>
                                     </td>
-                                    <td>Electronics</td>
+                                    <td><%=products[i].category.name%></td>
                                     <td>
                                         <%= products[i].quantity %>
                                     </td>
@@ -65,7 +65,7 @@
             </div>
         </div>
     </section>
-    <%- include("../../views/partials/admin/footer") %>
+<%- include("../../views/partials/admin/footer") %>
 
         <script>
             function updateStock(productId) {

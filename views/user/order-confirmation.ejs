@@ -5,8 +5,16 @@
         min-height: calc(100vh - 200px);
         display: flex;
         align-items: center;
+        justify-content: center;
         padding: 40px 0;
         background-color: #f8f9fa;
+    }
+
+    .confirmation-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     .confirmation-card {
@@ -16,13 +24,34 @@
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
         max-width: 800px;
         margin: 0 auto;
+        width: 100%;
+        text-align: center;
+    }
+
+    .card-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
     }
 
     .success-icon {
-        width: 80px;
-        height: 80px;
+        font-size: 64px;
+        color: #28a745;
         margin-bottom: 25px;
+        display: inline-block;
         animation: bounce 1s ease-in-out;
+    }
+
+    .success-circle {
+        width: 100px;
+        height: 100px;
+        background: #e8f5e9;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 25px;
     }
 
     .order-number {
@@ -59,6 +88,7 @@
         transition: all 0.3s ease;
         text-decoration: none;
         min-width: 180px;
+        text-align: center;
     }
 
     .btn-home {
@@ -106,6 +136,7 @@
         .action-buttons {
             flex-direction: column;
             gap: 10px;
+            width: 100%;
         }
 
         .action-button {
@@ -119,14 +150,25 @@
         .confirmation-message {
             font-size: 1em;
         }
+
+        .success-circle {
+            width: 80px;
+            height: 80px;
+        }
+
+        .success-icon {
+            font-size: 48px;
+        }
     }
 </style>
 
 <main class="main page-confirmation">
-    <div class="container">
+    <div class="confirmation-container">
         <div class="confirmation-card">
-            <div class="text-center">
-                <img src="evara-frontend/assets/imgs/theme/success.png" alt="Success" class="success-icon">
+            <div class="card-content">
+                <div class="success-circle">
+                    <span class="success-icon">✓</span>
+                </div>
                 
                 <h1 class="confirmation-title">Order Confirmed!</h1>
                 

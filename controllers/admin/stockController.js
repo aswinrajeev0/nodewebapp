@@ -3,7 +3,7 @@ const Product = require('../../models/productSchema');
 const getStocks = async (req,res) => {
     try {
         
-        const products = await Product.find();
+        const products = await Product.find().populate('category', 'name');
         res.render('stocks',{products});
 
     } catch (error) {
