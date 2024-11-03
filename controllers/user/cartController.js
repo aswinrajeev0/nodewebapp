@@ -5,7 +5,7 @@ const User = require('../../models/userSchema');
 
 const addToCart = async (req, res) => {
     try {
-        const productId = req.query.id;
+        const productId = req.query.id || req.body.productId;
         const user = req.session.user;
         
         if (!user) {
@@ -13,8 +13,8 @@ const addToCart = async (req, res) => {
         }
 
         const product = await Product.findById(productId);
-        const quantity = parseInt(req.body.quantity, 10);
-        const totalPrice = product.salePrice * quantity;
+        const quantity = parseInt(req.body.quantity, 10) || 1;
+        const totalPrice = product.salePrice * quantity || product.salePrice;
 
         const cartDoc = await Cart.findOne({ userId: user });
 

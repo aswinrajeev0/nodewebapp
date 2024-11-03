@@ -92,16 +92,13 @@ const verifyForgotOtp = async (req, res) => {
     try {
         const enteredOtp = req.body.otp;
 
-        console.log("Entered OTP:", enteredOtp);  // Log to check
-        console.log("Stored OTP:", req.session.forgOtp);  // Log to check
-
         if (enteredOtp === req.session.forgOtp) {
             res.json({ success: true, redirectUrl: '/reset-password' });
         } else {
             res.json({ success: false, message: "OTP does not match. Please try again." });
         }
     } catch (error) {
-        console.error("Error verifying OTP", error);  // Log the error
+        console.error("Error verifying OTP", error);
         res.status(500).json({ success: false, message: "An error occurred. Please try again." });
     }
 };
@@ -238,7 +235,6 @@ const saveAddress = async (req, res) => {
     try {
         const userId = req.session.user;
         const { addressId } = req.body;
-        console.log(addressId);
         const { addressType, name, city, streetAddress, state, pincode, phone, altPhone } = req.body;
 
         const updatedAddress = {
@@ -334,9 +330,6 @@ const editAddress = async (req, res) => {
         res.status(500).send('Server error');
     }
 };
-
-
-
 
 module.exports = {
     getForgotPassword,

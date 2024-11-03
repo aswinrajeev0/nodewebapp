@@ -63,11 +63,6 @@ const orderSchema = new Schema({
       "Returned",
     ],
   },
-  createdOn: {
-    type: Date,
-    default: Date.now,
-    required: true,
-  },
   couponApplied: {
     type: Boolean,
     default: false,
@@ -82,6 +77,8 @@ paymentStatus: {
     enum: ['Pending', 'Processing', 'Completed', 'Failed'],
     default: 'Pending'
 }
+},{
+  timestamps:true
 });
 
 const Order = mongoose.model("Order", orderSchema);

@@ -6,6 +6,7 @@ const Address = require('../../models/addressSchema');
 const Order = require('../../models/orderSchema');
 
 
+
 const getProductDetails = async (req, res) => {
   try {
 
@@ -20,11 +21,11 @@ const getProductDetails = async (req, res) => {
     }).limit(4);
 
     res.render('product-details', {
-            product: productData,
-            cat: category,
-            recProducts: recommendedProducts,
-            user: user
-        });
+      product: productData,
+      cat: category,
+      recProducts: recommendedProducts,
+      user: user
+    });
 
   } catch (error) {
     res.redirect('/page-not-found')
@@ -68,69 +69,69 @@ const getCheckout = async (req, res) => {
 
 const placeOrder = async (req, res) => {
   try {
-      const { cart, totalPrice, addressId, singleProduct, payment_method } = req.body;
-      const userId = req.session.user;
+    const { cart, totalPrice, addressId, singleProduct, payment_method } = req.body;
+    const userId = req.session.user;
 
-      let orderedItems = [];
-      let paymentStatus = payment_method === 'COD' ? 'Pending' : 'Processing';
+    let orderedItems = [];
+    let paymentStatus = payment_method === 'COD' ? 'Pending' : 'Processing';
 
-      if (singleProduct) {
-          const product = JSON.parse(singleProduct);
-          orderedItems.push({
-              product: product._id,
-              quantity: 1,
-              price: product.salePrice,
-          });
-      } else {
-          const cartItems = JSON.parse(cart);
-          orderedItems = cartItems.map(item => ({
-              product: item.productId,
-              quantity: item.quantity,
-              price: item.totalPrice / item.quantity,
-          }));
-      }
-
-      const discount = 0;
-      const finalAmount = totalPrice - discount;
-
-      const newOrder = new Order({
-          orderedItems,
-          totalPrice,
-          finalAmount,
-          user: userId,
-          address: addressId,
-          status: 'Pending',
-          paymentMethod: payment_method,
-          paymentStatus: paymentStatus,
+    if (singleProduct) {
+      const product = JSON.parse(singleProduct);
+      orderedItems.push({
+        product: product._id,
+        quantity: 1,
+        price: product.salePrice,
       });
+    } else {
+      const cartItems = JSON.parse(cart);
+      orderedItems = cartItems.map(item => ({
+        product: item.productId,
+        quantity: item.quantity,
+        price: item.totalPrice / item.quantity,
+      }));
+    }
 
-      await newOrder.save();
+    const discount = 0;
+    const finalAmount = totalPrice - discount;
 
-      for (const item of orderedItems) {
-          await Product.findByIdAndUpdate(item.product, {
-              $inc: { quantity: -item.quantity }
-          });
-      }
+    const newOrder = new Order({
+      orderedItems,
+      totalPrice,
+      finalAmount,
+      user: userId,
+      address: addressId,
+      status: 'Pending',
+      paymentMethod: payment_method,
+      paymentStatus: paymentStatus,
+    });
 
-      if (payment_method === 'Online') {
-          res.redirect('/payment-gateway?orderId=' + newOrder._id);
-      } else {
-          res.redirect('/order-confirmation');
-      }
+    await newOrder.save();
+
+    for (const item of orderedItems) {
+      await Product.findByIdAndUpdate(item.product, {
+        $inc: { quantity: -item.quantity }
+      });
+    }
+
+    if (payment_method === 'Online') {
+      res.redirect('/payment-gateway?orderId=' + newOrder._id);
+    } else {
+      res.redirect('/order-confirmation');
+    }
 
   } catch (error) {
-      console.error("Error placing order:", error);
-      res.redirect('/checkout');
+    console.error("Error placing order:", error);
+    res.redirect('/checkout');
   }
 };
 
-const orderConfirm = async (req,res) => {
+const orderConfirm = async (req, res) => {
   try {
-    
+
     res.render('order-confirmation');
 
   } catch (error) {
-    console.error("Error loading cofirmation page",error);
+    console.error("Error loading cofirmation page", error);
     res.redirect('/page-not-found');
   }
 }
@@ -141,11 +142,12 @@ const getOrders = async (req, res) => {
     const { user: userId } = req.session;
 
     if (userId) {
+      const user = await User.findById(userId);
       const orders = await Order.find({ user: userId }).sort({ createdOn: -1 });
       if (orders.length > 0) {
-        res.render('orders', { orders });
+        res.render('orders', { orders, user });
       } else {
-        res.render('orders', { orders: [], message: "No orders found." });
+        res.render('orders', { orders: [], message: "No orders found.", user });
       }
     } else {
       return res.redirect('/login');
@@ -156,11 +158,11 @@ const getOrders = async (req, res) => {
   }
 };
 
-const cancelOrder = async (req,res) => {
+const cancelOrder = async (req, res) => {
   try {
-    
+
     const id = req.query.id;
-    await Order.findByIdAndUpdate(id,{$set:{status:'Cancelled'}});
+    await Order.findByIdAndUpdate(id, { $set: { status: 'Cancelled' } });
     res.redirect('/orders')
 
   } catch (error) {
@@ -172,27 +174,53 @@ const cancelOrder = async (req,res) => {
 const orderDetails = async (req, res) => {
   try {
     const orderId = req.query.id;
-    const user = req.session.user;
+    const userId = req.session.user;
 
-    if (!user) {
+    if (!userId) {
       return res.redirect('/login');
     }
-
+    const user = await User.findById(userId);
     const order = await Order.findOne({ _id: orderId });
     const address = await Address.findOne({ "addresses._id": order.address }, { "addresses.$": 1 });
-    
+
     const products = await Promise.all(
       order.orderedItems.map(async (item) => {
         return await Product.findOne({ _id: item.product });
       })
     );
 
-    res.render('order-details', { order, products, address: address.addresses[0] });
+    res.render('order-details', { order, products, address: address.addresses[0], user });
   } catch (error) {
-    console.error("Error getting order details",error);
+    console.error("Error getting order details", error);
     res.redirect('/page-not-found');
   }
 };
+
+const searchProduct = async (req, res) => {
+  const { category, q } = req.query;
+  const searchCriteria = {};
+
+  if (category) {
+    searchCriteria.category = category
+  }
+
+  if (q) {
+    searchCriteria.productName = { $regex: q, $options: 'i' };
+  }
+
+  try {
+
+    console.log(category);
+    console.log(q);
+    const products = await Product.find(searchCriteria).populate('category','name')
+
+    res.render('search-results',{products,searchTerm: q});
+
+  } catch (error) {
+    console.error("Error fetching search results:", error);
+    res.status(500).send("Internal Server Error");
+  }
+}
 
 
 module.exports = {
@@ -202,5 +230,6 @@ module.exports = {
   orderConfirm,
   getOrders,
   cancelOrder,
-  orderDetails
+  orderDetails,
+  searchProduct
 }

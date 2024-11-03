@@ -50,11 +50,11 @@
                                         <td>#<%= order.orderId %></td>
                                         <td><%= order.createdOn.toLocaleDateString() %></td>
                                         <td><%= order.status %></td>
-                                        <td><%= order.totalAmount %></td>
+                                        <td>₹<%=order.finalAmount.toLocaleString() %></td>
                                         <td>
-                                            <a href="/order-details?id=<%= order._id %>" class="btn btn-view">View Details</a>
+                                            <a href="/order-details?id=<%= order._id %>" class="btn btn-success">View Details</a>
                                             <% if (order.status !== 'Cancelled' && order.status !== 'Completed') { %>
-                                                <button class="btn btn-cancel btn-info" onclick="confirmCancelOrder('<%= order._id %>')">Cancel Order</button>
+                                                <button class="btn btn-danger" onclick="confirmCancelOrder('<%= order._id %>')">Cancel Order</button>
                                             <% } %>
                                         </td>
                                     </tr>

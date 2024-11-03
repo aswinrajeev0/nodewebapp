@@ -4,13 +4,12 @@ const userController = require('../controllers/user/userController');
 const profileController = require('../controllers/user/profileController.js')
 const productController = require('../controllers/user/productController.js')
 const cartController = require('../controllers/user/cartController.js')
+const wishlistController = require('../controllers/user/wishlistController.js')
 const passport = require('passport');
-
-
+const {loadCategories} = require('../middlewares/loadCategories')
 
 router.use(express.static('public'));
-
-
+router.use(loadCategories);
 
 router.get('/page-not-found',userController.pageNotFound)
 router.get('/',userController.loadHomepage)
@@ -61,6 +60,13 @@ router.get('/order-confirmation',productController.orderConfirm);
 router.get('/orders',productController.getOrders);
 router.get('/cancel-order',productController.cancelOrder);
 router.get('/order-details',productController.orderDetails);
+
+//wishlist
+router.get('/wishlist',wishlistController.getWishList);
+router.post('/add-to-wishlist',wishlistController.addToWishlist);
+router.post('/remove-wishlist-item',wishlistController.removeItem);
+
+router.get('/search-product',productController.searchProduct);
 
 
 

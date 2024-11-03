@@ -192,14 +192,15 @@
                     </div>
                     <div class="header-right">
                         <div class="search-style-2">
-                            <form action="#">
-                                <select class="select-active">
-                                    <option>All Categories</option>
-                                    <option>Mobiles</option>
-                                    <option>Accessories</option>
-                                    <option>Headphones</option>
+                            <form action="/search-product" method="GET">
+                                <select name="category" class="select-active">
+                                    <option value="">All Categories</option>
+                                    <% categories.forEach(category => { %>
+                                        <option value="<%= category._id %>"><%= category.name %></option>
+                                    <% }) %>
                                 </select>
-                                <input type="text" placeholder="Search for items...">
+                                <input type="text" name="q" placeholder="Search for items...">
+                                <button type="submit">Search</button>
                             </form>
                         </div>
                         

@@ -84,7 +84,7 @@
                     <div class="col-12">
                         <div class="table-responsive">
 
-                            <%if(cart){%>
+                            <%if(cart.items.length>0){%>
                                 <table class="table shopping-summery text-center clean">
                                     <thead>
                                         <tr class="main-heading">
@@ -133,7 +133,7 @@
                                                         action="/remove-cart-item" method="POST">
                                                         <input type="hidden" name="productId"
                                                             value="<%= cart.items[i].productId._id %>">
-                                                        <button type="button" class="btn"
+                                                        <button type="button" class="btn btn-danger"
                                                             onclick="confirmRemove('<%= cart.items[i].productId._id %>')">
                                                             <i class="fi-rs-trash"></i>
                                                         </button>
@@ -160,7 +160,7 @@
 
                         </div>
                         <div class="cart-action text-end">
-                            <a class="btn " href="/"><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
+                            <a class="btn btn-success" href="/"><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
                         </div>
                         <br>
                         <hr><br>
@@ -180,7 +180,7 @@
                                                                 placeholder="Enter Your Coupon">
                                                         </div>
                                                         <div class="form-group col-lg-6">
-                                                            <button class="btn  btn-sm"><i
+                                                            <button class="btn  btn-sm btn-success"><i
                                                                     class="fi-rs-label mr-10"></i>Apply</button>
                                                         </div>
                                                     </div>
@@ -209,10 +209,10 @@
                                         </table>
                                     </div>
                                     <%if(cart){%>
-                                        <a href="/checkout" class="btn "> <i class="fi-rs-box-alt mr-10"></i> Proceed To
+                                        <a href="/checkout" class="btn btn-success"> <i class="fi-rs-box-alt mr-10"></i> Proceed To
                                             CheckOut</a>
                                         <%}else{%>
-                                            <a href="#" class="btn"> <i class="fi-rs-box-alt mr-10"></i> Proceed To
+                                            <a href="#" class="btn btn-success"> <i class="fi-rs-box-alt mr-10"></i> Proceed To
                                                 CheckOut</a>
                                             <%}%>
                                 </div>
