@@ -68,6 +68,8 @@ router.post('/remove-wishlist-item',wishlistController.removeItem);
 
 router.get('/search-product',productController.searchProduct);
 
+router.post('/apply-coupon',productController.applyCoupon);
+
 
 
 

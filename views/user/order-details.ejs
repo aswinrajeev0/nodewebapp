@@ -14,7 +14,7 @@
                 <div>
                     <h2 class="store-name">Mobile King</h2>
                     <p>Order ID: <%= order.orderId %> <br>Order Status: <span class="badge bg-warning text-dark ms-2"><%= order.status %></span></p>
-                    <p>Placed on: <%= order.createdOn.toLocaleString() %></p>
+                    <p>Placed on: <%= order.createdAt.toLocaleString() %></p>
                 </div>
                 <div class="order-total">
                     <h3>Total: <span class="text-primary">₹ <%= order.finalAmount.toLocaleString() %></span></h3>

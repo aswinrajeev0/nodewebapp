@@ -1,0 +1,140 @@
+<%- include('../partials/admin/header') %>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Coupons</h2>
+                <p>Add, edit, or delete a coupon</p>
+            </div>
+            <div>
+                <input type="text" placeholder="Search Coupons" class="form-control bg-white">
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <form action="/admin/save-coupon" method="post">
+                            <div class="mb-4">
+                                <label for="couponCode" class="form-label">Coupon Code</label>
+                                <input type="text" placeholder="Type here" class="form-control" id="couponCode" ,
+                                    name="couponCode" />
+                                <small id="codeError" style="color: red; display: none;">Code is required</small>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Discount Price</label>
+                                <input type="number" placeholder="Enter discount price" class="form-control"
+                                    id="discountPrice" name="discountPrice" />
+                                <small id="discountError" style="color: red; display: none;">Discount price can't be
+                                    empty</small>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Minimum Price</label>
+                                <input type="number" placeholder="Enter minimum price" class="form-control"
+                                    id="minimumPrice" name="minimumPrice" />
+                                <small id="minimumError" style="color: red; display: none;">Minimum price can't be
+                                    empty</small>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Created On</label>
+                                <input type="date" class="form-control" id="createdDate" name="createdDate" />
+                                <small id="createdError" style="color: red; display: none;"></small>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="endDate" name="endDate" />
+                                <small id="discountError" style="color: red; display: none;">This fied is
+                                    required</small>
+                            </div>
+                            <div class="d-grid">
+                                <button class="btn btn-primary" type="submit">Create Coupon</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-9">
+                        <div>
+                            <%if(coupons.length>0){%>
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Coupon Code</th>
+                                            <th>Discount Price</th>
+                                            <!-- <th>Status</th> -->
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <%for(let i=0;i<coupons.length;i++){%>
+                                            <tr>
+                                                <td>
+                                                    <%=coupons[i].name%>
+                                                </td>
+                                                <td>
+                                                    <%=coupons[i].offerPrice.toLocaleString()%>
+                                                </td>
+                                                <!-- <%if(coupons[i].isList){%>
+                                                <td>
+                                                    <span class="badge rounded-pill alert-success">Active</span>
+                                                </td>
+                                            <%}else{%>
+                                                <td>
+                                                    <span class="badge rounded-pill alert-danger">Inactive</span>
+                                                </td>
+                                            <%}%> -->
+                                                <td>
+                                                    <button class="btn btn-danger text-white"
+                                                        onclick="confirmDelete('<%= coupons[i]._id %>')">Delete</button>
+                                                </td>
+                                            </tr>
+                                            <%}%>
+                                    </tbody>
+                                </table>
+                                <%}else{%>
+                                    <h3>No coupons added yet.</h3>
+                                    <%}%>
+                        </div>
+                    </div> <!-- .col// -->
+                </div> <!-- .row // -->
+            </div> <!-- card body .// -->
+        </div> <!-- card .// -->
+    </section> <!-- content-main end// -->
+
+    <div class="pagination-area mt-30 mb-50">
+        <nav aria-label="Page navigation example justify-content-center">
+            <ul class="pagination justify-content-center">
+                <li class="page-item"><a class="page-link active" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+            </ul>
+        </nav>
+    </div>
+    <br>
+
+    <script>
+
+        function confirmDelete(couponId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This action will delete the coupon permanently.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `/admin/delete-coupon?id=${couponId}`;
+                }
+            });
+        }
+
+        document.getElementById("createdDate").value = new Date().toISOString().split("T")[0];
+    </script>
+
+
+    <%- include('../partials/admin/footer') %>

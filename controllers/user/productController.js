@@ -4,6 +4,7 @@ const Category = require('../../models/categorySchema');
 const User = require('../../models/userSchema');
 const Address = require('../../models/addressSchema');
 const Order = require('../../models/orderSchema');
+const Coupon = require('../../models/couponSchma');
 
 
 
@@ -67,63 +68,112 @@ const getCheckout = async (req, res) => {
 };
 
 
-const placeOrder = async (req, res) => {
+const applyCoupon = async (req, res) => {
   try {
-    const { cart, totalPrice, addressId, singleProduct, payment_method } = req.body;
-    const userId = req.session.user;
-
-    let orderedItems = [];
-    let paymentStatus = payment_method === 'COD' ? 'Pending' : 'Processing';
-
-    if (singleProduct) {
-      const product = JSON.parse(singleProduct);
-      orderedItems.push({
-        product: product._id,
-        quantity: 1,
-        price: product.salePrice,
-      });
-    } else {
-      const cartItems = JSON.parse(cart);
-      orderedItems = cartItems.map(item => ({
-        product: item.productId,
-        quantity: item.quantity,
-        price: item.totalPrice / item.quantity,
-      }));
-    }
-
-    const discount = 0;
-    const finalAmount = totalPrice - discount;
-
-    const newOrder = new Order({
-      orderedItems,
-      totalPrice,
-      finalAmount,
-      user: userId,
-      address: addressId,
-      status: 'Pending',
-      paymentMethod: payment_method,
-      paymentStatus: paymentStatus,
+    const { couponCode, totalPrice } = req.body;
+    
+    // Find the coupon in the database
+    const coupon = await Coupon.findOne({ 
+      name: couponCode,  // Change to use 'name' since that’s the field in your schema
+      isList: true,      // Change to use 'isList' for active coupons
+      expireOn: { $gt: new Date() } // Adjusted to match your field name
     });
 
-    await newOrder.save();
-
-    for (const item of orderedItems) {
-      await Product.findByIdAndUpdate(item.product, {
-        $inc: { quantity: -item.quantity }
+    if (!coupon) {
+      return res.json({
+        success: false,
+        message: 'Invalid or expired coupon code'
       });
     }
 
-    if (payment_method === 'Online') {
-      res.redirect('/payment-gateway?orderId=' + newOrder._id);
-    } else {
-      res.redirect('/order-confirmation');
+    // Calculate discount
+    let discountAmount = coupon.offerPrice; // Using offerPrice directly for discount amount
+
+    // Check minimum price condition
+    if (coupon.minimumPrice && totalPrice < coupon.minimumPrice) {
+      return res.json({
+        success: false,
+        message: `Minimum purchase amount of ${coupon.minimumPrice} required`
+      });
     }
 
+    // Calculate discounted total
+    const discountedTotal = totalPrice - discountAmount;
+
+    return res.json({
+      success: true,
+      message: 'Coupon applied successfully!',
+      discountedTotal: discountedTotal.toFixed(2),
+      discountAmount: discountAmount.toFixed(2)
+    });
+
   } catch (error) {
-    console.error("Error placing order:", error);
-    res.redirect('/checkout');
+    console.error('Error applying coupon:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to apply coupon'
+    });
   }
 };
+
+
+
+const placeOrder = async (req, res) => {
+  try {
+      const { cart, totalPrice, addressId, singleProduct, payment_method, finalPrice } = req.body; // Get finalPrice from the request
+      const userId = req.session.user;
+
+      let orderedItems = [];
+      let paymentStatus = payment_method === 'COD' ? 'Pending' : 'Processing';
+
+      if (singleProduct) {
+          const product = JSON.parse(singleProduct);
+          orderedItems.push({
+              product: product._id,
+              quantity: 1,
+              price: product.salePrice,
+          });
+      } else {
+          const cartItems = JSON.parse(cart);
+          orderedItems = cartItems.map(item => ({
+              product: item.productId,
+              quantity: item.quantity,
+              price: item.totalPrice / item.quantity,
+          }));
+      }
+
+      const discount = 0; // Assuming no discount is applied on the server-side; it's already handled on the client-side
+      const newOrder = new Order({
+          orderedItems,
+          totalPrice, // You may choose to keep this if necessary
+          finalAmount: finalPrice, // Use finalPrice from the request
+          user: userId,
+          address: addressId,
+          status: 'Pending',
+          paymentMethod: payment_method,
+          paymentStatus: paymentStatus,
+      });
+
+      await newOrder.save();
+
+      for (const item of orderedItems) {
+          await Product.findByIdAndUpdate(item.product, {
+              $inc: { quantity: -item.quantity }
+          });
+      }
+
+      if (payment_method === 'Online') {
+          res.redirect('/payment-gateway?orderId=' + newOrder._id);
+      } else {
+          res.redirect('/order-confirmation');
+      }
+
+  } catch (error) {
+      console.error("Error placing order:", error);
+      res.redirect('/checkout');
+  }
+};
+
 
 const orderConfirm = async (req, res) => {
   try {
@@ -231,5 +281,6 @@ module.exports = {
   getOrders,
   cancelOrder,
   orderDetails,
-  searchProduct
+  searchProduct,
+  applyCoupon
 }

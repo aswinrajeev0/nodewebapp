@@ -6,11 +6,11 @@
         margin-right: 10px;
         cursor: pointer;
     }
-    
+
     .payment_option {
         margin: 15px 0;
     }
-    
+
     .custome-radio {
         margin-bottom: 10px;
         padding: 10px;
@@ -18,186 +18,303 @@
         border-radius: 5px;
         transition: all 0.3s ease;
     }
-    
+
     .custome-radio:hover {
         background-color: #f8f9fa;
     }
-    
+
     .custome-radio input[type="radio"] {
         margin-right: 10px;
     }
-    
+
     .custome-radio label {
         cursor: pointer;
         font-weight: 500;
     }
-    
+
     .form-check-input:checked + label {
         color: #28a745;
     }
+
+    .discount-amount {
+        color: #28a745;
+        font-weight: 500;
+    }
+
+    .final-total {
+        font-size: 1.1em;
+        font-weight: bold;
+    }
 </style>
 
-    <main class="main">
-        <div class="page-header breadcrumb-wrap">
-            <div class="container">
-                <div class="breadcrumb">
-                    <a href="/" rel="nofollow">Home</a>
-                    <span></span> Shop
-                    <span></span> Checkout
-                </div>
+<main class="main">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="/" rel="nofollow">Home</a>
+                <span></span> Shop
+                <span></span> Checkout
             </div>
         </div>
-        <section class="mt-50 mb-50">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-6">
-                        <!-- Address Selection -->
-                        <h4>Select Your Address</h4>
-                        <% if (address.length> 0) { %>
-                            <% address.forEach((addr, i)=> { %>
-                                <div class="card">
-                                    <input type="radio" name="selectedAddress" id="address-<%= i %>"
-                                        value="<%= JSON.stringify(addr) %>" required style="transform: scale(0.4);"
-                                        onchange="document.getElementById('addressId').value = '<%= addr._id %>';">
-                                    <label for="address-<%= i %>">
-                                        <div class="card-body">
-                                            <strong>
-                                                <%= addr.addressType %>
-                                            </strong><br>
-                                            <%= addr.name %><br>
-                                            <%= addr.streetAddress %><br>
-                                            <%= addr.city %>, <%= addr.state %><br>
-                                            <%= addr.pincode %><br>
-                                            <%= addr.phone %>
-                                            <% if (addr.altPhone) { %>&nbsp; | &nbsp; 
-                                                <%= addr.altPhone %>
-                                           <% } %>
-                                        </div>
-                                    </label>
-                                </div>
-                                <% }); %>
-                                    <% } else { %>
-                                        <p>No addresses available.</p>
-                                        <a href="/add-address" class="btn">Add one</a>
-                                    <% } %>
-                    </div>
+    </div>
+    <section class="mt-50 mb-50">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <!-- Address Selection -->
+                    <h4>Select Your Address</h4>
+                    <% if (address.length > 0) { %>
+                        <% address.forEach((addr, i) => { %>
+                            <div class="card">
+                                <input type="radio" name="selectedAddress" id="address-<%= i %>"
+                                    value="<%= JSON.stringify(addr) %>" required style="transform: scale(0.4);"
+                                    onchange="document.getElementById('addressId').value = '<%= addr._id %>';">
 
-                    <div class="col-md-6">
-                        <div class="order_review">
-                            <h4>Your Orders</h4>
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th colspan="2">Product</th>
-                                        <th>Total</th>
-                                    </tr>
-                                </thead>
+                                <label for="address-<%= i %>">
+                                    <div class="card-body">
+                                        <strong><%= addr.addressType %></strong><br>
+                                        <%= addr.name %><br>
+                                        <%= addr.streetAddress %><br>
+                                        <%= addr.city %>, <%= addr.state %><br>
+                                        <%= addr.pincode %><br>
+                                        <%= addr.phone %>
+                                        <% if (addr.altPhone) { %>&nbsp; | &nbsp;<%= addr.altPhone %><% } %>
+                                    </div>
+                                </label>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p>No addresses available.</p>
+                        <a href="/add-address" class="btn">Add one</a>
+                    <% } %>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="order_review">
+                        <h4>Your Orders</h4>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">Product</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
                                 <tbody>
-                                    <% if (product) { %>
-                                        <tr>
-                                            <td class="image product-thumbnail"><img
-                                                    src="/uploads/re-image/<%= product.productImage[0] %>"
-                                                    alt="<%= product.productName %>"></td>
-                                            <td>
-                                                <h5>
-                                                    <%= product.productName %>
-                                                </h5>
-                                                <span>Qty: 1</span>
-                                            </td>
-                                            <td>
-                                                <%= product.salePrice.toLocaleString() %>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>SubTotal</th>
-                                            <td colspan="2">
-                                                <%= totalPrice.toLocaleString() %>
-                                            </td>
-                                        </tr>
-                                    <% } else if (cart && cart.items.length> 0) { %>
-                                            <!-- Cart Items Case -->
-                                       <% cart.items.forEach(item=> { %>
-                                        <tr>
-                                            <td class="image product-thumbnail"><img
-                                                src="/uploads/re-image/<%= item.productId.productImage[0] %>"
-                                                alt="<%= item.productId.productName %>"></td>
-                                            <td>
-                                                <h5>
-                                                        <%= item.productId.productName %>
-                                                </h5>
-                                            <span>Qty: <%= item.quantity %></span>
-                                            </td>
-                                            <td>
-                                                <%= item.totalPrice.toLocaleString() %>
-                                            </td>
-                                        </tr>
-                                    <% }); %>
-                                        <tr>
-                                            <th>SubTotal</th>
-                                            <td colspan="2">
-                                                <%= totalPrice.toLocaleString() %>
-                                            </td>
-                                        </tr>
+                                    <% if (cart && cart.items.length > 0) { %>
+                                        <% cart.items.forEach(item => { %>
+                                            <tr>
+                                                <td class="image product-thumbnail"><img
+                                                    src="/uploads/re-image/<%= item.productId.productImage[0] %>"
+                                                    alt="<%= item.productId.productName %>"></td>
+                                                <td>
+                                                    <h5><%= item.productId.productName %></h5>
+                                                    <span>Qty: <%= item.quantity %></span>
+                                                </td>
+                                                <td><%= (item.productId.salePrice * item.quantity).toLocaleString() %></td>
+                                            </tr>
+                                            
+                                        <% }); %>
                                     <% } else { %>
-                                       <tr>
-                                            <td colspan="3">No items in cart or product selection.</td>
+                                        <tr>
+                                            <td colspan="3">No items in the cart.</td>
                                         </tr>
                                     <% } %>
+                                    
                                 </tbody>
-                            </table>
+                                
+                                <% if (product) { %>
+                                    <tr>
+                                        <td class="image product-thumbnail"><img
+                                                src="/uploads/re-image/<%= product.productImage[0] %>"
+                                                alt="<%= product.productName %>"></td>
+                                        <td>
+                                            <h5><%= product.productName %></h5>
+                                            <span>Qty: 1</span>
+                                        </td>
+                                        <td><%= product.salePrice.toLocaleString() %></td>
+                                    </tr>
 
-                            <form id="orderForm" action="/place-order" method="POST"
-                                onsubmit="return validateAddress()">
-                                <div>
-                                    <h4>Select Payment Method</h4><br>
-                                    <div class="payment_option">
-                                        <div class="custome-radio">
-                                            <input class="form-check-input" required type="radio" name="payment_method" value="COD" id="cod" checked>
-                                            <label class="form-check-label" for="cod">Cash On Delivery (COD)</label>
-                                        </div>
-                                        
-                                        <div class="custome-radio">
-                                            <input class="form-check-input" required type="radio" name="payment_method" value="Online" id="online">
-                                            <label class="form-check-label" for="online">Online Payment</label>
+                                    <tr>
+                                        <th>SubTotal</th>
+                                        <td colspan="2" class="subtotal-display">
+                                            <span id="subtotalDisplay"><%= totalPrice.toLocaleString() %></span>
+                                        </td>
+                                    </tr>
+
+                                    <tr id="discount-row" style="display: none;">
+                                        <th>Discount</th>
+                                        <td colspan="2"><span class="discount-amount" id="discountDisplay">0</span></td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Final Total</th>
+                                        <td colspan="2">
+                                            <span class="final-total" id="finalTotalDisplay"><%= totalPrice.toLocaleString() %></span>
+                                        </td>
+                                    </tr>
+                                <% } %>
+
+                                
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>SubTotal</th>
+                                    <td colspan="2" class="subtotal-display">
+                                        <span id="subtotalDisplay"><%= totalPrice.toLocaleString() %></span>
+                                    </td>
+                                </tr>
+
+                                <tr id="discount-row" style="display: none;">
+                                    <th>Discount</th>
+                                    <td colspan="2"><span class="discount-amount" id="discountDisplay">0</span></td>
+                                </tr>
+
+                                <tr>
+                                    <th>Final Total</th>
+                                    <td colspan="2">
+                                        <span class="final-total" id="finalTotalDisplay"><%= totalPrice.toLocaleString() %></span>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <div class="col-lg-6 col-md-12">
+                            <div class="mb-30 mt-50">
+                                <div class="heading_s1 mb-3">
+                                    <h4>Apply Coupon</h4>
+                                </div>
+                                <div class="total-amount">
+                                    <div class="left">
+                                        <div class="coupon">
+                                            <form id="couponForm" onsubmit="return false;">
+                                                <div class="form-row row justify-content-center">
+                                                    <div class="form-group col-lg-6">
+                                                        <input type="hidden" id="totalPrice" name="totalPrice" value="<%= totalPrice %>">
+                                                        <input type="hidden" id="discountAmount" name="discountAmount" value="0">
+                                                        <input class="font-medium" id="couponCode" name="couponCode" placeholder="Enter Your Coupon">
+                                                    </div>
+                                                    <div class="form-group col-lg-6">
+                                                        <button class="btn btn-sm btn-success" type="button" onclick="applyCoupon()">
+                                                            <i class="fi-rs-label mr-10"></i>Apply
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
-                                </div>
-                                
-                                <input type="hidden" name="cart" value='<%= JSON.stringify(cart ? cart.items : []) %>'>
-
-                                <input type="hidden" name="totalPrice" value="<%= totalPrice %>">
-                                <% if (product) { %>
-                                    <input type="hidden" name="singleProduct" value="<%= JSON.stringify(product) %>">
-                                    <% } %>
-                                        <input type="hidden" name="addressId" id="addressId">
-                                        <button type="submit" class="btn btn-fill-out btn-block mt-30">Place
-                                            Order</button>
-                            </form>
+                            </div>
                         </div>
+
+                        <form id="orderForm" action="/place-order" method="POST" onsubmit="return validateAddress()">
+                            <div>
+                                <h4>Select Payment Method</h4><br>
+                                <div class="payment_option">
+                                    <div class="custome-radio">
+                                        <input class="form-check-input" required type="radio" name="payment_method" value="COD" id="cod" checked>
+                                        <label class="form-check-label" for="cod">Cash On Delivery (COD)</label>
+                                    </div>
+
+                                    <div class="custome-radio">
+                                        <input class="form-check-input" required type="radio" name="payment_method" value="Online" id="online">
+                                        <label class="form-check-label" for="online">Online Payment</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <input type="hidden" name="cart" value='<%= JSON.stringify(cart ? cart.items : []) %>'>
+                            <input type="hidden" name="totalPrice" value="<%= totalPrice %>">
+                            <input type="hidden" name="finalPrice" id="finalPrice" value="<%= totalPrice %>">
+                            <% if (product) { %>
+                                <input type="hidden" name="singleProduct" value="<%= JSON.stringify(product) %>">
+                            <% } %>
+                            <input type="hidden" name="addressId" id="addressId">
+                            <button type="submit" class="btn btn-fill-out btn-block mt-30">Place Order</button>
+                        </form>
                     </div>
                 </div>
             </div>
-        </section>
-    </main>
+        </div>
+    </section>
+</main>
 
-    <%- include('../partials/user/footer') %>
+<%- include('../partials/user/footer') %>
 
-        <script>
-            function validateAddress() {
-                const addressRadioButtons = document.querySelectorAll('input[name="selectedAddress"]');
-                let addressSelected = false;
+<script>
+    function formatPrice(price) {
+        return parseFloat(price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
 
-                addressRadioButtons.forEach((radio) => {
-                    if (radio.checked) {
-                        addressSelected = true;
-                    }
-                });
+    function updateDisplayValue(elementId, value) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.textContent = formatPrice(value);
+        }
+    }
 
-                if (!addressSelected) {
-                    alert('Please select an address before proceeding.');
-                    return false;
-                }
-                return true;
-            }
-        </script>
+    async function applyCoupon() {
+    const couponCode = document.querySelector('#couponCode')?.value;
+    const totalPriceInput = document.querySelector('#totalPrice');
+    const discountRow = document.getElementById('discount-row');
+
+    if (!couponCode) {
+        alert('Please enter a coupon code');
+        return;
+    }
+
+    const originalPrice = parseFloat(totalPriceInput.value);
+
+    try {
+        const response = await fetch('/apply-coupon', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ couponCode, totalPrice: originalPrice })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+            discountRow.style.display = 'table-row';
+
+            const discountAmount = parseFloat(result.discountAmount);
+            const finalTotal = originalPrice - discountAmount;
+
+            updateDisplayValue('subtotalDisplay', originalPrice);
+            updateDisplayValue('discountDisplay', discountAmount);
+            updateDisplayValue('finalTotalDisplay', finalTotal);
+            document.querySelector('#discountAmount').value = discountAmount;
+
+            // Update the final price hidden input
+            document.querySelector('#finalPrice').value = finalTotal; // Update the hidden final price input
+
+        } else {
+            alert('Invalid coupon code');
+            updateDisplayValue('subtotalDisplay', originalPrice);
+            discountRow.style.display = 'none';
+            document.querySelector('#discountAmount').value = 0;
+
+            // Reset the final price to the original total price
+            document.querySelector('#finalPrice').value = originalPrice; // Reset if coupon is invalid
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to apply the coupon');
+    }
+}
+
+
+    function validateAddress() {
+        const addressSelected = document.querySelector('input[name="selectedAddress"]:checked');
+        if (!addressSelected) {
+            alert('Please select an address before proceeding with the order.');
+            return false;
+        }
+        return true;
+    }
+</script>
