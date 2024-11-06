@@ -5,6 +5,8 @@ const profileController = require('../controllers/user/profileController.js')
 const productController = require('../controllers/user/productController.js')
 const cartController = require('../controllers/user/cartController.js')
 const wishlistController = require('../controllers/user/wishlistController.js')
+const walletController = require('../controllers/user/walletController.js');
+const paymentController = require('../controllers/user/paymentController.js');
 const passport = require('passport');
 const {loadCategories} = require('../middlewares/loadCategories')
 
@@ -56,6 +58,11 @@ router.post('/update-cart-quantity',cartController.updateCart);
 router.get('/checkout',productController.getCheckout);
 router.post('/place-order',productController.placeOrder);
 
+router.post('/create-order',paymentController.createOrder);
+router.post('/verify-payment', paymentController.verifyPayment);
+router.get('/razorpay-key', paymentController.getRazorpayKey);
+router.get('/get-address/:id',paymentController.getAddress);
+
 router.get('/order-confirmation',productController.orderConfirm);
 router.get('/orders',productController.getOrders);
 router.get('/cancel-order',productController.cancelOrder);
@@ -69,6 +76,9 @@ router.post('/remove-wishlist-item',wishlistController.removeItem);
 router.get('/search-product',productController.searchProduct);
 
 router.post('/apply-coupon',productController.applyCoupon);
+router.post('/remove-coupon',productController.removeCoupon);
+
+router.get('/wallet',walletController.getWallet);
 
 
 

@@ -5,6 +5,7 @@ const User = require('../../models/userSchema');
 const Address = require('../../models/addressSchema');
 const Order = require('../../models/orderSchema');
 const Coupon = require('../../models/couponSchma');
+const Wallet = require('../../models/walletSchema');
 
 
 
@@ -71,12 +72,11 @@ const getCheckout = async (req, res) => {
 const applyCoupon = async (req, res) => {
   try {
     const { couponCode, totalPrice } = req.body;
-    
-    // Find the coupon in the database
-    const coupon = await Coupon.findOne({ 
-      name: couponCode,  // Change to use 'name' since that’s the field in your schema
-      isList: true,      // Change to use 'isList' for active coupons
-      expireOn: { $gt: new Date() } // Adjusted to match your field name
+
+    const coupon = await Coupon.findOne({
+      name: couponCode,
+      isList: true,
+      expireOn: { $gt: new Date() }
     });
 
     if (!coupon) {
@@ -86,10 +86,8 @@ const applyCoupon = async (req, res) => {
       });
     }
 
-    // Calculate discount
-    let discountAmount = coupon.offerPrice; // Using offerPrice directly for discount amount
+    let discountAmount = coupon.offerPrice;
 
-    // Check minimum price condition
     if (coupon.minimumPrice && totalPrice < coupon.minimumPrice) {
       return res.json({
         success: false,
@@ -97,7 +95,6 @@ const applyCoupon = async (req, res) => {
       });
     }
 
-    // Calculate discounted total
     const discountedTotal = totalPrice - discountAmount;
 
     return res.json({
@@ -116,63 +113,82 @@ const applyCoupon = async (req, res) => {
   }
 };
 
+const removeCoupon = async (req, res) => {
+  try {
 
+    const { totalPrice } = req.body;
+
+    const discountAmount = 0;
+    const finalTotal = totalPrice;
+
+    res.json({
+      success: true,
+      discountAmount,
+      finalTotal,
+    });
+
+  } catch (error) {
+    console.error("Error removing coupon", error);
+    res.status(500);
+  }
+}
 
 const placeOrder = async (req, res) => {
   try {
-      const { cart, totalPrice, addressId, singleProduct, payment_method, finalPrice } = req.body; // Get finalPrice from the request
-      const userId = req.session.user;
+    const { cart, totalPrice, addressId, singleProduct, payment_method, finalPrice } = req.body;
+    const userId = req.session.user;
 
-      let orderedItems = [];
-      let paymentStatus = payment_method === 'COD' ? 'Pending' : 'Processing';
+    let orderedItems = [];
+    const paymentStatus = payment_method === 'COD' ? 'Pending' : 'Processing';
 
-      if (singleProduct) {
-          const product = JSON.parse(singleProduct);
-          orderedItems.push({
-              product: product._id,
-              quantity: 1,
-              price: product.salePrice,
-          });
-      } else {
-          const cartItems = JSON.parse(cart);
-          orderedItems = cartItems.map(item => ({
-              product: item.productId,
-              quantity: item.quantity,
-              price: item.totalPrice / item.quantity,
-          }));
-      }
-
-      const discount = 0; // Assuming no discount is applied on the server-side; it's already handled on the client-side
-      const newOrder = new Order({
-          orderedItems,
-          totalPrice, // You may choose to keep this if necessary
-          finalAmount: finalPrice, // Use finalPrice from the request
-          user: userId,
-          address: addressId,
-          status: 'Pending',
-          paymentMethod: payment_method,
-          paymentStatus: paymentStatus,
+    if (singleProduct) {
+      const product = JSON.parse(singleProduct);
+      orderedItems.push({
+        product: product._id,
+        quantity: 1,
+        price: product.salePrice,
       });
+    } else if (cart) {
+      const cartItems = JSON.parse(cart);
+      orderedItems = cartItems.map(item => ({
+        product: item.productId,
+        quantity: item.quantity,
+        price: item.totalPrice / item.quantity,
+      }));
+    }
 
-      await newOrder.save();
+    const discount = 0;
+    const newOrder = new Order({
+      orderedItems,
+      totalPrice,
+      finalAmount: finalPrice - discount,
+      user: userId,
+      address: addressId,
+      status: 'Pending',
+      paymentMethod: payment_method,
+      paymentStatus: paymentStatus,
+    });
 
-      for (const item of orderedItems) {
-          await Product.findByIdAndUpdate(item.product, {
-              $inc: { quantity: -item.quantity }
-          });
-      }
+    await newOrder.save();
 
-      if (payment_method === 'Online') {
-          res.redirect('/payment-gateway?orderId=' + newOrder._id);
-      } else {
-          res.redirect('/order-confirmation');
-      }
+    for (const item of orderedItems) {
+      await Product.findByIdAndUpdate(item.product, {
+        $inc: { quantity: -item.quantity }
+      });
+    }
+
+    if (payment_method === 'Online') {
+      res.status(200).json({ success: true, redirectUrl: `/payment-gateway?orderId=${newOrder._id}` });
+    } else {
+      res.status(200).json({ success: true, redirectUrl: '/order-confirmation' });
+    }
 
   } catch (error) {
-      console.error("Error placing order:", error);
-      res.redirect('/checkout');
+    console.error("Error placing order:", error);
+    res.status(500).json({ success: false, message: 'Failed to place order. Please try again.' });
   }
 };
+
 
 
 const orderConfirm = async (req, res) => {
@@ -211,8 +227,35 @@ const getOrders = async (req, res) => {
 const cancelOrder = async (req, res) => {
   try {
 
+    const userId = req.session.user;
     const id = req.query.id;
     await Order.findByIdAndUpdate(id, { $set: { status: 'Cancelled' } });
+    const order = await Order.findOne({ user: userId,_id:id });
+    console.log(order.paymentMethod);
+
+    if(order.paymentMethod && order.paymentMethod.trim().toLowerCase() === "online"){
+      const walletData = {
+        $inc: { balance: order.totalPrice },
+        $push: { 
+          transactions: {
+            type: "Refund",
+            amount: order.totalPrice,
+            orderId: order._id
+          }
+        }
+      }
+  
+      const walletUpdate = await Wallet.findOneAndUpdate(
+        {userId:userId},
+        walletData,
+        { upsert: true, new: true }
+      );
+  
+      if(!walletUpdate){
+        throw new Error("Failed to update wallet");
+      }
+    }
+
     res.redirect('/orders')
 
   } catch (error) {
@@ -262,9 +305,9 @@ const searchProduct = async (req, res) => {
 
     console.log(category);
     console.log(q);
-    const products = await Product.find(searchCriteria).populate('category','name')
+    const products = await Product.find(searchCriteria).populate('category', 'name')
 
-    res.render('search-results',{products,searchTerm: q});
+    res.render('search-results', { products, searchTerm: q });
 
   } catch (error) {
     console.error("Error fetching search results:", error);
@@ -282,5 +325,6 @@ module.exports = {
   cancelOrder,
   orderDetails,
   searchProduct,
-  applyCoupon
+  applyCoupon,
+  removeCoupon
 }

@@ -328,7 +328,8 @@
             function updateQuantity(change) {
                 const qtyInput = document.getElementById('qty-val');
                 let currentQty = parseInt(qtyInput.value);
-                currentQty = Math.max(1, Math.min(maxQuantity, currentQty + change));
+                const maxLimit = 5;
+                currentQty = Math.max(1, Math.min(maxQuantity,maxLimit, currentQty + change));
                 qtyInput.value = currentQty;
             }
 

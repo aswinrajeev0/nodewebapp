@@ -28,6 +28,7 @@
                             <select class="form-select" onchange="filterByStatus(this.value)">
                                 <option value="All" <%= currentStatus === 'All' ? 'selected' : '' %>>All</option>
                                 <option value="Pending" <%= currentStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                <option value="Processing" <%= currentStatus === 'Processing' ? 'selected' : '' %>>Processing</option>
                                 <option value="Shipped" <%= currentStatus === 'Shipped' ? 'selected' : '' %>>Shipped</option>
                                 <option value="Cancelled" <%= currentStatus === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
                                 <option value="Delivered" <%= currentStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
@@ -56,7 +57,7 @@
                                 <%for(let i=orders.length-1;i>=0;i--){%>
                                     <tr>
                                         <td><%=orders[i].orderId%></td>
-                                        <td><%=orders[i].createdOn.toLocaleDateString()%></td>
+                                        <td><%=orders[i].createdAt.toLocaleDateString()%></td>
                                         <td>
                                             <ul style="padding-left: 15px; margin: 0;">
                                                 <% orders[i].orderedItems.forEach(item => { %>

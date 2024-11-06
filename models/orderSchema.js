@@ -8,7 +8,7 @@ const orderSchema = new Schema({
     default: () => uuidv4(),
     unique: true,
   },
-  user:{
+  user: {
     type: Schema.Types.ObjectId,
     ref: "User",
     required: true,
@@ -47,6 +47,11 @@ const orderSchema = new Schema({
     ref: "Address",
     require: true,
   },
+  razorpayDetails: {
+    orderId: String,
+    paymentId: String,
+    signature: String
+  },
   invoiceDate: {
     type: Date,
   },
@@ -71,14 +76,14 @@ const orderSchema = new Schema({
     type: String,
     enum: ['COD', 'Online'],
     required: true
-},
-paymentStatus: {
+  },
+  paymentStatus: {
     type: String,
     enum: ['Pending', 'Processing', 'Completed', 'Failed'],
     default: 'Pending'
-}
-},{
-  timestamps:true
+  }
+}, {
+  timestamps: true
 });
 
 const Order = mongoose.model("Order", orderSchema);
