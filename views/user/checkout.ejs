@@ -330,7 +330,7 @@
                             <div class="coupon-section">
                                 <h5 class="mb-3">Apply Coupon</h5>
                                 <div class="input-group">
-                                    <input type="text" id="couponCode" class="form-control"
+                                    <input type="text" id="couponCode" name="couponCode" class="form-control"
                                         placeholder="Enter coupon code">
                                     <div class="input-group-append">
                                         <button id="applyCouponBtn" class="btn btn-success" type="button"
@@ -354,7 +354,7 @@
                                 <div id="discount-row" class="d-none">
                                     <div class="d-flex justify-content-between mb-2">
                                         <span>Discount</span>
-                                        <span id="discountDisplay" class="text-success">-₹0</span>
+                                        <span id="discountDisplay" class="text-success">-0</span>
                                     </div>
                                 </div>
                                 <div class="d-flex justify-content-between mt-3">
@@ -401,12 +401,14 @@
                                 <input type="hidden" name="cart" value='<%= JSON.stringify(cart ? cart.items : []) %>'>
                                 <input type="hidden" name="totalPrice" value="<%= totalPrice %>">
                                 <input type="hidden" name="finalPrice" id="finalPrice" value="<%= totalPrice %>">
+                                <input type="hidden" name="discount" id="discount">
+                                <input type="hidden" name="coupon" id="coupon">
                                 <% if (product) { %>
                                     <input type="hidden" name="singleProduct" value="<%= JSON.stringify(product) %>">
                                     <% } %>
                                         <input type="hidden" name="addressId" id="addressId">
 
-                                        <button type="submit" class="btn-place-order">
+                                        <button type="submit" class="btn-place-order" onclick="syncDiscount()">
                                             Place Order
                                         </button>
                             </form>
@@ -418,6 +420,18 @@
     </main>
 
     <script>
+
+        function syncDiscount() {
+            const discountDisplay = document.getElementById('discountDisplay');
+            if (discountDisplay) {
+                const discountText = discountDisplay.innerText.replace('₹', '').trim();
+                const discountValue = parseFloat(discountText);
+                document.getElementById('discount').value = discountValue || 0;
+                const coupon = document.getElementById('couponCode').value;
+                document.getElementById('coupon').value = coupon;
+            }
+        }
+
         function selectAddress(element, addressId) {
             document.querySelectorAll('.address-card').forEach(card => {
                 card.classList.remove('selected');
@@ -604,7 +618,7 @@
                                 razorpay_payment_id: response.razorpay_payment_id,
                                 razorpay_order_id: response.razorpay_order_id,
                                 razorpay_signature: response.razorpay_signature,
-                                payment_method: 'Online'
+                                payment_method: 'Online',
                             };
 
                             const orderResponse = await fetch('/place-order', {
@@ -612,7 +626,7 @@
                                 headers: {
                                     'Content-Type': 'application/json',
                                 },
-                                body: JSON.stringify(orderData)
+                                body: JSON.stringify(orderData),discount
                             });
 
                             const orderResult = await orderResponse.json();
@@ -787,9 +801,9 @@
                 final: document.getElementById('finalTotalDisplay')
             };
 
-            if (elements.subtotal) elements.subtotal.textContent = `₹${subtotal.toFixed(2)}`;
-            if (elements.discount) elements.discount.textContent = `-₹${discount.toFixed(2)}`;
-            if (elements.final) elements.final.textContent = `₹${final.toFixed(2)}`;
+            if (elements.subtotal) elements.subtotal.textContent = `₹${subtotal.toLocaleString()}`;
+            if (elements.discount) elements.discount.textContent = `₹${discount.toLocaleString()}`;
+            if (elements.final) elements.final.textContent = `₹${final.toLocaleString()}`;
         }
 
         async function removeCoupon() {

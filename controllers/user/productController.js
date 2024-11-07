@@ -135,7 +135,7 @@ const removeCoupon = async (req, res) => {
 
 const placeOrder = async (req, res) => {
   try {
-    const { cart, totalPrice, addressId, singleProduct, payment_method, finalPrice } = req.body;
+    const { cart, totalPrice, addressId, singleProduct, payment_method, finalPrice, coupon, discount } = req.body;
     const userId = req.session.user;
 
     let orderedItems = [];
@@ -157,16 +157,19 @@ const placeOrder = async (req, res) => {
       }));
     }
 
-    const discount = 0;
+    const discountAmount = discount ;
     const newOrder = new Order({
       orderedItems,
       totalPrice,
-      finalAmount: finalPrice - discount,
+      discount:discountAmount,
+      finalAmount: finalPrice,
       user: userId,
       address: addressId,
       status: 'Pending',
       paymentMethod: payment_method,
       paymentStatus: paymentStatus,
+      couponCode:coupon,
+      ...(coupon && discountAmount ? { couponApplied: true } : {couponApplied:false})
     });
 
     await newOrder.save();

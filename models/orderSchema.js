@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-const { v4: uuidv4 } = require("uuid");
+const { v4: uuidv4, NIL } = require("uuid");
 
 const orderSchema = new Schema({
   orderId: {
@@ -71,6 +71,10 @@ const orderSchema = new Schema({
   couponApplied: {
     type: Boolean,
     default: false,
+  },
+  couponCode:{
+    type:String,
+    required:false
   },
   paymentMethod: {
     type: String,

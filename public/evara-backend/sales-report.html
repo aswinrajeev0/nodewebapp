@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Report</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .filter-section {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .filter-section div {
+            flex: 1;
+        }
+        .filter-section label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .filter-section select, .filter-section input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        .report-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .report-summary .summary-box {
+            flex: 1 1 200px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .summary-box h3 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+        .summary-box p {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .report-table th, .report-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        .report-table th {
+            background-color: #f4f4f4;
+        }
+        .download-buttons {
+            text-align: right;
+            margin-top: 20px;
+        }
+        .download-buttons button {
+            padding: 10px 15px;
+            margin-left: 10px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        .pdf-button {
+            background-color: #d9534f;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+        }
+        .excel-button {
+            background-color: #5cb85c;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Sales Report</h1>
+    
+    <div class="filter-section">
+        <div>
+            <label for="dateRange">Date Range</label>
+            <select id="dateRange">
+                <option value="custom">Custom</option>
+                <option value="1day">1 Day</option>
+                <option value="1week">1 Week</option>
+                <option value="1month">1 Month</option>
+            </select>
+        </div>
+        
+        <div>
+            <label for="startDate">Start Date</label>
+            <input type="date" id="startDate">
+        </div>
+        
+        <div>
+            <label for="endDate">End Date</label>
+            <input type="date" id="endDate">
+        </div>
+    </div>
+
+    <div class="report-summary">
+        <div class="summary-box">
+            <h3>Overall Sales Count</h3>
+            <p>1234</p>
+        </div>
+        <div class="summary-box">
+            <h3>Overall Order Amount</h3>
+            <p>$10,000</p>
+        </div>
+        <div class="summary-box">
+            <h3>Overall Discount</h3>
+            <p>$500</p>
+        </div>
+        <div class="summary-box">
+            <h3>Coupons Deduction</h3>
+            <p>$300</p>
+        </div>
+        <div class="summary-box">
+            <h3>Average Order Value</h3>
+            <p>$150</p>
+        </div>
+        <div class="summary-box">
+            <h3>Total Coupon Applications</h3>
+            <p>50</p>
+        </div>
+    </div>
+
+    <table class="report-table">
+        <thead>
+            <tr>
+                <th>Order Date</th>
+                <th>Order ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Product Name</th>
+                <th>Product Price</th>
+                <th>Quantity</th>
+                <th>Total Price</th>
+                <th>Order Status</th>
+                <th>Coupon Name</th>
+                <th>Coupon Code</th>
+                <th>Coupon Amount</th>
+                <th>Discount</th>
+                <th>Final Amount</th>
+                <th>Payment Method</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Rows would be dynamically populated here -->
+            <tr>
+                <td>2024-11-01</td>
+                <td>ORD1234</td>
+                <td>John Doe</td>
+                <td>john.doe@example.com</td>
+                <td>Product A</td>
+                <td>$100</td>
+                <td>2</td>
+                <td>$200</td>
+                <td>Shipped</td>
+                <td>Holiday Sale</td>
+                <td>HOLIDAY20</td>
+                <td>$20</td>
+                <td>$10</td>
+                <td>$170</td>
+                <td>Credit Card</td>
+            </tr>
+            <tr>
+                <td>2024-11-02</td>
+                <td>ORD1235</td>
+                <td>Jane Smith</td>
+                <td>jane.smith@example.com</td>
+                <td>Product B</td>
+                <td>$150</td>
+                <td>1</td>
+                <td>$150</td>
+                <td>Processing</td>
+                <td>Spring Discount</td>
+                <td>SPRING10</td>
+                <td>$15</td>
+                <td>$15</td>
+                <td>$120</td>
+                <td>PayPal</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="download-buttons">
+        <button class="pdf-button"><i class="fas fa-file-pdf"></i> Download PDF</button>
+        <button class="excel-button"><i class="fas fa-file-excel"></i> Download Excel</button>
+    </div>
+</div>
+
+</body>
+</html>
