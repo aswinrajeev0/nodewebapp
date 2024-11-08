@@ -7,11 +7,13 @@ const cartController = require('../controllers/user/cartController.js')
 const wishlistController = require('../controllers/user/wishlistController.js')
 const walletController = require('../controllers/user/walletController.js');
 const paymentController = require('../controllers/user/paymentController.js');
+const User = require('../models/userSchema.js');
 const passport = require('passport');
 const {loadCategories} = require('../middlewares/loadCategories')
 
 router.use(express.static('public'));
 router.use(loadCategories);
+
 
 router.get('/page-not-found',userController.pageNotFound)
 router.get('/',userController.loadHomepage)

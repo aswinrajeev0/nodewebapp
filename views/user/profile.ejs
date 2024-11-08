@@ -21,6 +21,17 @@
 
                     <div class="col-md-9">
                         <h4>Account Details</h4><br>
+
+                        <div class="referral-section mb-4">
+                            <h5>Your Referral Code</h5>
+                            <div class="input-group">
+                                <input type="text" id="referralCode" class="form-control"
+                                    value="<%= user.referalCode %>" readonly>
+                                <button onclick="copyReferralCode()" class="btn btn-secondary">Copy</button>
+                            </div>
+                            <small class="text-muted">Share your referral code with friends to earn rewards!</small>
+                        </div>
+
                         <form id="myForm" method="post" action="/updateprofile?id=<%= user._id %>" class="form">
                             <div class="form-group">
                                 <label for="dname">Display Name</label>
@@ -49,6 +60,13 @@
     </main>
 
     <script>
+
+        function copyReferralCode() {
+            const referralCodeInput = document.getElementById("referralCode");
+            referralCodeInput.select();
+            document.execCommand("copy");
+        }
+
         document.getElementById('myForm').addEventListener('submit', function (event) {
             // Prevent form submission initially
             event.preventDefault();

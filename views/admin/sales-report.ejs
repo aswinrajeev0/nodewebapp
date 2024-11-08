@@ -23,10 +23,10 @@
         </form>
 
         <div class="d-flex justify-content-around">
-            <!-- Filter Options -->
+            <!-- Replace the first div with this -->
             <div class="mb-4 d-flex gap-3">
                 <div class="input-group" style="width: 200px;">
-                    <select class="form-control" name="dateRange" onchange="this.form.submit()">
+                    <select class="form-control" name="dateRange" id="dateRangeSelect">
                         <option value="">Select Date Range</option>
                         <option value="today">Today</option>
                         <option value="week">This Week</option>
@@ -36,18 +36,18 @@
                 </div>
             </div>
 
+            <!-- Keep your existing date input form -->
             <div class="mb-4 d-flex gap-3">
                 <form method="get" action="/admin/sales-report" class="d-flex align-items-center">
                     <label for="startDate" class="me-2">Start Date:</label>
                     <input type="date" id="startDate" name="startDate" class="form-control me-3">
                     <label for="endDate" class="me-2">End Date:</label>
                     <input type="date" id="endDate" name="endDate" class="form-control me-3">
-                    <button type="submit" class="btn btn-primary">Filter</button>
+                    <!-- <button type="submit" class="btn btn-primary">Filter</button> -->
                 </form>
             </div>
         </div>
 
-        <!-- Summary Cards -->
         <div class="row mb-4">
             <div class="col-lg-3 col-md-6">
                 <div class="card card-body mb-4">
@@ -70,7 +70,9 @@
                         </span>
                         <div class="text">
                             <h6 class="mb-1">Total Orders</h6>
-                            <span>150</span>
+                            <span>
+                                <%= count %>
+                            </span>
                         </div>
                     </article>
                 </div>
@@ -122,58 +124,56 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <%let k=1;%>
-                    <%for(let i=orders.length-1;i>=0;i--){%>
-
-                        <tr>
-                            <td><%=k++%></td>
-                            <td>
-                                <%=orders[i].user.username%>
-                            </td>
-                            <td>
-                                <%=orders[i].user.email%>
-                            </td>
-                            <td>
-                                <ul>
-                                    <% orders[i].orderedItems.forEach(item=> { %>
-                                        <li>
-                                            <%= item.product.productName %>
-                                        </li>
-                                        <% }) %>
-                                </ul>
-                            </td>
-                            <td>
-                                <ul>
-                                    <% orders[i].orderedItems.forEach(item=> { %>
-                                        <li>
-                                            <%= item.quantity %>
-                                        </li>
-                                        <% }) %>
-                                </ul>
-                            </td>
-                            <td>
-                                <%=orders[i].createdAt.toLocaleDateString()%>
-                            </td>
-                            <td>
-                                ₹<%=orders[i].totalPrice.toLocaleString()%>
-                            </td>
-                            <td>
-                                <%=orders[i].couponCode%>
-                            </td>
-                            <td>
-                                ₹<%=orders[i].discount.toLocaleString()%>
-                            </td>
-                            <td>
-                                ₹<%=orders[i].finalAmount.toLocaleString()%>
-                            </td>
-                            <td>
-                                <%=orders[i].paymentMethod%>
-                            </td>
-                            <td>
-                                <%=orders[i].status%>
-                            </td>
-                        </tr>
-                        <%}%>
+                    <% let k=1; %>
+                        <% for (let i=orders.length - 1; i>= 0; i--) { %>
+                            <tr>
+                                <td>
+                                    <%= k++ %>
+                                </td>
+                                <td>
+                                    <%= orders[i].user.username %>
+                                </td>
+                                <td>
+                                    <%= orders[i].user.email %>
+                                </td>
+                                <td>
+                                    <ul>
+                                        <% orders[i].orderedItems.forEach(item=> { %>
+                                            <li>
+                                                <%= item.product.productName %>
+                                            </li>
+                                            <% }) %>
+                                    </ul>
+                                </td>
+                                <td>
+                                    <ul>
+                                        <% orders[i].orderedItems.forEach(item=> { %>
+                                            <li>
+                                                <%= item.quantity %>
+                                            </li>
+                                            <% }) %>
+                                    </ul>
+                                </td>
+                                <td>
+                                    <%= orders[i].createdAt.toLocaleDateString() %>
+                                </td>
+                                <td>₹<%= orders[i].totalPrice.toLocaleString() %>
+                                </td>
+                                <td>
+                                    <%= orders[i].couponCode %>
+                                </td>
+                                <td>₹<%= orders[i].discount.toLocaleString() %>
+                                </td>
+                                <td>₹<%= orders[i].finalAmount.toLocaleString() %>
+                                </td>
+                                <td>
+                                    <%= orders[i].paymentMethod %>
+                                </td>
+                                <td>
+                                    <%= orders[i].status %>
+                                </td>
+                            </tr>
+                            <% } %>
                 </tbody>
             </table>
         </div>
@@ -193,35 +193,167 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
 
-
     <script>
         function exportToPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-
             const table = document.getElementById('salesTable');
 
             doc.setFontSize(18);
             doc.text('Sales Report', 14, 20);
-
             doc.setFontSize(12);
             doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
-
-            doc.autoTable({
-                html: table,
-                startY: 40
-            });
-
+            doc.autoTable({ html: table, startY: 40 });
             doc.save('sales-report.pdf');
         }
-
 
         function exportToExcel() {
             const table = document.getElementById('salesTable');
             const wb = XLSX.utils.table_to_book(table, { sheet: "Sales Report" });
-
             XLSX.writeFile(wb, 'sales-report.xlsx');
         }
+
+        const dateRangeFormHtml = `
+            <div class="mb-4 d-flex gap-3">
+                <div class="input-group" style="width: 200px;">
+                    <select class="form-control" name="dateRange" id="dateRangeSelect">
+                        <option value="">Select Date Range</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                        <option value="year">This Year</option>
+                    </select>
+                </div>
+            </div>`;
+
+        // Replace your existing date filter JavaScript with this updated version
+        function initializeDateFilter() {
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            const table = document.getElementById('salesTable');
+            const tbody = table.getElementsByTagName('tbody')[0];
+            const rows = tbody.getElementsByTagName('tr');
+            const dateRangeSelect = document.getElementById('dateRangeSelect');
+
+            // Helper function to parse date
+            function parseDate(dateStr) {
+                const [day, month, year] = dateStr.split('/').map(Number);
+                return new Date(year, month - 1, day);
+            }
+
+            function formatCurrency(amount) {
+                return amount.toLocaleString('en-IN', {
+                    style: 'currency',
+                    currency: 'INR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                }).replace('INR', '₹');
+            }
+
+            function filterTable() {
+                const startDate = startDateInput.value ? new Date(startDateInput.value) : null;
+                const endDate = endDateInput.value ? new Date(endDateInput.value) : null;
+
+                if (startDate) startDate.setHours(0, 0, 0, 0);
+                if (endDate) endDate.setHours(23, 59, 59, 999);
+
+                let visibleRows = 0;
+                let totalSales = 0;
+                let totalDiscount = 0;
+                const uniqueCustomers = new Set();
+
+                for (const row of rows) {
+                    const dateCell = row.cells[5].textContent.trim();
+                    const rowDate = parseDate(dateCell);
+
+                    if (!rowDate) continue;
+
+                    let showRow = true;
+                    if (startDate && rowDate < startDate) showRow = false;
+                    if (endDate && rowDate > endDate) showRow = false;
+
+                    row.style.display = showRow ? '' : 'none';
+
+                    if (showRow) {
+                        visibleRows++;
+                        const finalAmount = parseFloat(row.cells[9].textContent.replace(/[₹,]/g, '')) || 0;
+                        const discount = parseFloat(row.cells[8].textContent.replace(/[₹,]/g, '')) || 0;
+                        const customer = row.cells[1].textContent.trim();
+
+                        totalSales += finalAmount;
+                        totalDiscount += discount;
+                        uniqueCustomers.add(customer);
+                    }
+                }
+
+                const summaryCards = document.querySelectorAll('.card.card-body .text');
+                summaryCards.forEach(card => {
+                    const title = card.querySelector('h6').textContent.trim();
+                    const valueSpan = card.querySelector('span');
+
+                    switch (title) {
+                        case 'Total Sales':
+                            valueSpan.textContent = formatCurrency(totalSales);
+                            break;
+                        case 'Total Orders':
+                            valueSpan.textContent = visibleRows;
+                            break;
+                        case 'Total Discount':
+                            valueSpan.textContent = formatCurrency(totalDiscount);
+                            break;
+                        case 'Total Customers':
+                            valueSpan.textContent = uniqueCustomers.size;
+                            break;
+                    }
+                });
+            }
+
+            function handleDateRangeSelection(e) {
+                e.preventDefault();
+
+                const today = new Date();
+                // today.setHours(0, 0, 0, 0);
+
+                const startDate = new Date(today);
+
+                switch (this.value) {
+                    case 'today':
+                        startDateInput.value = today.toISOString().split('T')[0];
+                        endDateInput.value = today.toISOString().split('T')[0];
+                        break;
+                    case 'week':
+                        startDate.setDate(today.getDate() - 7);
+                        startDateInput.value = startDate.toISOString().split('T')[0];
+                        endDateInput.value = today.toISOString().split('T')[0];
+                        break;
+                    case 'month':
+                        startDate.setMonth(today.getMonth() - 1);
+                        startDateInput.value = startDate.toISOString().split('T')[0];
+                        endDateInput.value = today.toISOString().split('T')[0];
+                        break;
+                    case 'year':
+                        startDate.setFullYear(today.getFullYear() - 1);
+                        startDateInput.value = startDate.toISOString().split('T')[0];
+                        endDateInput.value = today.toISOString().split('T')[0];
+                        break;
+                    default:
+                        startDateInput.value = '';
+                        endDateInput.value = '';
+                        break;
+                }
+                filterTable();
+            }
+
+
+            dateRangeSelect.addEventListener('change', handleDateRangeSelection);
+            startDateInput.addEventListener('change', filterTable);
+            endDateInput.addEventListener('change', filterTable);
+
+            filterTable();
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeDateFilter);
+
     </script>
 
     <%- include('../partials/admin/footer') %>

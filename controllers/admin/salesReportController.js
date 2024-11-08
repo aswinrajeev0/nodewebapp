@@ -6,7 +6,8 @@ const getSalesReport = async (req,res) => {
     try {
         
         const orders = await Order.find().populate('user').populate('orderedItems.product');
-        res.render('sales-report',{orders});
+        const count = await Order.countDocuments();
+        res.render('sales-report',{orders,count});
 
     } catch (error) {
         console.error("Error loading sales report page",error);
