@@ -212,17 +212,18 @@
                         </div>
                         <div class="clearfix product-price-cover text-center">
                             <div class="product-price primary-color">
-                                <ins><span class="text-brand">
-                                        ₹ <%=product.salePrice.toLocaleString()%>
-                                    </span></ins>
-                                <ins><span class="old-price font-md ml-15">
-                                        ₹ <%=product.regularPrice.toLocaleString()%>
-                                    </span></ins>
+                              <ins><span class="text-brand">
+                                ₹ <%=finalSalePrice.toLocaleString() || product.salePrice.toLocaleString()%>
+                              </span></ins>
+                              <ins><span class="old-price font-md ml-15">
+                                ₹ <%=product.regularPrice.toLocaleString()%>
+                              </span></ins>
                                 <span class="save-price font-md color3 ml-15">
-                                    <%=product.productOffer%>%
+                                  <%=highestOffer%>%
                                 </span>
                             </div>
-                        </div>
+                          </div>
+                          
                         <div class="bt-1 border-color-1 mt-15 mb-15"></div>
                         <div class="short-desc mb-30 text-center">
                             <p class="font-sm">
@@ -250,8 +251,8 @@
                                         </div>
                                     </div>
                                     <form action="/add-to-cart?id=<%= product._id %>" method="POST"
-                                        style="display: inline;">
-                                        <input type="hidden" name="quantity" value="1">
+                                        style="display: inline; " onsubmit="syncQuantity()">
+                                        <input type="hidden" name="quantity" id="cart-quantity" value="1">
                                         <button type="submit" class="btn btn-success">Add to cart</button>
                                     </form>
 
@@ -309,7 +310,8 @@
                             </h5>
                             <p class="card-text text-primary">₹ <%= recommended.salePrice.toLocaleString() %>
                             </p>
-                            <a href="/productdetails?id=<%= recommended._id %>" class="btn btn-outline-success btn-success">View
+                            <a href="/productdetails?id=<%= recommended._id %>"
+                                class="btn btn-outline-success btn-success">View
                                 Details</a>
                         </div>
                     </div>
@@ -323,13 +325,19 @@
 
 
         <script>
+
+            function syncQuantity() {
+                const qtyVal = document.getElementById('qty-val').value;
+                document.getElementById('cart-quantity').value = qtyVal;
+            }
+
             const maxQuantity = '<%= product.quantity %>';
 
             function updateQuantity(change) {
                 const qtyInput = document.getElementById('qty-val');
                 let currentQty = parseInt(qtyInput.value);
                 const maxLimit = 5;
-                currentQty = Math.max(1, Math.min(maxQuantity,maxLimit, currentQty + change));
+                currentQty = Math.max(1, Math.min(maxQuantity, maxLimit, currentQty + change));
                 qtyInput.value = currentQty;
             }
 

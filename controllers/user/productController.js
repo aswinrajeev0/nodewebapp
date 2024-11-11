@@ -17,6 +17,14 @@ const getProductDetails = async (req, res) => {
     const id = req.query.id;
     const productData = await Product.findOne({ _id: id });
     const category = await Category.findOne({ _id: productData.category });
+
+    const productOffer = productData.productOffer || 0;
+    const categoryOffer = category ? category.categoryOffer || 0 : 0;
+    const highestOffer = Math.max(productOffer, categoryOffer);
+
+    const discount = (productData.regularPrice * highestOffer) / 100;
+    const finalSalePrice = productData.regularPrice - discount;
+
     const recommendedProducts = await Product.find({
       category: productData.category,
       _id: { $ne: productData._id }
@@ -26,7 +34,9 @@ const getProductDetails = async (req, res) => {
       product: productData,
       cat: category,
       recProducts: recommendedProducts,
-      user: user
+      user: user,
+      finalSalePrice: Math.floor(finalSalePrice),
+      highestOffer
     });
 
   } catch (error) {
@@ -68,10 +78,31 @@ const getCheckout = async (req, res) => {
   }
 };
 
+const getCouponList = async (req,res) => {
+  try {
+    
+    const user = req.session.user;
+    if(!user){
+      return res.redirect('/login');
+    }
+
+    const coupons = await Coupon.find({
+      isList: true,
+      userId: { $ne: user },
+    });
+    
+    res.render('coupon-list',{coupons});
+
+  } catch (error) {
+    
+  }
+}
+
 
 const applyCoupon = async (req, res) => {
   try {
     const { couponCode, totalPrice } = req.body;
+    const userId = req.session.user;
 
     const coupon = await Coupon.findOne({
       name: couponCode,
@@ -86,7 +117,14 @@ const applyCoupon = async (req, res) => {
       });
     }
 
-    let discountAmount = coupon.offerPrice;
+    if (coupon.userId.includes(userId)) {
+      return res.json({
+        success: false,
+        message: 'Coupon has already been used by this user'
+      });
+    }
+
+    let discountAmount = (totalPrice*coupon.offerPercentage)/100;
 
     if (coupon.minimumPrice && totalPrice < coupon.minimumPrice) {
       return res.json({
@@ -96,6 +134,9 @@ const applyCoupon = async (req, res) => {
     }
 
     const discountedTotal = totalPrice - discountAmount;
+
+    coupon.userId.push(userId);
+    await coupon.save();
 
     return res.json({
       success: true,
@@ -136,6 +177,7 @@ const removeCoupon = async (req, res) => {
 const placeOrder = async (req, res) => {
   try {
     const { cart, totalPrice, addressId, singleProduct, payment_method, finalPrice, coupon, discount } = req.body;
+    console.log(discount);
     const userId = req.session.user;
 
     let orderedItems = [];
@@ -232,7 +274,8 @@ const cancelOrder = async (req, res) => {
 
     const userId = req.session.user;
     const id = req.query.id;
-    await Order.findByIdAndUpdate(id, { $set: { status: 'Cancelled' } });
+    const reason = req.query.reason;
+    await Order.findByIdAndUpdate(id, { $set: { status: 'Cancelled',cancellationReason:reason } });
     const order = await Order.findOne({ user: userId,_id:id });
     console.log(order.paymentMethod);
 
@@ -328,6 +371,7 @@ module.exports = {
   cancelOrder,
   orderDetails,
   searchProduct,
+  getCouponList,
   applyCoupon,
   removeCoupon
 }

@@ -112,14 +112,14 @@
                                                 <td class="text-center" data-title="Stock">
                                                     <div class="quantity-control">
                                                         <button type="button"
-                                                            onclick="updateQuantity('<%= cart.items[i].productId._id %>', -1)"
+                                                            onclick="updateQuantity('<%= cart.items[i].productId._id %>', -1,'<%= cart.items[i].productId.quantity %>')"
                                                             class="btn-quantity">-</button>
                                                         <span id="quantity-<%= cart.items[i].productId._id %>"
                                                             class="quantity-display">
                                                             <%= cart.items[i].quantity %>
                                                         </span>
                                                         <button type="button"
-                                                            onclick="updateQuantity('<%= cart.items[i].productId._id %>', 1)"
+                                                            onclick="updateQuantity('<%= cart.items[i].productId._id %>', 1,'<%= cart.items[i].productId.quantity %>')"
                                                             class="btn-quantity">+</button>
                                                     </div>
                                                 </td>
@@ -218,15 +218,23 @@
         }
 
 
-        function updateQuantity(productId, change) {
+        function updateQuantity(productId, change, availableQuantity) {
             const quantityElement = document.getElementById(`quantity-${productId}`);
             const currentQuantity = parseInt(quantityElement.textContent);
+
+            const maxQuantity = Math.min(availableQuantity, 5);
 
             if (currentQuantity + change < 1) {
                 Swal.fire({
                     icon: "warning",
                     title: "Minimum Quantity Reached",
                     text: "The minimum quantity is 1.",
+                });
+                return;
+            }else if(currentQuantity + change > maxQuantity){
+                Swal.fire({
+                    icon: "warning",
+                    title: "Maximum Quantity Reached"
                 });
                 return;
             }

@@ -46,6 +46,16 @@
                             <option value="alphabetical-z-a">Alphabetical (Z-A)</option>
                         </select>
                     </div>
+                    <div>
+                        <select id="cat-filter" class="sort-select" onchange="catFilter()">
+                            <option value="all-categories">All Categories</option>
+                            <%for(let i=0;i<categories.length;i++){%>
+                                <option value="<%=categories[i]._id%>">
+                                    <%=categories[i].name%>
+                                </option>
+                                <%}%>
+                        </select>
+                    </div>
                 </div><br><br>
                 <!--End nav-tabs-->
                 <div class="tab-content wow fadeIn animated" id="myTabContent">
@@ -72,18 +82,22 @@
                                             <h4>
                                                 <%= products[i].productName %>
                                             </h4><br>
-                                            <h5 class="text-">₹<%= products[i].salePrice.toLocaleString() %>
-                                            </h5>
-                                            <p>Rating: <%= products[i].rating !==undefined ?
-                                                    products[i].rating : 'N/A' %>
+                                            <div class="d-flex">
+                                                <h4 class="text pe-3">₹<%= products[i].finalPrice.toLocaleString() %>
+                                                </h4>
+                                                <h6 class="text pe-3" style="text-decoration: line-through; color: rgb(164, 103, 103);">₹<%=products[i].regularPrice.toLocaleString()%></h6>
+                                                <h4><%=products[i].highestOffer%>%</h4>
+                                            </div>
+                                            <p>Rating: <%= products[i].rating !==undefined ? products[i].rating : 'N/A'
+                                                    %>
                                             </p>
                                             <%if(products[i].quantity>0){%>
                                                 <span class="text-success">
                                                     <%=products[i].quantity%> stocks left
                                                 </span>
-                                            <%}else{%>
-                                                <span class="text-danger">Out of Stock</span>
-                                            <%}%>
+                                                <%}else{%>
+                                                    <span class="text-danger">Out of Stock</span>
+                                                    <%}%>
                                         </div>
                                     </div>
                                 </div>
@@ -120,6 +134,21 @@
     </main>
 
     <script>
+
+        function catFilter() {
+            const selectedCategory = document.getElementById('cat-filter').value;
+
+            fetch(`/filter-by-category?category=${selectedCategory}`, {
+                method: 'GET',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    updateProductList(data.products);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+
         function handleSortChange() {
             const sortBy = document.getElementById('sort-by').value;
 
@@ -160,9 +189,9 @@
                                 <h6>${product.productName}</h6>
                                 <h5>₹${product.salePrice.toLocaleString()}</h5>
                                 ${product.quantity > 0
-                                        ? `<span class="text-success">${product.quantity} stocks left</span>`
-                                        : `<span class="text-danger">Out of Stock</span>`
-                                    }
+                        ? `<span class="text-success">${product.quantity} stocks left</span>`
+                        : `<span class="text-danger">Out of Stock</span>`
+                    }
                                 <p>Rating: ${product.rating !== undefined ? product.rating : 'N/A'}</p>
                             </div>
                         </div>

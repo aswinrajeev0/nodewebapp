@@ -85,6 +85,9 @@ const orderSchema = new Schema({
     type: String,
     enum: ['Pending', 'Processing', 'Completed', 'Failed'],
     default: 'Pending'
+  },
+  cancellationReason:{
+    type:String
   }
 }, {
   timestamps: true

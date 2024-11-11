@@ -15,12 +15,12 @@ const getCouponPage = async (req,res) => {
 const addCoupon = async (req,res) => {
     try {
         
-        const {couponCode,discountPrice,minimumPrice,createdDate,endDate} = req.body;
+        const {couponCode,discountPercentage,minimumPrice,createdDate,endDate} = req.body;
         const coupon = new Coupon({
             name:couponCode,
             createdOn:createdDate,
             expireOn:endDate,
-            offerPrice:discountPrice,
+            offerPercentage:discountPercentage,
             minimumPrice:minimumPrice
         })
 

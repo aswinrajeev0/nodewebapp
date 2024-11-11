@@ -15,20 +15,28 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-3">
-                        <form action="/admin/save-coupon" method="post">
+                        <form action="/admin/save-coupon" method="post" onsubmit="return validateCouponForm()">
                             <div class="mb-4">
                                 <label for="couponCode" class="form-label">Coupon Code</label>
-                                <input type="text" placeholder="Type here" class="form-control" id="couponCode" ,
+                                <input type="text" placeholder="Type here" class="form-control" id="couponCode"
                                     name="couponCode" />
                                 <small id="codeError" style="color: red; display: none;">Code is required</small>
                             </div>
 
-                            <div class="mb-4">
+                            <!-- <div class="mb-4">
                                 <label class="form-label">Discount Price</label>
                                 <input type="number" placeholder="Enter discount price" class="form-control"
                                     id="discountPrice" name="discountPrice" />
                                 <small id="discountError" style="color: red; display: none;">Discount price can't be
                                     empty</small>
+                            </div> -->
+
+                            <div class="mb-4">
+                                <label class="form-label">Discount Percentage (%)</label>
+                                <input type="number" placeholder="Enter discount percentage" class="form-control"
+                                    id="discountPercentage" name="discountPercentage"/>
+                                <small id="discountError" style="color: red; display: none;">Discount percentage must be
+                                    between 1 and 100</small>
                             </div>
 
                             <div class="mb-4">
@@ -42,14 +50,14 @@
                             <div class="mb-4">
                                 <label class="form-label">Created On</label>
                                 <input type="date" class="form-control" id="createdDate" name="createdDate" />
-                                <small id="createdError" style="color: red; display: none;"></small>
+                                <small id="createdError" style="color: red; display: none;">Created date is
+                                    required</small>
                             </div>
 
                             <div class="mb-4">
                                 <label class="form-label">End Date</label>
                                 <input type="date" class="form-control" id="endDate" name="endDate" />
-                                <small id="discountError" style="color: red; display: none;">This fied is
-                                    required</small>
+                                <small id="endDateError" style="color: red; display: none;">End date is required</small>
                             </div>
                             <div class="d-grid">
                                 <button class="btn btn-primary" type="submit">Create Coupon</button>
@@ -63,7 +71,7 @@
                                     <thead>
                                         <tr>
                                             <th>Coupon Code</th>
-                                            <th>Discount Price</th>
+                                            <th>Discount Percentage</th>
                                             <!-- <th>Status</th> -->
                                             <th>Action</th>
                                         </tr>
@@ -75,7 +83,7 @@
                                                     <%=coupons[i].name%>
                                                 </td>
                                                 <td>
-                                                    <%=coupons[i].offerPrice.toLocaleString()%>
+                                                    <%=coupons[i].offerPercentage%>
                                                 </td>
                                                 <!-- <%if(coupons[i].isList){%>
                                                 <td>
@@ -131,6 +139,56 @@
                     window.location.href = `/admin/delete-coupon?id=${couponId}`;
                 }
             });
+        }
+
+        function validateCouponForm() {
+            let isValid = true;
+
+            const couponCode = document.getElementById("couponCode");
+            // const discountPrice = document.getElementById("discountPrice");
+            const discountPercentage = document.getElementById("discountPercentage");
+            const minimumPrice = document.getElementById("minimumPrice");
+            const createdDate = document.getElementById("createdDate");
+            const endDate = document.getElementById("endDate");
+
+            document.getElementById("codeError").style.display = "none";
+            document.getElementById("discountError").style.display = "none";
+            document.getElementById("minimumError").style.display = "none";
+            document.getElementById("createdError").style.display = "none";
+            document.getElementById("endDateError").style.display = "none";
+
+            if (!couponCode.value.trim()) {
+                document.getElementById("codeError").style.display = "block";
+                isValid = false;
+            }
+
+            // if (!discountPrice.value.trim() || discountPrice.value <= 0) {
+            //     document.getElementById("discountError").style.display = "block";
+            //     isValid = false;
+            // }
+
+            const discountValue = parseInt(discountPercentage.value, 10);
+            if (!discountPercentage.value.trim() || discountValue < 1 || discountValue > 100) {
+                document.getElementById("discountError").style.display = "block";
+                isValid = false;
+            }
+
+            if (!minimumPrice.value.trim() || minimumPrice.value <= 0) {
+                document.getElementById("minimumError").style.display = "block";
+                isValid = false;
+            }
+
+            if (!createdDate.value) {
+                document.getElementById("createdError").style.display = "block";
+                isValid = false;
+            }
+
+            if (!endDate.value) {
+                document.getElementById("endDateError").style.display = "block";
+                isValid = false;
+            }
+
+            return isValid;
         }
 
         document.getElementById("createdDate").value = new Date().toISOString().split("T")[0];

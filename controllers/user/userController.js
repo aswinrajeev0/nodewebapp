@@ -19,31 +19,37 @@ const loadHomepage = async (req, res) => {
   try {
     const today = new Date().toISOString();
     const findBanner = await Banner.find({
-      startDate:{$lt:new Date(today)},
-      endDate:{$gt: new Date(today)}
-    })
+      startDate: { $lt: new Date(today) },
+      endDate: { $gt: new Date(today) }
+    });
+
     const user = req.session.user;
     const categories = await Category.find({ isListed: true });
     let productData = await Product.find({
       isBlocked: false,
       category: { $in: categories.map(category => category._id) }
+    }).populate('category');
+
+    productData = productData.map(product => {
+      const highestOffer = Math.max(product.productOffer || 0, product.category.categoryOffer || 0);
+      const finalPrice = product.regularPrice - (product.regularPrice * (highestOffer / 100));
+      
+      return {
+        ...product.toObject(),
+        finalPrice: Math.floor(finalPrice),
+        highestOffer
+      };
     });
 
     productData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    productData = productData.slice(0);
 
-    if (user) {
-      const userData = await User.findOne({ _id: user });
-      return res.render('home', { user: userData, products: productData, cat:categories, banner:findBanner || []});
-    } else {
-      return res.render('home', { products: productData, cat: categories, banner:findBanner || []});
-    }
+    return res.render('home', { products: productData, cat: categories, banner: findBanner || [] });
+    
   } catch (error) {
     console.log("Home page not found:", error);
     res.status(500).send("Server error");
   }
 };
-
 
 
 const loadSignup = async (req, res) => {
@@ -62,11 +68,11 @@ function generateOtp() {
 function generateReferalCode(length) {
   let result = '';
   const characters = 'abcdef0123456789';
-  
+
   for (let i = 0; i < length; i++) {
-      result += characters[Math.floor(Math.random() * characters.length)];
+    result += characters[Math.floor(Math.random() * characters.length)];
   }
-  
+
   return result;
 }
 
@@ -154,16 +160,16 @@ const verifyOtp = async (req, res) => {
 
       let refererBonus = 120;
       let newUserBonus = 100;
-      
+
       if (user.referal) {
         const refererUser = await User.findOne({ referalCode: user.referal });
-        
+
         if (refererUser) {
           await Wallet.findOneAndUpdate(
             { userId: refererUser._id },
             {
               $inc: { balance: refererBonus },
-              $push: { 
+              $push: {
                 transactions: {
                   type: "Referal",
                   amount: refererBonus,
@@ -192,10 +198,10 @@ const verifyOtp = async (req, res) => {
         balance: user.referal ? newUserBonus : 0,
         transactions: user.referal
           ? [{
-              type: "Referal",
-              amount: newUserBonus,
-              description: "Referral bonus for signing up with a referral code"
-            }]
+            type: "Referal",
+            amount: newUserBonus,
+            description: "Referral bonus for signing up with a referral code"
+          }]
           : []
       });
 
@@ -240,12 +246,17 @@ const resendOtp = async (req, res) => {
 const loadLogin = async (req, res) => {
   try {
 
-    const message = req.query.msg || ""
+    // const message = req.query.msg || ""
 
-    if (!req.session.user) {
-      return res.render('login', { message })
+    if (req.session.user) {
+      const user = await User.findById(req.session.user);
+      if (user && user.isBlocked) {
+        req.session.user = null;
+        return res.render("login", { message: "User is blocked" });
+      }
+      return res.redirect("/");
     } else {
-      res.redirect('/');
+      return res.render("login", { message: '' });
     }
 
   } catch (error) {
@@ -263,7 +274,7 @@ const login = async (req, res) => {
     })
 
     if (!findUser) {
-      return res.render('login',{message:"User not found"})
+      return res.render('login', { message: "User not found" })
     }
 
     if (findUser.isBlocked) {
@@ -285,17 +296,17 @@ const login = async (req, res) => {
   }
 }
 
-const getLogoutPage = async (req,res) => {
+const getLogoutPage = async (req, res) => {
   try {
-    
+
     const user = req.session.user;
-    if(!user){
-    }else{
+    if (!user) {
+    } else {
       res.render('logout-user');
     }
 
   } catch (error) {
-    console.error("Eroor loading logout page",error);
+    console.error("Eroor loading logout page", error);
     res.status(500).json("Server Error")
   }
 }
@@ -314,43 +325,63 @@ const logout = async (req, res) => {
 
 const sortProducts = async (req, res) => {
   try {
-      const sortOption = req.query.sort || 'default';
-      let sortCriteria;
+    const sortOption = req.query.sort || 'default';
+    let sortCriteria;
 
-      switch (sortOption) {
-          case 'popularity':
-              sortCriteria = { popularity: -1 };
-              break;
-          case 'price-low-high':
-              sortCriteria = { salePrice: 1 };
-              break;
-          case 'price-high-low':
-              sortCriteria = { salePrice: -1 };
-              break;
-          case 'rating':
-              sortCriteria = { rating: -1 };
-              break;
-          case 'new-arrivals':
-              sortCriteria = { createdAt: -1 };
-              break;
-          case 'alphabetical-a-z':
-              sortCriteria = { productName: 1 };
-              break;
-          case 'alphabetical-z-a':
-              sortCriteria = { productName: -1 };
-              break;
-          default:
-              sortCriteria = { createdAt: -1 };
-      }
+    switch (sortOption) {
+      case 'popularity':
+        sortCriteria = { popularity: -1 };
+        break;
+      case 'price-low-high':
+        sortCriteria = { salePrice: 1 };
+        break;
+      case 'price-high-low':
+        sortCriteria = { salePrice: -1 };
+        break;
+      case 'rating':
+        sortCriteria = { rating: -1 };
+        break;
+      case 'new-arrivals':
+        sortCriteria = { createdAt: -1 };
+        break;
+      case 'alphabetical-a-z':
+        sortCriteria = { productName: 1 };
+        break;
+      case 'alphabetical-z-a':
+        sortCriteria = { productName: -1 };
+        break;
+      default:
+        sortCriteria = { createdAt: -1 };
+    }
 
-      const products = await Product.find().sort(sortCriteria);
-      res.json({ products });
-      
+    const products = await Product.find().sort(sortCriteria);
+    res.json({ products });
+
   } catch (error) {
-      console.error('Error fetching sorted products:', error);
-      res.status(500).json({ message: 'An error occurred while sorting products.' });
+    console.error('Error fetching sorted products:', error);
+    res.status(500).json({ message: 'An error occurred while sorting products.' });
   }
 };
+
+const catFilter = async (req, res) => {
+  try {
+
+    const category = req.query.category;
+    let products;
+
+    if (category === 'all-categories') {
+      products = await Product.find({});
+    } else {
+      products = await Product.find({ category: category });
+    }
+
+    res.json({ products });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error fetching products' });
+  }
+}
 
 
 
@@ -365,5 +396,6 @@ module.exports = {
   login,
   getLogoutPage,
   logout,
-  sortProducts
+  sortProducts,
+  catFilter
 };

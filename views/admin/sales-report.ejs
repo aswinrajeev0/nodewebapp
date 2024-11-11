@@ -13,14 +13,7 @@
             </div>
         </div>
 
-        <form class="searchform mb-4" method="get" action="/admin/sales-report">
-            <div class="input-group">
-                <input type="text" class="form-control" name="search" placeholder="Search Orders">
-                <button class="btn btn-light bg" type="submit">
-                    <i class="material-icons md-search"></i>
-                </button>
-            </div>
-        </form>
+        
 
         <div class="d-flex justify-content-around">
             <!-- Replace the first div with this -->
@@ -38,12 +31,11 @@
 
             <!-- Keep your existing date input form -->
             <div class="mb-4 d-flex gap-3">
-                <form method="get" action="/admin/sales-report" class="d-flex align-items-center">
+                <form class="d-flex align-items-center">
                     <label for="startDate" class="me-2">Start Date:</label>
                     <input type="date" id="startDate" name="startDate" class="form-control me-3">
                     <label for="endDate" class="me-2">End Date:</label>
                     <input type="date" id="endDate" name="endDate" class="form-control me-3">
-                    <!-- <button type="submit" class="btn btn-primary">Filter</button> -->
                 </form>
             </div>
         </div>

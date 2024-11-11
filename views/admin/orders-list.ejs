@@ -46,10 +46,11 @@
                                 <tr>
                                     <th>#ID</th>
                                     <th scope="col">Date</th>
+                                    <th scope="col">Name</th>
                                     <th scope="col">Product</th>
                                     <th scope="col">Quantity</th>
-                                    <th scope="col">Name</th>
                                     <th scope="col">Total</th>
+                                    <th scope="col">Payment Method</th>
                                     <th scope="col">Status</th>
                                 </tr>
                             </thead>
@@ -58,6 +59,7 @@
                                     <tr>
                                         <td><%=orders[i].orderId%></td>
                                         <td><%=orders[i].createdAt.toLocaleDateString()%></td>
+                                        <td><b><%= orders[i].user ? orders[i].user.username : 'User not found' %></b></td>
                                         <td>
                                             <ul style="padding-left: 15px; margin: 0;">
                                                 <% orders[i].orderedItems.forEach(item => { %>
@@ -72,21 +74,29 @@
                                                 <%})%>
                                             </ul>
                                         </td>
-                                        <td><b><%= orders[i].user ? orders[i].user.username : 'User not found' %></b></td>
                                         <td>₹<%=orders[i].finalAmount.toLocaleString()%></td>
+                                        <td><%=orders[i].paymentMethod%></td>
                                         <td>
                                             <select
                                                 class="badge rounded-pill <%= `status-${orders[i].status.toLowerCase().replace(/ /g, '-')}` %>"
                                                 onchange="updateOrderStatus('<%= orders[i]._id %>', this.value)"
                                             >
-                                                <% ["Pending", "Processing", "Shipped", "Delivered", "Cancelled", "Return Request", "Returned"].forEach(statusOption => { %>
-                                                    <option value="<%= statusOption %>" <%= orders[i].status === statusOption ? 'selected' : '' %>>
+                                                <% 
+                                                    const statuses = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled", "Return Request", "Returned"];
+                                                    const currentIndex = statuses.indexOf(orders[i].status); // Find index of current status
+                                                %>
+                                                
+                                                <% statuses.forEach((statusOption, index) => { %>
+                                                    <option 
+                                                        value="<%= statusOption %>" 
+                                                        <%= orders[i].status === statusOption ? 'selected' : '' %>
+                                                        <%= index < currentIndex ? 'disabled' : '' %> <!-- Disable earlier statuses -->
+                                                    >
                                                         <%= statusOption %>
                                                     </option>
                                                 <% }) %>
                                             </select>
                                         </td>
-                                        
                                     </tr>
                                 <%}%>
                             </tbody>

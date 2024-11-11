@@ -342,6 +342,10 @@
                                             Remove
                                         </button>
                                     </div>
+                                    
+                                </div><br>
+                                <div>
+                                    <a href="/coupons" class="btn btn-success">Show Available coupons</a>
                                 </div>
                             </div>
 
@@ -424,8 +428,8 @@
         function syncDiscount() {
             const discountDisplay = document.getElementById('discountDisplay');
             if (discountDisplay) {
-                const discountText = discountDisplay.innerText.replace('₹', '').trim();
-                const discountValue = parseFloat(discountText);
+                const discountText = discountDisplay.innerText.replace('₹', '').replace(/,/g, '');
+                const discountValue = parseInt(discountText, 10) || 0;
                 document.getElementById('discount').value = discountValue || 0;
                 const coupon = document.getElementById('couponCode').value;
                 document.getElementById('coupon').value = coupon;
@@ -626,7 +630,7 @@
                                 headers: {
                                     'Content-Type': 'application/json',
                                 },
-                                body: JSON.stringify(orderData),discount
+                                body: JSON.stringify(orderData), discount
                             });
 
                             const orderResult = await orderResponse.json();
