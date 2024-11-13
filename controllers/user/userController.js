@@ -42,8 +42,9 @@ const loadHomepage = async (req, res) => {
     });
 
     productData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const products = productData.slice(0,8);
 
-    return res.render('home', { products: productData, cat: categories, banner: findBanner || [] });
+    return res.render('home', { products: products, cat: categories, banner: findBanner || [] });
     
   } catch (error) {
     console.log("Home page not found:", error);

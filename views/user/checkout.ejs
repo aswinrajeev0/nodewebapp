@@ -342,7 +342,7 @@
                                             Remove
                                         </button>
                                     </div>
-                                    
+
                                 </div><br>
                                 <div>
                                     <a href="/coupons" class="btn btn-success">Show Available coupons</a>
@@ -472,6 +472,7 @@
                 } else {
                     await processOnlinePayment(formData);
                 }
+                
             } catch (error) {
                 console.error('Order processing error:', error);
                 Swal.fire({
@@ -484,6 +485,23 @@
 
         async function processCODOrder(formData) {
             try {
+                
+                const finalPrice = parseFloat(formData.finalPrice);
+                if (finalPrice > 1000) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    Swal.close() 
+                    Swal.fire({
+                        title: 'Payment Restriction',
+                        text: 'Cash on Delivery is not available for orders above ₹1000.',
+                        icon: 'error',
+                        showConfirmButton: true,
+                        confirmButtonText: "OK",
+                        allowOutsideClick: false,
+                        allowEscapeKey: false 
+                    });
+
+                    return;
+                }
                 const response = await fetch('/place-order', {
                     method: 'POST',
                     headers: {
@@ -504,7 +522,7 @@
                 }
 
                 if (result.success) {
-                    window.location.href = '/order-confirmation';
+                    window.location.href = `/order-confirmation?id=${result.order._id}`;
                 } else {
                     throw new Error(result.message || 'Failed to place order');
                 }
@@ -635,7 +653,7 @@
 
                             const orderResult = await orderResponse.json();
                             if (orderResult.success) {
-                                window.location.href = `/order-confirmation?id=${orderResult.orderId}`;
+                                window.location.href = `/order-confirmation?id=${orderResult.order._id}`;
                             } else {
                                 throw new Error(orderResult.message || 'Failed to place order');
                             }

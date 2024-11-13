@@ -7,6 +7,7 @@ const cartController = require('../controllers/user/cartController.js')
 const wishlistController = require('../controllers/user/wishlistController.js')
 const walletController = require('../controllers/user/walletController.js');
 const paymentController = require('../controllers/user/paymentController.js');
+const invoiceController = require('../controllers/user/invoiceController.js');
 const User = require('../models/userSchema.js');
 const passport = require('passport');
 const { loadCategories } = require('../middlewares/loadCategories')
@@ -74,6 +75,9 @@ router.get('/delete-address', profileController.deleteAddress);
 //product details
 router.get('/productdetails', productController.getProductDetails);
 
+router.get('/all-products',productController.getAllProducts);
+router.get('/brands',productController.getBrands);
+
 //user cart
 router.get('/cart', cartController.getCart);
 router.post('/add-to-cart', cartController.addToCart);
@@ -92,6 +96,7 @@ router.get('/order-confirmation', productController.orderConfirm);
 router.get('/orders', productController.getOrders);
 router.get('/cancel-order', productController.cancelOrder);
 router.get('/order-details', productController.orderDetails);
+router.get('/download-invoice',invoiceController.downloadInvoice)
 
 //wishlist
 router.get('/wishlist', wishlistController.getWishList);

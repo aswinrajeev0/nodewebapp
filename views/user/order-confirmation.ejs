@@ -174,14 +174,18 @@
                 
                 <p class="confirmation-message">
                     Thank you for your order! <br>
-                    Your order number is <span class="order-number">#12345</span><br>
+                    Your order number is <span class="order-number"><%=order.orderId%></span><br>
                     You will receive an email confirmation shortly.
                 </p>
 
                 <div class="action-buttons">
-                    <a href="/" class="action-button btn-home">Back To Home</a>
+                    <a href="/" class="action-button btn-home">Back To Home</a> 
                     <a href="/orders" class="action-button btn-orders">View Orders</a>
+                    <a href="/download-invoice?id=<%= order._id %>" class="btn btn-primary">Download Invoice</a>
                 </div>
+
+                
+                
             </div>
         </div>
     </div>

@@ -6,7 +6,8 @@ const Address = require('../../models/addressSchema');
 const Order = require('../../models/orderSchema');
 const Coupon = require('../../models/couponSchma');
 const Wallet = require('../../models/walletSchema');
-
+const Brand = require('../../models/brandSchema');
+const fs = require('fs');
 
 
 const getProductDetails = async (req, res) => {
@@ -222,10 +223,12 @@ const placeOrder = async (req, res) => {
       });
     }
 
+    const order = await Order.findById(newOrder._id)
+
     if (payment_method === 'Online') {
-      res.status(200).json({ success: true, redirectUrl: `/payment-gateway?orderId=${newOrder._id}` });
+      res.status(200).json({ success: true, redirectUrl: `/payment-gateway?orderId=${newOrder._id}`,order });
     } else {
-      res.status(200).json({ success: true, redirectUrl: '/order-confirmation' });
+      res.status(200).json({ success: true, redirectUrl: `/order-confirmation?id=${newOrder._id}`,order });
     }
 
   } catch (error) {
@@ -239,14 +242,15 @@ const placeOrder = async (req, res) => {
 const orderConfirm = async (req, res) => {
   try {
 
-    res.render('order-confirmation');
+    const id = req.query.id
+    const order = await Order.findById(id);
+    res.render('order-confirmation',{order});
 
   } catch (error) {
     console.error("Error loading cofirmation page", error);
     res.redirect('/page-not-found');
   }
 }
-
 
 const getOrders = async (req, res) => {
   try {
@@ -361,6 +365,38 @@ const searchProduct = async (req, res) => {
   }
 }
 
+const getAllProducts = async (req,res) => {
+  try {
+    
+    const limit = 12;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const products = await Product.find()
+    .limit(limit)
+    .skip((page - 1) * limit);
+
+    const count = await Product.countDocuments();
+
+    res.render('all-products',{products,
+      totalPages:Math.ceil(count/limit),
+      currentPage:page
+    })
+
+  } catch (error) {
+    
+  }
+}
+
+const getBrands = async (req,res) => {
+  try {
+    
+    const brands = await Brand.find();
+    res.render('brand-list',{brands});
+
+  } catch (error) {
+    
+  }
+}
+
 
 module.exports = {
   getProductDetails,
@@ -373,5 +409,7 @@ module.exports = {
   searchProduct,
   getCouponList,
   applyCoupon,
-  removeCoupon
+  removeCoupon,
+  getAllProducts,
+  getBrands
 }
