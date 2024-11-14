@@ -86,6 +86,8 @@ router.post('/update-cart-quantity', cartController.updateCart);
 
 router.get('/checkout', productController.getCheckout);
 router.post('/place-order', productController.placeOrder);
+router.post('/place-order-initial',productController.placeOrderInitial);
+router.post('/retry-payment',paymentController.retryPayment);
 
 router.post('/create-order', paymentController.createOrder);
 router.post('/verify-payment', paymentController.verifyPayment);

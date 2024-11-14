@@ -85,7 +85,7 @@ const createOrder = async (req, res) => {
 
     } catch (error) {
         console.error('Razorpay order creation error:', error);
-        
+
         // Enhanced error handling
         if (error.error && error.error.code === 'BAD_REQUEST_ERROR') {
             return res.status(400).json({
@@ -118,7 +118,7 @@ const verifyPayment = async (req, res) => {
             });
         }
 
-        if (!req.session.razorpayOrderId || !req.session.razorpayOrderExpiry || 
+        if (!req.session.razorpayOrderId || !req.session.razorpayOrderExpiry ||
             Date.now() > req.session.razorpayOrderExpiry) {
             return res.status(400).json({
                 success: false,
@@ -161,7 +161,7 @@ const verifyPayment = async (req, res) => {
         res.status(200).json({
             success: true,
             message: 'Payment verified successfully',
-            paymentId: razorpay_payment_id
+            paymentId: razorpay_payment_id,
         });
 
     } catch (error) {
@@ -181,22 +181,22 @@ const getRazorpayKey = (req, res) => {
             message: 'Razorpay key not configured'
         });
     }
-    
+
     res.json({
         success: true,
         key: process.env.RAZOR_KEY_ID
     });
 };
 
-const getAddress = async (req,res) => {
+const getAddress = async (req, res) => {
     try {
         const user = req.session.user;
         const addressId = req.params.id;
-        const addressDoc = await Address.findOne({userId:user});
-        const address = addressDoc.addresses.filter((address)=>{
+        const addressDoc = await Address.findOne({ userId: user });
+        const address = addressDoc.addresses.filter((address) => {
             address._id = addressId
         })
-        
+
         if (!address) {
             return res.status(404).json({
                 success: false,
@@ -220,9 +220,64 @@ const getAddress = async (req,res) => {
     }
 }
 
+const getOrderDetails = async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+        const order = await Order.findOne({orderId});
+        if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+
+        res.json({
+            success: true,
+            orderDetails: {
+                _id: order._id,
+                razorpayOrderId: order.razorpayOrderId,
+                amount: order.finalAmount * 100,
+                currency: 'INR'
+            },
+            razorpayKey: process.env.RAZOR_KEY_ID
+        });
+    } catch (error) {
+        console.error("Error fetching order details:", error);
+        res.status(500).json({ success: false, message: 'Failed to fetch order details' });
+    }
+}
+
+const retryPayment = async (req,res) => {
+    const { orderId } = req.body;
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+        return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    try {
+        const razorpayOrder = await razorpay.orders.create({
+            amount: order.finalAmount*100,
+            currency: order.currency,
+            receipt: `order_rcptid_${order.id}`,
+        });
+
+        req.session.razorpayOrderId = razorpayOrder.id;
+        req.session.razorpayOrderExpiry = Date.now() + (30 * 60 * 1000);
+
+        res.json({
+            success: true,
+            razorpayOrderId: razorpayOrder.id,
+            razorpayKey: process.env.RAZOR_KEY_ID,
+            amount: order.finalAmount,
+            currency: order.currency
+        });
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ success: false, message: 'Failed to create Razorpay order' });
+    }
+}
+
 module.exports = {
     createOrder,
     verifyPayment,
     getRazorpayKey,
-    getAddress
+    getAddress,
+    getOrderDetails,
+    retryPayment
 };

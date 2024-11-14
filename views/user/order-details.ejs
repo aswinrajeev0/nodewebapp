@@ -1,5 +1,48 @@
 <%- include('../partials/user/header') %>
 
+    <style>
+        .order-details-section {
+            padding-top: 50px;
+        }
+
+        .store-order-summary h2.store-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .order-total h3 {
+            font-size: 1.25rem;
+        }
+
+        .shipment-status .card-body {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .order-products .product-item {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .product-image {
+            border-radius: 8px;
+        }
+
+        .order-summary .card-body {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .shipping-details,
+        .payment-method,
+        .order-summary-details {
+            width: 30%;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <main class="main">
         <!-- Order Details Section -->
         <section class="order-details-section position-relative pt-50">
@@ -22,7 +65,11 @@
                 <% } else if (order.paymentStatus === 'Failed') { %> bg-dander 
                 <% } %>">
                                     <%= order.paymentStatus %>
-                                </span>
+                                </span>&nbsp;&nbsp;&nbsp;
+                                <% if (order.paymentStatus==='Pending' && order.paymentMethod==='Online' ) { %>
+                                    <button id="continuePaymentButton" class="btn btn-primary"
+                                        onclick="retryPayment('<%=order._id%>')">Continue Payment</button>
+                                    <% } %>
                         </p>
                         <p>Placed on: <%= order.createdAt.toLocaleString() %>
                         </p>
@@ -46,8 +93,8 @@
                                 <% } else if (order.status === 'Return Request') { %> bg-warning 
                                 <% } else if (order.status === 'Returned') { %> bg-dark 
                                 <% } %>">
-                                <%= order.status %>
-                            </span>
+                                    <%= order.status %>
+                                </span>
                             </h5>
                         </div>
                         <a href="#" class="btn btn-outline-success btn-success">Track Order</a>
@@ -118,44 +165,85 @@
 
     <%- include('../partials/user/footer') %>
 
-        <style>
-            .order-details-section {
-                padding-top: 50px;
+        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+        <script>
+            async function retryPayment(orderId) {
+                try {
+                    // Step 1: Request a new Razorpay order ID for the retry payment
+                    const response = await fetch('/retry-payment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ orderId })
+                    });
+
+                    const data = await response.json();
+                    if (!data.success) {
+                        throw new Error(data.message || 'Failed to initialize retry payment');
+                    }
+
+                    // Step 2: Configure Razorpay options with the new order ID
+                    const options = {
+                        key: data.razorpayKey,
+                        amount: data.amount,
+                        currency: data.currency,
+                        order_id: data.razorpayOrderId,
+                        handler: async function (response) {
+                            try {
+                                // Step 3: Verify the payment
+                                const verifyResponse = await fetch('/verify-payment', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        orderId: orderId,  // Use the provided order ID
+                                        razorpay_payment_id: response.razorpay_payment_id,
+                                        razorpay_order_id: response.razorpay_order_id,
+                                        razorpay_signature: response.razorpay_signature
+                                    })
+                                });
+
+                                const verifyData = await verifyResponse.json();
+                                if (!verifyData.success) throw new Error(verifyData.message || 'Payment verification failed');
+
+                                // Step 4: Finalize the order by updating it to "Completed"
+                                const finalOrderResponse = await fetch('/place-order', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        orderId: orderId,  // Use the provided order ID
+                                        paymentSuccess: true,
+                                        paymentDetails: {
+                                            razorpay_payment_id: response.razorpay_payment_id,
+                                            razorpay_order_id: response.razorpay_order_id,
+                                            razorpay_signature: response.razorpay_signature
+                                        }
+                                    })
+                                });
+
+                                const finalOrderData = await finalOrderResponse.json();
+                                if (!finalOrderData.success) throw new Error(finalOrderData.message || 'Failed to finalize order');
+
+                                // Redirect on successful payment
+                                window.location.href = `/order-confirmation?id=${orderId}`;
+                            } catch (error) {
+                                Swal.fire({ title: 'Order Error', text: error.message || 'Failed to complete order', icon: 'error' });
+                            }
+                        },
+                        modal: {
+                            ondismiss: function () {
+                                Swal.fire({
+                                    title: 'Payment Cancelled',
+                                    text: 'Your payment was cancelled. You can retry payment from the order details page.',
+                                    icon: 'info'
+                                });
+                            }
+                        }
+                    };
+
+                    const razorpay = new Razorpay(options);
+                    razorpay.open();
+                } catch (error) {
+                    Swal.fire({ title: 'Payment Error', text: error.message || 'Failed to retry payment', icon: 'error' });
+                }
             }
 
-            .store-order-summary h2.store-name {
-                font-size: 1.5rem;
-                font-weight: bold;
-            }
-
-            .order-total h3 {
-                font-size: 1.25rem;
-            }
-
-            .shipment-status .card-body {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-            }
-
-            .order-products .product-item {
-                border-bottom: 1px solid #eee;
-                padding-bottom: 10px;
-            }
-
-            .product-image {
-                border-radius: 8px;
-            }
-
-            .order-summary .card-body {
-                display: flex;
-                justify-content: space-between;
-                gap: 20px;
-            }
-
-            .shipping-details,
-            .payment-method,
-            .order-summary-details {
-                width: 30%;
-            }
-        </style>
+        </script>

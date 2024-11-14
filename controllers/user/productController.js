@@ -175,67 +175,85 @@ const removeCoupon = async (req, res) => {
   }
 }
 
-const placeOrder = async (req, res) => {
+const placeOrderInitial = async (req, res) => {
   try {
-    const { cart, totalPrice, addressId, singleProduct, payment_method, finalPrice, coupon, discount } = req.body;
-    console.log(discount);
-    const userId = req.session.user;
+      const { cart, totalPrice, addressId, singleProduct, payment_method, finalPrice, coupon, discount } = req.body;
+      const userId = req.session.user;
 
-    let orderedItems = [];
-    const paymentStatus = payment_method === 'COD' ? 'Pending' : 'Processing';
+      let orderedItems = [];
+      if (singleProduct) {
+          const product = JSON.parse(singleProduct);
+          orderedItems.push({
+              product: product._id,
+              quantity: 1,
+              price: product.salePrice,
+          });
+      } else if (cart) {
+          const cartItems = JSON.parse(cart);
+          orderedItems = cartItems.map(item => ({
+              product: item.productId,
+              quantity: item.quantity,
+              price: item.totalPrice / item.quantity,
+          }));
+      }
 
-    if (singleProduct) {
-      const product = JSON.parse(singleProduct);
-      orderedItems.push({
-        product: product._id,
-        quantity: 1,
-        price: product.salePrice,
+      const newOrder = new Order({
+          orderedItems,
+          totalPrice,
+          discount: discount,
+          finalAmount: finalPrice,
+          user: userId,
+          address: addressId,
+          status: 'Pending',
+          paymentMethod: payment_method,
+          paymentStatus: 'Pending', 
+          couponCode: coupon,
+          couponApplied: Boolean(coupon && discount)
       });
-    } else if (cart) {
-      const cartItems = JSON.parse(cart);
-      orderedItems = cartItems.map(item => ({
-        product: item.productId,
-        quantity: item.quantity,
-        price: item.totalPrice / item.quantity,
-      }));
-    }
 
-    const discountAmount = discount ;
-    const newOrder = new Order({
-      orderedItems,
-      totalPrice,
-      discount:discountAmount,
-      finalAmount: finalPrice,
-      user: userId,
-      address: addressId,
-      status: 'Pending',
-      paymentMethod: payment_method,
-      paymentStatus: paymentStatus,
-      couponCode:coupon,
-      ...(coupon && discountAmount ? { couponApplied: true } : {couponApplied:false})
-    });
-
-    await newOrder.save();
-
-    for (const item of orderedItems) {
-      await Product.findByIdAndUpdate(item.product, {
-        $inc: { quantity: -item.quantity }
-      });
-    }
-
-    const order = await Order.findById(newOrder._id)
-
-    if (payment_method === 'Online') {
-      res.status(200).json({ success: true, redirectUrl: `/payment-gateway?orderId=${newOrder._id}`,order });
-    } else {
-      res.status(200).json({ success: true, redirectUrl: `/order-confirmation?id=${newOrder._id}`,order });
-    }
-
+      await newOrder.save();
+      res.status(200).json({ success: true, orderId: newOrder._id });
   } catch (error) {
-    console.error("Error placing order:", error);
-    res.status(500).json({ success: false, message: 'Failed to place order. Please try again.' });
+      console.error("Error placing initial order:", error);
+      res.status(500).json({ success: false, message: 'Failed to save order. Please try again.' });
   }
 };
+
+
+const placeOrder = async (req, res) => {
+  try {
+      const { orderId, paymentDetails, paymentSuccess } = req.body;
+
+      // Fetch the order using orderId
+      const order = await Order.findById(orderId);
+      if (!order) {
+          return res.status(404).json({ success: false, message: 'Order not found' });
+      }
+
+      if (paymentSuccess) {
+          order.paymentStatus = 'Completed';
+      } else {
+          order.paymentStatus = 'Pending';
+      }
+
+      if (paymentDetails) {
+          order.paymentDetails = paymentDetails;
+      }
+      console.log(paymentDetails);
+
+      await order.save();
+
+      res.status(200).json({
+          success: true,
+          message: `Order ${paymentSuccess ? 'completed' : 'pending due to payment failure'}`,
+          orderId: order._id
+      });
+  } catch (error) {
+      console.error("Error updating order payment status:", error);
+      res.status(500).json({ success: false, message: 'Failed to update order. Please try again.' });
+  }
+};
+
 
 
 
@@ -401,6 +419,7 @@ const getBrands = async (req,res) => {
 module.exports = {
   getProductDetails,
   getCheckout,
+  placeOrderInitial,
   placeOrder,
   orderConfirm,
   getOrders,
