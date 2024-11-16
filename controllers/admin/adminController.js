@@ -213,7 +213,6 @@ async function getMostSellingProducts() {
             item._id = item._id.toString();
         });
 
-        console.log("Most selling products:", result);
         return result;
     } catch (error) {
         console.error("Error finding most selling product:", error);
@@ -264,7 +263,6 @@ async function getMostSellingCategories() {
             item._id = item._id.toString();
         });
 
-        console.log("Most selling categories:", result);
         return result;
     } catch (error) {
         console.error("Error finding most selling category:", error);
@@ -303,7 +301,6 @@ async function getMostSellingBrands() {
             item._id = item._id.toString();
         });
 
-        console.log("Most selling category and brand:", result);
         return result;
     } catch (error) {
         console.error("Error finding most selling category and brand:", error);

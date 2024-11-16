@@ -399,6 +399,20 @@
                                         </label>
                                         <div class="payment-description">Pay securely with Razorpay</div>
                                     </div>
+
+                                    <div class="payment-option">
+                                        <input type="radio" name="payment_method" id="wallet" value="Wallet">
+                                        <label for="wallet">
+                                            Pay with Wallet
+                                            <svg class="payment-icon" width="24" height="24" viewBox="0 0 24 24"
+                                                fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <rect x="2" y="4" width="20" height="16" rx="2" />
+                                                <line x1="2" y1="10" x2="22" y2="10" />
+                                            </svg>
+                                        </label>
+                                        <div class="payment-description">Pay with your wallet balance</div>
+                                    </div>
                                 </div>
 
                                 <!-- Hidden Fields -->
@@ -468,13 +482,23 @@
                 });
 
                 if (paymentMethod === 'COD') {
+                    const finalPrice = document.getElementById('finalPrice').value;
+                    if (finalPrice > 1000) {
+                        return Swal.fire({
+                            title: 'Error',
+                            text: "Caash on Delivery is not available for products above ₹ 1,000",
+                            icon: 'error',
+                            showConfirmButton: true,
+                            confirmButtonText: "OK",
+                        });
+                    }
                     const codResponse = await fetch('/place-order-initial', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             ...Object.fromEntries(formData),
                             paymentMethod: 'COD',
-                            paymentStatus: 'Pending' // Set status to Pending for COD orders
+                            paymentStatus: 'Pending'
                         })
                     });
 
@@ -483,8 +507,10 @@
 
                     // Redirect to order confirmation page for COD orders
                     window.location.href = `/order-confirmation?id=${result.orderId}`;
-                } else {
+                } else if (paymentMethod === 'Online') {
                     await processOnlinePayment(formData);
+                } else {
+                    await processWalletPayment(formData)
                 }
 
             } catch (error) {
@@ -497,56 +523,6 @@
             }
         }
 
-        // async function processCODOrder(formData) {
-        //     try {
-
-        //         const finalPrice = parseFloat(formData.finalPrice);
-        //         if (finalPrice > 1000) {
-        //             await new Promise(resolve => setTimeout(resolve, 100));
-        //             Swal.close()
-        //             Swal.fire({
-        //                 title: 'Payment Restriction',
-        //                 text: 'Cash on Delivery is not available for orders above ₹1000.',
-        //                 icon: 'error',
-        //                 showConfirmButton: true,
-        //                 confirmButtonText: "OK",
-        //                 allowOutsideClick: false,
-        //                 allowEscapeKey: false
-        //             });
-
-        //             return;
-        //         }
-        //         const response = await fetch('/place-order', {
-        //             method: 'POST',
-        //             headers: {
-        //                 'Content-Type': 'application/json',
-        //             },
-        //             body: JSON.stringify(formData)
-        //         });
-
-        //         const contentType = response.headers.get("content-type");
-        //         if (!contentType || !contentType.includes("application/json")) {
-        //             throw new Error('Server returned an invalid response. Please try again later.');
-        //         }
-
-        //         const result = await response.json();
-
-        //         if (!response.ok) {
-        //             throw new Error(result.message || 'Failed to place order');
-        //         }
-
-        //         if (result.success) {
-        //             window.location.href = `/order-confirmation?id=${result.order._id}`;
-        //         } else {
-        //             throw new Error(result.message || 'Failed to place order');
-        //         }
-        //     } catch (error) {
-        //         if (error.name === 'TypeError' && error.message.includes('JSON')) {
-        //             throw new Error('Unable to process order. Please try again later.');
-        //         }
-        //         throw error;
-        //     }
-        // }
 
         async function processOnlinePayment(formData) {
             try {
@@ -657,12 +633,12 @@
 
                             window.location.href = `/order-confirmation?id=${initialOrderData.orderId}`;
                         } catch (error) {
-                            Swal.fire({ title: 'Order Error', text: error.message || 'Failed to complete order', icon: 'error' });
+                            window.location.href = `/payment-failed?error=${encodeURIComponent(error.message)}&id=${initialOrderData.orderId}`;
                         }
                     },
                     modal: {
                         ondismiss: function () {
-                            Swal.fire({ title: 'Payment Cancelled', text: 'Your payment was cancelled. Please try again.', icon: 'info' });
+                            window.location.href = `/payment-failed?message=${encodeURIComponent('Payment was cancelled by the user')}&id=${initialOrderData.orderId}`;
                         }
                     }
                 };
@@ -670,7 +646,7 @@
                 const razorpay = new Razorpay(options);
                 razorpay.open();
             } catch (error) {
-                Swal.fire({ title: 'Payment Error', text: error.message || 'Failed to initialize payment', icon: 'error' });
+                window.location.href = `/payment-failed?error=${encodeURIComponent(error.message)}`;
             }
         }
 
@@ -693,6 +669,32 @@
             }
             return true;
         }
+
+        async function processWalletPayment(formData) {
+            try {
+                const response = await fetch('/wallet-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(Object.fromEntries(formData))
+                });
+
+                const result = await response.json();
+
+                if (!response.ok || !result.success) {
+                    throw new Error(result.message || 'Failed to process wallet payment.');
+                }
+
+                window.location.href = `/order-confirmation?id=${result.orderId}`;
+            } catch (error) {
+                console.error('Wallet payment error:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: error.message || 'Failed to process wallet payment. Please try again.',
+                    icon: 'error'
+                });
+            }
+        }
+
 
         async function applyCoupon() {
             const couponCodeInput = document.getElementById('couponCode');
@@ -875,4 +877,58 @@
             }
         }
 
+        // async function processCODOrder(formData) {
+    // try {
+
+    // const finalPrice = parseFloat(formData.finalPrice);
+    // if (finalPrice > 1000) {
+    // await new Promise(resolve => setTimeout(resolve, 100));
+    // Swal.close()
+    // Swal.fire({
+    // title: 'Payment Restriction',
+    // text: 'Cash on Delivery is not available for orders above ₹1000.',
+    // icon: 'error',
+    // showConfirmButton: true,
+    // confirmButtonText: "OK",
+    // allowOutsideClick: false,
+    // allowEscapeKey: false
+    // });
+
+    // return;
+    // }
+    // const response = await fetch('/place-order', {
+    // method: 'POST',
+    // headers: {
+    // 'Content-Type': 'application/json',
+    // },
+    // body: JSON.stringify(formData)
+    // });
+
+    // const contentType = response.headers.get("content-type");
+    // if (!contentType || !contentType.includes("application/json")) {
+    // throw new Error('Server returned an invalid response. Please try again later.');
+    // }
+
+    // const result = await response.json();
+
+    // if (!response.ok) {
+    // throw new Error(result.message || 'Failed to place order');
+    // }
+
+    // if (result.success) {
+    // window.location.href = `/order-confirmation?id=${result.order._id}`;
+    // } else {
+    // throw new Error(result.message || 'Failed to place order');
+    // }
+    // } catch (error) {
+    // if (error.name === 'TypeError' && error.message.includes('JSON')) {
+    // throw new Error('Unable to process order. Please try again later.');
+    // }
+    // throw error;
+    // }
+    // }
+
     </script>
+
+
+    

@@ -110,18 +110,25 @@
                                                 <td class="price" data-title="Price"><span>₹ <%=
                                                             cart.items[i].price.toLocaleString() %></span></td>
                                                 <td class="text-center" data-title="Stock">
-                                                    <div class="quantity-control">
-                                                        <button type="button"
-                                                            onclick="updateQuantity('<%= cart.items[i].productId._id %>', -1,'<%= cart.items[i].productId.quantity %>')"
-                                                            class="btn-quantity">-</button>
-                                                        <span id="quantity-<%= cart.items[i].productId._id %>"
-                                                            class="quantity-display">
-                                                            <%= cart.items[i].quantity %>
+                                                    <%if(cart.items[i].productId.quantity > 0){%>
+                                                        <div class="quantity-control">
+                                                            <button type="button"
+                                                                onclick="updateQuantity('<%= cart.items[i].productId._id %>', -1,'<%= cart.items[i].productId.quantity %>')"
+                                                                class="btn-quantity">-</button>
+                                                            <span id="quantity-<%= cart.items[i].productId._id %>"
+                                                                class="quantity-display">
+                                                                <%= cart.items[i].quantity %>
+                                                            </span>
+                                                            <button type="button"
+                                                                onclick="updateQuantity('<%= cart.items[i].productId._id %>', 1,'<%= cart.items[i].productId.quantity %>')"
+                                                                class="btn-quantity">+</button>
+                                                        </div>
+                                                    <%}else{%>
+                                                        <span class="tex-danger">
+                                                            Out of stock
                                                         </span>
-                                                        <button type="button"
-                                                            onclick="updateQuantity('<%= cart.items[i].productId._id %>', 1,'<%= cart.items[i].productId.quantity %>')"
-                                                            class="btn-quantity">+</button>
-                                                    </div>
+                                                    <%}%>
+                                                    
                                                 </td>
                                                 <td class="text-right" data-title="Cart">
                                                     <span id="subtotal-<%= cart.items[i].productId._id %>">₹ <%=

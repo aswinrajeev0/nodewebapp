@@ -10,10 +10,12 @@ const paymentController = require('../controllers/user/paymentController.js');
 const invoiceController = require('../controllers/user/invoiceController.js');
 const User = require('../models/userSchema.js');
 const passport = require('passport');
-const { loadCategories } = require('../middlewares/loadCategories')
+const { loadCategories } = require('../middlewares/loadCategories');
+const loadBrands = require('../middlewares/loadBrands.js');
 
 router.use(express.static('public'));
 router.use(loadCategories);
+router.use(loadBrands);
 
 router.use(async(req, res, next) => {
     const userData = await User.findById(req.session.user);
@@ -88,6 +90,8 @@ router.get('/checkout', productController.getCheckout);
 router.post('/place-order', productController.placeOrder);
 router.post('/place-order-initial',productController.placeOrderInitial);
 router.post('/retry-payment',paymentController.retryPayment);
+router.get('/payment-failed',paymentController.paymentFailed);
+router.post('/wallet-payment',paymentController.walletPayment);
 
 router.post('/create-order', paymentController.createOrder);
 router.post('/verify-payment', paymentController.verifyPayment);

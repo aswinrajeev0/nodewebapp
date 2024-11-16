@@ -188,6 +188,10 @@ const placeOrderInitial = async (req, res) => {
               quantity: 1,
               price: product.salePrice,
           });
+          await Product.findByIdAndUpdate(product._id, {
+            $inc: { quantity: -1 }
+        });
+        
       } else if (cart) {
           const cartItems = JSON.parse(cart);
           orderedItems = cartItems.map(item => ({
@@ -195,6 +199,11 @@ const placeOrderInitial = async (req, res) => {
               quantity: item.quantity,
               price: item.totalPrice / item.quantity,
           }));
+          cartItems.forEach(async item=>{
+            await Product.findByIdAndUpdate(item.productId,{
+              $inc:{quantity:-item.quantity}
+            })
+          })
       }
 
       const newOrder = new Order({
@@ -224,7 +233,6 @@ const placeOrder = async (req, res) => {
   try {
       const { orderId, paymentDetails, paymentSuccess } = req.body;
 
-      // Fetch the order using orderId
       const order = await Order.findById(orderId);
       if (!order) {
           return res.status(404).json({ success: false, message: 'Order not found' });

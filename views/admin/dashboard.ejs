@@ -99,144 +99,144 @@
         const salesData = JSON.parse('<%-JSON.stringify(salesData)%>')
 
 
-        document.addEventListener('DOMContentLoaded', function() {
-    // Products Chart
-    const productsChartCtx = document.getElementById("productsChart");
-    if (productsChartCtx) {
-        new Chart(productsChartCtx, {
-            type: "bar",
-            data: {
-                labels: productsData.map(item => item.productName || 'Unknown'),
-                datasets: [{
-                    label: "Quantity Sold",
-                    data: productsData.map(item => item.totalQuantitySold),
-                    backgroundColor: "rgba(54, 162, 235, 0.6)",
-                    borderColor: "rgba(54, 162, 235, 1)",
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            }
-        });
-    }
-
-    // Categories Chart
-    const categoriesChartCtx = document.getElementById("categoriesChart");
-    if (categoriesChartCtx) {
-        new Chart(categoriesChartCtx, {
-            type: "pie",
-            data: {
-                labels: categoriesData.map(item => item.categoryName || 'Unknown'),
-                datasets: [{
-                    label: "Total Sold",
-                    data: categoriesData.map(item => item.totalQuantitySold),
-                    backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"]
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'right'
-                    }
-                }
-            }
-        });
-    }
-
-    // Brands Chart
-    const brandsChartCtx = document.getElementById("brandsChart");
-    if (brandsChartCtx) {
-        new Chart(brandsChartCtx, {
-            type: "doughnut",
-            data: {
-                labels: brandsData.map(item => item._id),
-                datasets: [{
-                    label: "Total Sold",
-                    data: brandsData.map(item => item.totalQuantitySold),
-                    backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"]
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'right'
-                    }
-                }
-            }
-        });
-    }
-
-    // Main Sales Chart
-    const mainChartCtx = document.getElementById('mainChart');                                  
-    if (mainChartCtx) {
-        const mainChart = new Chart(mainChartCtx, {
-            type: 'line',
-            data: {
-                labels: salesData.monthly.labels || "Unknown",
-                datasets: [{
-                    label: 'Sales',
-                    data: salesData.monthly.data,
-                    borderColor: '#8884d8',
-                    tension: 0.1,
-                    fill: false,
-                    pointBackgroundColor: '#8884d8',
-                    pointRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top'
+        document.addEventListener('DOMContentLoaded', function () {
+            // Products Chart
+            const productsChartCtx = document.getElementById("productsChart");
+            if (productsChartCtx) {
+                new Chart(productsChartCtx, {
+                    type: "bar",
+                    data: {
+                        labels: productsData.map(item => item.productName || 'Unknown'),
+                        datasets: [{
+                            label: "Quantity Sold",
+                            data: productsData.map(item => item.totalQuantitySold),
+                            backgroundColor: "rgba(54, 162, 235, 0.6)",
+                            borderColor: "rgba(54, 162, 235, 1)",
+                            borderWidth: 1
+                        }]
                     },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+            }
+
+            // Categories Chart
+            const categoriesChartCtx = document.getElementById("categoriesChart");
+            if (categoriesChartCtx) {
+                new Chart(categoriesChartCtx, {
+                    type: "pie",
+                    data: {
+                        labels: categoriesData.map(item => item.categoryName || 'Unknown'),
+                        datasets: [{
+                            label: "Total Sold",
+                            data: categoriesData.map(item => item.totalQuantitySold),
+                            backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Brands Chart
+            const brandsChartCtx = document.getElementById("brandsChart");
+            if (brandsChartCtx) {
+                new Chart(brandsChartCtx, {
+                    type: "doughnut",
+                    data: {
+                        labels: brandsData.map(item => item._id),
+                        datasets: [{
+                            label: "Total Sold",
+                            data: brandsData.map(item => item.totalQuantitySold),
+                            backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Main Sales Chart
+            const mainChartCtx = document.getElementById('mainChart');
+            if (mainChartCtx) {
+                const mainChart = new Chart(mainChartCtx, {
+                    type: 'line',
+                    data: {
+                        labels: salesData.monthly.labels || "Unknown",
+                        datasets: [{
+                            label: 'Sales',
+                            data: salesData.monthly.data,
+                            borderColor: '#8884d8',
+                            tension: 0.1,
+                            fill: false,
+                            pointBackgroundColor: '#8884d8',
+                            pointRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        label += new Intl.NumberFormat('en-US', {
+                                            style: 'currency',
+                                            currency: 'INR'
+                                        }).format(context.parsed.y);
+                                        return label;
+                                    }
                                 }
-                                label += new Intl.NumberFormat('en-US', {
-                                    style: 'currency',
-                                    currency: 'INR'
-                                }).format(context.parsed.y);
-                                return label;
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function (value, index, values) {
+                                        return '₹' + value.toLocaleString();
+                                    }
+                                }
                             }
                         }
                     }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value, index, values) {
-                                return '₹' + value.toLocaleString();
-                            }
-                        }
-                    }
-                }
+                });
+
+
+                document.getElementById('timeFilter').addEventListener('change', function (e) {
+                    const timeFrame = e.target.value;
+                    mainChart.data.labels = salesData[timeFrame].labels;
+                    mainChart.data.datasets[0].data = salesData[timeFrame].data;
+                    mainChart.update();
+                });
             }
         });
-
-
-        document.getElementById('timeFilter').addEventListener('change', function(e) {
-            const timeFrame = e.target.value;
-            mainChart.data.labels = salesData[timeFrame].labels;
-            mainChart.data.datasets[0].data = salesData[timeFrame].data;
-            mainChart.update();
-        });
-    }
-});
 
     </script>
 

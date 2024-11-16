@@ -24,7 +24,7 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="wallet-balance" data-title="Balance"><span>₹<%=wallet.balance.toLocaleString()%></span></td>
+                                    <td class="wallet-balance" data-title="Balance"><strong style="font-size: 40px;">₹<%=wallet.balance.toLocaleString()%></strong></td>
                                     <td data-title="Add Money">
                                         <button onclick="confirmAddMoney()" class="btn btn-sm btn-primary">
                                             <i class="fi-rs-wallet mr-5"></i>Add Money
@@ -55,7 +55,11 @@
                                     <tr>
                                         <td data-title="Date"><%=wallet.transactions[i].date.toLocaleDateString()%></td>
                                         <td data-title="Transaction Type"><%=wallet.transactions[i].type%></td>
-                                        <td data-title="Amount">₹<%=wallet.transactions[i].amount.toLocaleString()%></td>
+                                        <%if(wallet.transactions[i].type === "Purchase"){%>
+                                            <td data-title="Amount"><b class="text-danger" style="font-size: 25px;">-</b>&nbsp;<strong class="text-danger">₹<%=wallet.transactions[i].amount.toLocaleString()%></strong></td>
+                                        <%}else{%>
+                                            <td data-title="Amount"><b class="text-success" style="font-size: 20px;">+</b>&nbsp;<strong class="text-success">₹<%=wallet.transactions[i].amount.toLocaleString()%></strong></td>
+                                        <%}%>
                                         <td data-title="Status">
                                             <span class="text-success font-weight-bold"><%=wallet.transactions[i].status%></span>
                                         </td>
