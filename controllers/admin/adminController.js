@@ -70,7 +70,6 @@ const loadDashboard = async (req, res) => {
 
 async function getTotalSales() {
     try {
-        // Get total sales
         const totalSales = await Order.aggregate([
             {
                 $group: {
@@ -93,13 +92,9 @@ async function getTotalSales() {
                     _id: { $isoWeek: "$createdAt" },
                     sales: { $sum: "$finalAmount" }
                 }
-            },
-            {
-                $sort: { "_id": 1 }
             }
         ]);
 
-        // Get monthly sales for current year
         const monthlySales = await Order.aggregate([
             {
                 $match: {
@@ -113,13 +108,9 @@ async function getTotalSales() {
                     _id: { $month: "$createdAt" },
                     sales: { $sum: "$finalAmount" }
                 }
-            },
-            {
-                $sort: { "_id": 1 }
             }
         ]);
 
-        // Get yearly sales
         const yearlySales = await Order.aggregate([
             {
                 $group: {
@@ -136,32 +127,42 @@ async function getTotalSales() {
         ]);
 
         const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        
-        // Format weekly sales data
+
+        // Weekly Data
+        const totalWeeks = 52; // Maximum weeks in a year
         const weeklyData = {
-            labels: weeklySales.map(item => `Week ${item._id}`),
-            data: weeklySales.map(item => item.sales)
+            labels: Array.from({ length: totalWeeks }, (_, i) => `Week ${i + 1}`),
+            data: Array(totalWeeks).fill(0)
         };
+        weeklySales.forEach(item => {
+            const weekIndex = item._id - 1; // Convert to zero-based index
+            if (weekIndex >= 0 && weekIndex < totalWeeks) {
+                weeklyData.data[weekIndex] = item.sales;
+            }
+        });
 
-        
-        // Format monthly sales data
+        // Monthly Data
         const monthlyData = {
-            labels: [],
-            data: []
+            labels: monthNames,
+            data: Array(12).fill(0)
         };
-        
-        // Initialize all months with 0
-        for (let i = 1; i <= 12; i++) {
-            const monthData = monthlySales.find(item => item._id === i);
-            monthlyData.labels.push(monthNames[i-1]);
-            monthlyData.data.push(monthData ? monthData.sales : 0);
-        }
+        monthlySales.forEach(item => {
+            const monthIndex = item._id - 1; // Convert to zero-based index
+            monthlyData.data[monthIndex] = item.sales;
+        });
 
-        // Format yearly sales data
+        // Yearly Data
+        const currentYear = new Date().getFullYear();
         const yearlyData = {
-            labels: yearlySales.map(item => item._id.toString()),
-            data: yearlySales.map(item => item.sales)
+            labels: Array.from({ length: 5 }, (_, i) => (currentYear - 4 + i).toString()),
+            data: Array(5).fill(0)
         };
+        yearlySales.forEach(item => {
+            const yearIndex = yearlyData.labels.indexOf(item._id.toString());
+            if (yearIndex !== -1) {
+                yearlyData.data[yearIndex] = item.sales;
+            }
+        });
 
         return {
             totalSalesAmount: totalSales.length > 0 ? totalSales[0].totalSalesAmount : 0,
@@ -179,6 +180,7 @@ async function getTotalSales() {
         };
     }
 }
+
 
 async function getMostSellingProducts() {
     try {

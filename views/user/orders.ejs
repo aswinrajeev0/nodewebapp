@@ -3,6 +3,7 @@
     <!-- Include SweetAlert library (CDN) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <main class="main">
         <div class="page-header breadcrumb-wrap">
@@ -46,9 +47,16 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% orders.reverse().forEach(order=> { %>
+                                    <% orders.forEach(order=> { %>
                                         <tr>
-                                            <td>#<%= order.orderId %>
+                                            <td>
+                                                <ul>
+                                                    <%order.orderedItems.forEach(item=>{%>
+                                                        <li>
+                                                            <strong><%=item.product.productName%></strong>
+                                                        </li>
+                                                    <%})%>
+                                                </ul>
                                             </td>
                                             <td>
                                                 <%= order.createdAt.toLocaleDateString() %>
@@ -71,12 +79,73 @@
                                         <% }) %>
                                 </tbody>
                             </table>
+                            <div class="pagination-area mt-15 mb-50 container">
+                                <nav aria-label="Page navigation example">
+                                    <ul class="pagination justify-content-start">
+                                        <!-- Previous Button -->
+                                        <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                                            <a class="page-link d-flex justify-content-center align-items-center" 
+                                            href="<%= currentPage === 1 ? '#' : `?page=${currentPage - 1}` %>"
+                                            <%= currentPage === 1 ? 'aria-disabled="true"' : '' %>>
+                                                <span class="material-icons">chevron_left</span>
+                                            </a>
+                                        </li>
+                    
+                                        <!-- Page Numbers -->
+                                        <% 
+                                        let startPage = Math.max(1, currentPage - 2);
+                                        let endPage = Math.min(totalPages, startPage + 4);
+                                        
+                                        if (endPage - startPage < 4) {
+                                            startPage = Math.max(1, endPage - 4);
+                                        }
+                                        
+                                        if (startPage > 1) { %>
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=1">1</a>
+                                            </li>
+                                            <% if (startPage > 2) { %>
+                                                <li class="page-item disabled">
+                                                    <span class="page-link">...</span>
+                                                </li>
+                                            <% } %>
+                                        <% } %>
+                    
+                                        <% for(let i = startPage; i <= endPage; i++) { %>
+                                            <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                                <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                                            </li>
+                                        <% } %>
+                    
+                                        <% if (endPage < totalPages) { %>
+                                            <% if (endPage < totalPages - 1) { %>
+                                                <li class="page-item disabled">
+                                                    <span class="page-link">...</span>
+                                                </li>
+                                            <% } %>
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=<%= totalPages %>"><%= totalPages %></a>
+                                            </li>
+                                        <% } %>
+                    
+                                        <!-- Next Button -->
+                                        <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                                            <a class="page-link d-flex justify-content-center align-items-center" 
+                                            href="<%= currentPage === totalPages ? '#' : `?page=${currentPage + 1}` %>"
+                                            <%= currentPage === totalPages ? 'aria-disabled="true"' : '' %>>
+                                                <span class="material-icons">chevron_right</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div><br>
                             <% } else { %>
                                 <p>You have no orders yet.</p>
                                 <% } %>
                     </div>
                 </div>
             </div>
+            
         </section>
     </main>
 

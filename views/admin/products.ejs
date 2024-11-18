@@ -47,7 +47,7 @@
                             <td><%=data[i].brand %></td>
                             <td><%=data[i].category.name %></td>
                             <td><%=data[i].quantity%></td>
-                            <td><%=data[i].salePrice %></td>
+                            <td>₹<%=data[i].salePrice.toLocaleString() %></td>
                             <td>
                                 <%if(data[i].productOffer){%>
                                     <%=data[i].productOffer%>%

@@ -59,7 +59,7 @@ const getCheckout = async (req, res) => {
     let totalPrice = 0;
 
     if (req.query.id) {
-      const product = await Product.findById(req.query.id);
+      const product = await Product.findOne({_id:req.query.id,isBlocked:false});
       if (!product) {
         return res.redirect('/page-not-found');
       }
@@ -136,8 +136,6 @@ const applyCoupon = async (req, res) => {
 
     const discountedTotal = totalPrice - discountAmount;
 
-    coupon.userId.push(userId);
-    await coupon.save();
 
     return res.json({
       success: true,
@@ -220,6 +218,13 @@ const placeOrderInitial = async (req, res) => {
           couponApplied: Boolean(coupon && discount)
       });
 
+      if (coupon) {
+        await Coupon.findOneAndUpdate(
+          { name: coupon },
+          { $push: { userId: userId } }
+        );
+      }
+
       await newOrder.save();
       res.status(200).json({ success: true, orderId: newOrder._id });
   } catch (error) {
@@ -284,9 +289,16 @@ const getOrders = async (req, res) => {
 
     if (userId) {
       const user = await User.findById(userId);
-      const orders = await Order.find({ user: userId }).sort({ createdOn: -1 });
+      const limit = 10;
+      const page = Math.max(1, parseInt(req.query.page) || 1);
+      const orders = await Order.find({ user: userId })
+      .populate('orderedItems.product')
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip((page - 1) * limit);
+      const count = await Order.find({ user: userId })
       if (orders.length > 0) {
-        res.render('orders', { orders, user });
+        res.render('orders', { orders, user ,totalPages:Math.ceil(count.length/limit), currentPage:page});
       } else {
         res.render('orders', { orders: [], message: "No orders found.", user });
       }

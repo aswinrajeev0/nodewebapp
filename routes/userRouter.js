@@ -8,6 +8,7 @@ const wishlistController = require('../controllers/user/wishlistController.js')
 const walletController = require('../controllers/user/walletController.js');
 const paymentController = require('../controllers/user/paymentController.js');
 const invoiceController = require('../controllers/user/invoiceController.js');
+const {userAuth} = require('../middlewares/auth.js')
 const User = require('../models/userSchema.js');
 const passport = require('passport');
 const { loadCategories } = require('../middlewares/loadCategories');

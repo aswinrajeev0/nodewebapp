@@ -8,7 +8,6 @@
     <link rel="shortcut icon" type="image/x-icon" href="evara-frontend/assets/imgs/theme/favicon.svg">
     <link rel="stylesheet" href="evara-frontend/assets/css/main.css">
     <style>
-        /* Move these styles to an external CSS file if possible */
         .header-bottom .container {
             display: flex;
             justify-content: center;
@@ -42,7 +41,7 @@
         }
 
         .notification-badge::after {
-            content: "3"; /* Example count */
+            content: "3";
             position: absolute;
             top: -8px;
             right: -8px;
@@ -54,29 +53,29 @@
         }
 
         .dropdown-content {
-            display: none; /* Hide by default */
+            display: none;
             position: absolute;
-            background-color: #ffffff; /* Background color */
+            background-color: #ffffff;
             min-width: 160px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 10; /* Higher z-index to overlay other elements */
-            border-radius: 4px; /* Rounded corners */
-            padding: 10px; /* Padding around dropdown items */
+            z-index: 10;
+            border-radius: 4px;
+            padding: 10px;
         }
 
         .dropdown:hover .dropdown-content {
-            display: block; /* Show dropdown on hover */
+            display: block;
         }
 
         .dropdown-content a {
-            display: block; /* Display links as block elements */
-            padding: 10px; /* Add padding for better spacing */
-            color: #333; /* Text color */
-            text-decoration: none; /* Remove underline */
+            display: block;
+            padding: 10px;
+            color: #333;
+            text-decoration: none;
         }
 
         .dropdown-content a:hover {
-            background-color: #f1f1f1; /* Highlight on hover */
+            background-color: #f1f1f1;
         }
 
         .promo-banner {
@@ -87,7 +86,7 @@
         }
 
         .mobile-menu-toggle {
-            display: none; /* Hide by default, show on smaller screens */
+            display: none;
         }
 
         .hamburger {
@@ -95,45 +94,91 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            width: 30px; /* Adjust as necessary */
-            height: 21px; /* Adjust as necessary */
+            width: 30px;
+            height: 21px;
         }
 
         .hamburger .line {
             height: 3px;
-            background: #333; /* Line color */
+            background: #333;
             border-radius: 5px;
             transition: all 0.3s ease;
         }
 
-        /* Show hamburger menu on small screens */
         @media (max-width: 768px) {
             .mobile-menu-toggle {
                 display: block;
             }
 
             .mobile-header-content-area {
-                display: none; /* Hide mobile menu initially */
+                display: none;
             }
 
             .mobile-header-content-area.show {
-                display: block; /* Show mobile menu when toggled */
+                display: block;
             }
 
             .main-menu {
-                display: none; /* Hide main menu on small screens */
+                display: none;
             }
 
             .main-menu.show {
                 display: flex;
                 flex-direction: column;
-                background-color: white; /* Background color of mobile menu */
+                background-color: white;
                 position: absolute;
-                top: 60px; /* Adjust based on header height */
+                top: 60px;
                 left: 0;
                 right: 0;
-                z-index: 999; /* Ensure it appears above other elements */
+                z-index: 999;
                 padding: 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-menu.show {
+                display: flex;
+                flex-direction: column;
+                background-color: white;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                z-index: 999;
+                padding: 15px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            }
+
+            .main-menu.show ul {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .main-menu.show ul li {
+                width: 100%;
+            }
+
+            .main-menu.show ul li a {
+                display: block;
+                padding: 10px;
+                width: 100%;
+            }
+
+            .hamburger.active .line:nth-child(1) {
+                transform: rotate(45deg) translate(5px, 5px);
+            }
+
+            .hamburger.active .line:nth-child(2) {
+                opacity: 0;
+            }
+
+            .hamburger.active .line:nth-child(3) {
+                transform: rotate(-45deg) translate(5px, -5px);
+            }
+
+            body.menu-open {
+                overflow: hidden;
             }
         }
     </style>
@@ -172,11 +217,11 @@
                                     <li class="notification-badge">
                                         <a href="/notifications"><i class="fi-rs-bell"></i></a>
                                     </li>
-                                <% } else { %>
-                                    <li><i class="fi-rs-user"></i><a href="/login">Log In</a></li>
-                                    <li><i class="fi-rs-user"></i><a href="/signup">Sign Up</a></li>
-                                <% } %>
-                                <li><a href="/help"><i class="fi-rs-help"></i> Help</a></li>
+                                    <% } else { %>
+                                        <li><i class="fi-rs-user"></i><a href="/login">Log In</a></li>
+                                        <li><i class="fi-rs-user"></i><a href="/signup">Sign Up</a></li>
+                                        <% } %>
+                                            <li><a href="/help"><i class="fi-rs-help"></i> Help</a></li>
                             </ul>
                         </div>
                     </div>
@@ -195,20 +240,23 @@
                             <form action="/search-product" method="GET">
                                 <select name="category" class="select-active">
                                     <option value="">All Categories</option>
-                                    <% categories.forEach(category => { %>
-                                        <option value="<%= category._id %>"><%= category.name %></option>
-                                    <% }) %>
+                                    <% categories.forEach(category=> { %>
+                                        <option value="<%= category._id %>">
+                                            <%= category.name %>
+                                        </option>
+                                        <% }) %>
                                 </select>
                                 <input type="text" name="q" placeholder="Search for items...">
                                 <button type="submit">Search</button>
                             </form>
                         </div>
-                        
+
                         <div class="header-action-right">
                             <div class="header-action-2">
                                 <div class="header-action-icon-2">
                                     <a href="/wishlist">
-                                        <img class="svgInject" alt="Wishlist" src="evara-frontend/assets/imgs/theme/icons/icon-heart.svg">
+                                        <img class="svgInject" alt="Wishlist"
+                                            src="evara-frontend/assets/imgs/theme/icons/icon-heart.svg">
                                     </a>
                                 </div>
                                 <div class="header-action-icon-2 mini-cart-icon">
@@ -239,30 +287,53 @@
                                             <a href="/categories">Categories</a>
                                             <a href="/brands">Brands</a>
                                             <a href="/cart">Cart</a>
-                                        </div></li>
+                                        </div>
+                                    </li>
                                     <li><a href="/about">About Us</a></li>
                                     <li><a href="/contact">Contact</a></li>
                                 </ul>
                             </nav>
                         </div>
                     </div>
-                    <div class="mobile-menu-toggle d-block d-lg-none">
+                </div>
+                <div class="mobile-menu-toggle d-block d-lg-none">
                         <div class="hamburger" onclick="toggleMobileMenu()">
                             <div class="line"></div>
                             <div class="line"></div>
                             <div class="line"></div>
                         </div>
                     </div>
-                </div>
             </div>
         </div>
     </header>
 
     <script>
         function toggleMobileMenu() {
-            const menu = document.querySelector('.main-menu');
-            menu.classList.toggle('show'); // Toggle visibility of mobile menu
+            const mobileHeaderContent = document.querySelector('.mobile-header-content-area');
+            const mainMenu = document.querySelector('.main-menu');
+            const hamburger = document.querySelector('.hamburger');
+
+            // Toggle classes to show/hide menu
+            mainMenu.classList.toggle('show');
+            hamburger.classList.toggle('active');
+
+            // Optional: Add a body class to prevent scrolling when menu is open
+            document.body.classList.toggle('menu-open');
         }
+
+        // Optional: Close menu when clicking outside
+        document.addEventListener('click', function (event) {
+            const mainMenu = document.querySelector('.main-menu');
+            const hamburger = document.querySelector('.hamburger');
+
+            if (mainMenu.classList.contains('show') &&
+                !mainMenu.contains(event.target) &&
+                !hamburger.contains(event.target)) {
+                mainMenu.classList.remove('show');
+                hamburger.classList.remove('active');
+                document.body.classList.remove('menu-open');
+            }
+        });
     </script>
 </body>
 
