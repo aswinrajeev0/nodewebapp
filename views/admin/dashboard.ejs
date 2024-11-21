@@ -5,10 +5,10 @@
                 <h2 class="content-title card-title">Dashboard</h2>
                 <p>Whole data about your business here</p>
             </div>
-            <div>
+            <!-- <div>
                 <a href="#" class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Create
                     report</a>
-            </div>
+            </div> -->
         </div>
 
         <!-- Statistics Cards -->
@@ -26,6 +26,34 @@
                     </article>
                 </div>
             </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card card-body mb-4">
+                    <article class="icontext">
+                        <span class="icon icon-sm rounded-circle bg-success-light">
+                            <i class="material-icons md-shopping_bag text-success"></i>
+                        </span>
+                        <div class="text">
+                            <h6 class="mb-1">Total Orders</h6>
+                            <span>
+                                <%=count%>
+                            </span>
+                        </div>
+                    </article>
+                </div>
+            </div>
+            <!-- <div class="col-lg-3 col-md-6">
+                <div class="card card-body mb-4">
+                    <article class="icontext">
+                        <span class="icon icon-sm rounded-circle bg-info-light">
+                            <i class="material-icons md-person text-info"></i>
+                        </span>
+                        <div class="text">
+                            <h6 class="mb-1">Total Customers</h6>
+                            <span>85</span>
+                        </div>
+                    </article>
+                </div>
+            </div> -->
             <!-- Other stat cards... -->
         </div>
 
@@ -101,6 +129,69 @@
 
 
         document.addEventListener('DOMContentLoaded', function () {
+
+            // Main Sales Chart
+            const mainChartCtx = document.getElementById('mainChart');
+            if (mainChartCtx) {
+                const mainChart = new Chart(mainChartCtx, {
+                    type: 'line',
+                    data: {
+                        labels: salesData.monthly.labels || "Unknown",
+                        datasets: [{
+                            label: 'Sales',
+                            data: salesData.monthly.data,
+                            borderColor: '#8884d8',
+                            tension: 0.1,
+                            fill: false,
+                            pointBackgroundColor: '#8884d8',
+                            pointRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        label += new Intl.NumberFormat('en-US', {
+                                            style: 'currency',
+                                            currency: 'INR'
+                                        }).format(context.parsed.y);
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function (value, index, values) {
+                                        return '₹' + value.toLocaleString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+
+                document.getElementById('timeFilter').addEventListener('change', function (e) {
+                    const timeFrame = e.target.value;
+                    mainChart.data.labels = salesData[timeFrame].labels;
+                    mainChart.data.datasets[0].data = salesData[timeFrame].data;
+                    mainChart.update();
+                });
+            }
+
             // Products Chart
             const productsChartCtx = document.getElementById("productsChart");
             if (productsChartCtx) {
@@ -176,67 +267,6 @@
                 });
             }
 
-            // Main Sales Chart
-            const mainChartCtx = document.getElementById('mainChart');
-            if (mainChartCtx) {
-                const mainChart = new Chart(mainChartCtx, {
-                    type: 'line',
-                    data: {
-                        labels: salesData.monthly.labels || "Unknown",
-                        datasets: [{
-                            label: 'Sales',
-                            data: salesData.monthly.data,
-                            borderColor: '#8884d8',
-                            tension: 0.1,
-                            fill: false,
-                            pointBackgroundColor: '#8884d8',
-                            pointRadius: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'top'
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function (context) {
-                                        let label = context.dataset.label || '';
-                                        if (label) {
-                                            label += ': ';
-                                        }
-                                        label += new Intl.NumberFormat('en-US', {
-                                            style: 'currency',
-                                            currency: 'INR'
-                                        }).format(context.parsed.y);
-                                        return label;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    callback: function (value, index, values) {
-                                        return '₹' + value.toLocaleString();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-
-
-                document.getElementById('timeFilter').addEventListener('change', function (e) {
-                    const timeFrame = e.target.value;
-                    mainChart.data.labels = salesData[timeFrame].labels;
-                    mainChart.data.datasets[0].data = salesData[timeFrame].data;
-                    mainChart.update();
-                });
-            }
         });
 
     </script>

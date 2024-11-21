@@ -392,10 +392,20 @@ const searchProduct = async (req, res) => {
   try {
 
     console.log(category);
-    console.log(q);
-    const products = await Product.find(searchCriteria).populate('category', 'name')
+    const limit = 12;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const products = await Product.find(searchCriteria)
+    .populate('category', 'name')
+    .limit(limit)
+    .skip((page - 1) * limit);
 
-    res.render('search-results', { products, searchTerm: q });
+    const count = await Product.countDocuments(searchCriteria);
+
+    res.render('search-results', { products, 
+      searchTerm: q,
+      totalPages:Math.ceil(count/limit),
+      currentPage:page
+    });
 
   } catch (error) {
     console.error("Error fetching search results:", error);

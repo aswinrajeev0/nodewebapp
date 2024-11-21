@@ -58,9 +58,11 @@ const loadDashboard = async (req, res) => {
             const categories = await getMostSellingCategories();
             const brands = await getMostSellingBrands();
 
+            const count = await Order.countDocuments();
+
             // const {totalSalesAmount,monthly,yearly} = salesData;
 
-            res.render('dashboard', { salesData, products, categories, brands });
+            res.render('dashboard', { salesData, products, categories, brands,count });
         }
 
     } catch (error) {

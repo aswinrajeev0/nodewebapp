@@ -2,10 +2,19 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const { v4: uuidv4, NIL } = require("uuid");
 
+const generateShortId = () => {
+  const chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let shortId = "";
+  for (let i = 0; i < 6; i++) {
+    shortId += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return shortId;
+};
+
 const orderSchema = new Schema({
   orderId: {
     type: String,
-    default: () => uuidv4(),
+    default: () => generateShortId(),
     unique: true,
   },
   user: {

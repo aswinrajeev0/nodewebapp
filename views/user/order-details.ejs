@@ -97,7 +97,9 @@
                                 </span>
                             </h5>
                         </div>
-                        <a href="#" class="btn btn-outline-success btn-success">Track Order</a>
+                        <%if(order.status == "Delivered"){%>
+                            <a href="/download-invoice?id=<%= order._id %>" class="btn btn-primary">Download Invoice</a>
+                        <%}%>
                     </div>
                 </div>
 
@@ -169,7 +171,6 @@
         <script>
             async function retryPayment(orderId) {
                 try {
-                    // Step 1: Request a new Razorpay order ID for the retry payment
                     const response = await fetch('/retry-payment', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -181,7 +182,6 @@
                         throw new Error(data.message || 'Failed to initialize retry payment');
                     }
 
-                    // Step 2: Configure Razorpay options with the new order ID
                     const options = {
                         key: data.razorpayKey,
                         amount: data.amount,
@@ -189,12 +189,11 @@
                         order_id: data.razorpayOrderId,
                         handler: async function (response) {
                             try {
-                                // Step 3: Verify the payment
                                 const verifyResponse = await fetch('/verify-payment', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({
-                                        orderId: orderId,  // Use the provided order ID
+                                        orderId: orderId,
                                         razorpay_payment_id: response.razorpay_payment_id,
                                         razorpay_order_id: response.razorpay_order_id,
                                         razorpay_signature: response.razorpay_signature
@@ -204,12 +203,11 @@
                                 const verifyData = await verifyResponse.json();
                                 if (!verifyData.success) throw new Error(verifyData.message || 'Payment verification failed');
 
-                                // Step 4: Finalize the order by updating it to "Completed"
                                 const finalOrderResponse = await fetch('/place-order', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({
-                                        orderId: orderId,  // Use the provided order ID
+                                        orderId: orderId,
                                         paymentSuccess: true,
                                         paymentDetails: {
                                             razorpay_payment_id: response.razorpay_payment_id,
@@ -222,7 +220,6 @@
                                 const finalOrderData = await finalOrderResponse.json();
                                 if (!finalOrderData.success) throw new Error(finalOrderData.message || 'Failed to finalize order');
 
-                                // Redirect on successful payment
                                 window.location.href = `/order-confirmation?id=${orderId}`;
                             } catch (error) {
                                 Swal.fire({ title: 'Order Error', text: error.message || 'Failed to complete order', icon: 'error' });
