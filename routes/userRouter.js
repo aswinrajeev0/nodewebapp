@@ -106,6 +106,7 @@ router.get('/get-address/:id', paymentController.getAddress);
 router.get('/order-confirmation', productController.orderConfirm);
 router.get('/orders', productController.getOrders);
 router.get('/cancel-order', productController.cancelOrder);
+router.post('/return-request',productController.returnOrder);
 router.get('/order-details', productController.orderDetails);
 router.get('/download-invoice',invoiceController.downloadInvoice)
 

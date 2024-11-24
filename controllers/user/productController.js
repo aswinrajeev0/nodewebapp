@@ -7,6 +7,7 @@ const Order = require('../../models/orderSchema');
 const Coupon = require('../../models/couponSchma');
 const Wallet = require('../../models/walletSchema');
 const Brand = require('../../models/brandSchema');
+const Return = require('../../models/returnSchema');
 const fs = require('fs');
 
 
@@ -252,7 +253,6 @@ const placeOrder = async (req, res) => {
       if (paymentDetails) {
           order.paymentDetails = paymentDetails;
       }
-      console.log(paymentDetails);
 
       await order.save();
 
@@ -445,6 +445,40 @@ const getBrands = async (req,res) => {
   }
 }
 
+const returnOrder = async (req, res) => {
+  try {
+      const { orderId, reason } = req.body;
+      const userId = req.session.user;
+
+      const orderData = await Order.findById(orderId);
+      if (!orderData) {
+          return res.status(404).json({ message: 'Order not found' });
+      }
+
+      await Order.findByIdAndUpdate(orderId,{$set:{status:'Return Request'}})
+
+      const Existingreturn = await Return.findOne({orderId});
+      if(Existingreturn){
+          return res.status(404).json({message: 'Return request already submited for this order'})
+      }
+
+      const reasonData = new Return({
+          userId,
+          orderId,
+          reason,
+          refundAmount: orderData.finalAmount,
+      });
+
+      await reasonData.save();
+
+      return res.status(200).json({ message: "Return Request Submitted Successfully" });
+
+  } catch (error) {
+      console.error("Error processing return request:", error);
+      return res.status(500).json({ message: 'Something went wrong, please try again later.' });
+  }
+};
+
 
 module.exports = {
   getProductDetails,
@@ -460,5 +494,6 @@ module.exports = {
   applyCoupon,
   removeCoupon,
   getAllProducts,
-  getBrands
+  getBrands,
+  returnOrder
 }

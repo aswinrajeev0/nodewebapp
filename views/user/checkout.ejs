@@ -877,57 +877,6 @@
             }
         }
 
-        // async function processCODOrder(formData) {
-    // try {
-
-    // const finalPrice = parseFloat(formData.finalPrice);
-    // if (finalPrice > 1000) {
-    // await new Promise(resolve => setTimeout(resolve, 100));
-    // Swal.close()
-    // Swal.fire({
-    // title: 'Payment Restriction',
-    // text: 'Cash on Delivery is not available for orders above ₹1000.',
-    // icon: 'error',
-    // showConfirmButton: true,
-    // confirmButtonText: "OK",
-    // allowOutsideClick: false,
-    // allowEscapeKey: false
-    // });
-
-    // return;
-    // }
-    // const response = await fetch('/place-order', {
-    // method: 'POST',
-    // headers: {
-    // 'Content-Type': 'application/json',
-    // },
-    // body: JSON.stringify(formData)
-    // });
-
-    // const contentType = response.headers.get("content-type");
-    // if (!contentType || !contentType.includes("application/json")) {
-    // throw new Error('Server returned an invalid response. Please try again later.');
-    // }
-
-    // const result = await response.json();
-
-    // if (!response.ok) {
-    // throw new Error(result.message || 'Failed to place order');
-    // }
-
-    // if (result.success) {
-    // window.location.href = `/order-confirmation?id=${result.order._id}`;
-    // } else {
-    // throw new Error(result.message || 'Failed to place order');
-    // }
-    // } catch (error) {
-    // if (error.name === 'TypeError' && error.message.includes('JSON')) {
-    // throw new Error('Unable to process order. Please try again later.');
-    // }
-    // throw error;
-    // }
-    // }
-
     </script>
 
 

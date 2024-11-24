@@ -87,7 +87,7 @@
                                                     <i class="material-icons">visibility</i> View Details
                                                 </a>
                                             </td>
-                                            <% if (order.status !== 'Cancelled' && order.status !== 'Completed') { %>
+                                            <% if (order.status !== 'Cancelled' && order.status !== 'Delivered' && order.status !== 'Return Request' && order.status !== 'Returned') { %>
                                                 <td class="text-center">
                                                     <button class="btn btn-xs btn-danger" onclick="confirmCancelOrder('<%= order._id %>')">
                                                         <i class="material-icons">cancel</i> Cancel Order
@@ -100,6 +100,12 @@
                                                         onclick="retryPayment('<%= order._id %>')">
                                                         <i class="material-icons">payment</i> Continue Payment
                                                     </button>
+                                                </td>
+                                            <% } %>
+                                            <% if (order.status && order.status.toLowerCase()==="delivered" ) { %>
+                                                <td class="text-center">
+                                                    <button class="btn btn-xs btn-primary"
+                                                    onclick="confirmReturn('<%= order._id %>')">Return</button>
                                                 </td>
                                             <% } %>
                                         </tr>
@@ -207,7 +213,54 @@
                     }
                 });
             }
+        </script>
 
+        <script>
+        async function confirmReturn(orderId) {
+          try {
+            const result = await Swal.fire({
+              title: "Return Order?",
+              icon: "warning",
+              text: "Reason for Returning Product",
+              html: `<textarea id="returnReason" class="swal2-textarea" placeholder="Enter your reason here"></textarea>`,
+              showCancelButton: true,
+              confirmButtonText: 'Submit',
+              cancelButtonText: 'Cancel',
+              preConfirm: () => {
+                const reason = document.getElementById('returnReason').value.trim();
+                if (!reason) {
+                  Swal.showValidationMessage('Reason cannot be empty');
+                }
+                return reason;
+              }
+            });
+
+            if (result.isConfirmed) {
+              const reason = result.value;
+
+              const response = await fetch('/return-request', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json', 
+                },
+                body: JSON.stringify({ 
+                  orderId: orderId,
+                  reason: reason,
+                }),
+              });
+
+              const responseData = await response.json();
+              if (response.ok) {
+                Swal.fire('Success!', responseData.message, 'success');
+              } else {
+                Swal.fire('Error!', responseData.message, 'error');
+              }
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            Swal.fire('Error!', 'Something went wrong. Please try again.', 'error');
+          }
+        }
         </script>
 
         <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
