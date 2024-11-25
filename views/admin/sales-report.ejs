@@ -240,7 +240,6 @@
                 </div>
             </div>`;
 
-        // Replace your existing date filter JavaScript with this updated version
         function initializeDateFilter() {
             const startDateInput = document.getElementById('startDate');
             const endDateInput = document.getElementById('endDate');
@@ -249,24 +248,30 @@
             const rows = tbody.getElementsByTagName('tr');
             const dateRangeSelect = document.getElementById('dateRangeSelect');
 
-            // Helper function to parse date
             function parseDate(dateStr) {
-                const [day, month, year] = dateStr.split('/').map(Number);
-                return new Date(year, month - 1, day);
+                if (!dateStr) return null;
+
+                let date = new Date(dateStr);
+                if (!isNaN(date)) return date;
+
+                const parts = dateStr.split('/');
+                if (parts.length === 3) {
+                    return new Date(parts[2], parts[1] - 1, parts[0]);
+                }
+
+                return null;
             }
 
             function formatCurrency(amount) {
-                return amount.toLocaleString('en-IN', {
-                    style: 'currency',
-                    currency: 'INR',
+                return '₹' + amount.toLocaleString('en-IN', {
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 0
-                }).replace('INR', '₹');
+                });
             }
 
             function filterTable() {
-                const startDate = startDateInput.value ? new Date(startDateInput.value) : null;
-                const endDate = endDateInput.value ? new Date(endDateInput.value) : null;
+                let startDate = startDateInput.value ? new Date(startDateInput.value) : null;
+                let endDate = endDateInput.value ? new Date(endDateInput.value) : null;
 
                 if (startDate) startDate.setHours(0, 0, 0, 0);
                 if (endDate) endDate.setHours(23, 59, 59, 999);
@@ -277,7 +282,7 @@
                 const uniqueCustomers = new Set();
 
                 for (const row of rows) {
-                    const dateCell = row.cells[5].textContent.trim();
+                    const dateCell = row.cells[4].textContent.trim();
                     const rowDate = parseDate(dateCell);
 
                     if (!rowDate) continue;
@@ -290,8 +295,8 @@
 
                     if (showRow) {
                         visibleRows++;
-                        const finalAmount = parseFloat(row.cells[9].textContent.replace(/[₹,]/g, '')) || 0;
-                        const discount = parseFloat(row.cells[8].textContent.replace(/[₹,]/g, '')) || 0;
+                        const finalAmount = parseFloat(row.cells[6].textContent.replace(/[₹,]/g, '')) || 0;
+                        const discount = parseFloat(row.cells[5].textContent.replace(/[₹,]/g, '')) || 0;
                         const customer = row.cells[1].textContent.trim();
 
                         totalSales += finalAmount;
@@ -323,8 +328,6 @@
             }
 
             function handleDateRangeSelection(e) {
-                e.preventDefault();
-
                 const today = new Date();
                 // today.setHours(0, 0, 0, 0);
 
@@ -357,7 +360,6 @@
                 }
                 filterTable();
             }
-
 
             dateRangeSelect.addEventListener('change', handleDateRangeSelection);
             startDateInput.addEventListener('change', filterTable);

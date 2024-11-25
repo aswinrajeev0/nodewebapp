@@ -14,6 +14,7 @@ const addToCart = async (req, res) => {
 
         const product = await Product.findById(productId);
         const quantity = parseInt(req.body.quantity, 10) || 1;
+
         const totalPrice = product.salePrice * quantity || product.salePrice;
 
         const cartDoc = await Cart.findOne({ userId: user });
