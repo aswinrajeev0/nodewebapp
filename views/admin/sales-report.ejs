@@ -111,7 +111,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% let k=1; %>
+                    <% let k = (currentPage - 1) * 10 + 1; %>
                         <% for (let i=orders.length - 1; i>= 0; i--) { %>
                             <tr>
                                 <td>
@@ -154,17 +154,50 @@
                 </tbody>
             </table>
         </div>
-
-        <div class="pagination-area mt-15 mb-50">
-            <nav aria-label="Page navigation example">
-                <ul class="pagination justify-content-start">
-                    <li class="page-item"><a class="page-link active" href="?page=1">1</a></li>
-                    <li class="page-item"><a class="page-link" href="?page=2">2</a></li>
-                    <li class="page-item"><a class="page-link" href="?page=3">3</a></li>
-                </ul>
-            </nav>
-        </div>
     </div>
+    <div class="pagination-area mt-15 mb-50 container">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-start">
+
+                <!-- Page Numbers -->
+                <% 
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, startPage + 4);
+                
+                if (endPage - startPage < 4) {
+                    startPage = Math.max(1, endPage - 4);
+                }
+                
+                if (startPage > 1) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1">1</a>
+                    </li>
+                    <% if (startPage > 2) { %>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    <% } %>
+                <% } %>
+
+                <% for(let i = startPage; i <= endPage; i++) { %>
+                    <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                    </li>
+                <% } %>
+
+                <% if (endPage < totalPages) { %>
+                    <% if (endPage < totalPages - 1) { %>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    <% } %>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<%= totalPages %>"><%= totalPages %></a>
+                    </li>
+                <% } %>
+            </ul>
+        </nav>
+    </div><br>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>

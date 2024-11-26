@@ -23,6 +23,13 @@ const addToCart = async (req, res) => {
             const existingItemIndex = cartDoc.items.findIndex(item => item.productId.toString() === productId);
 
             if (existingItemIndex >= 0) {
+
+                // const existingQuantity = cartDoc.items[existingItemIndex].quantity;
+
+                // if (existingQuantity + quantity > 5) {
+                //     return res.status(400).json({ message: "You can only add up to 5 of this product to the cart." });
+                // }
+
                 cartDoc.items[existingItemIndex].quantity += quantity;
                 cartDoc.items[existingItemIndex].totalPrice += totalPrice;
             } else {

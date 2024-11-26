@@ -6,9 +6,18 @@ const { Transaction } = require("mongodb");
 
 const getReturnApprovals = async (req, res) => {
     try {
-        const returnData = await Return.find().populate('orderId userId'); 
+
+        const limit = 5;
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const returnData = await Return.find().populate('orderId userId')
+            .sort({ createdAt: -1 })
+            .limit(limit)
+            .skip((page - 1) * limit);
+        const count = await Return.find()
         res.render('return-order', {
             returns: returnData,
+            totalPages: Math.ceil(count.length / limit),
+            currentPage: page
         });
     } catch (error) {
         console.error('Error fetching return approvals:', error);
@@ -35,20 +44,20 @@ const returnUpdate = async (req, res) => {
             await Wallet.findOneAndUpdate(
                 { userId },
                 {
-                  $inc: { balance: amount },
-                  $push: {
-                    transactions: {
-                      type: 'Refund',
-                      amount: amount,
-                      description: "Refund for your returned product",
-                      orderId,
-                      date: new Date()
+                    $inc: { balance: amount },
+                    $push: {
+                        transactions: {
+                            type: 'Refund',
+                            amount: amount,
+                            description: "Refund for your returned product",
+                            orderId,
+                            date: new Date()
+                        }
                     }
-                  }
                 },
                 { new: true }
-              );
-              
+            );
+
 
             returnData.returnStatus = status;
             await returnData.save();
@@ -77,7 +86,7 @@ const returnUpdate = async (req, res) => {
 };
 
 
-module.exports={
+module.exports = {
     getReturnApprovals,
     returnUpdate
 }

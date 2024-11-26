@@ -7,9 +7,6 @@
                 <h2 class="content-title card-title">Coupons</h2>
                 <p>Add, edit, or delete a coupon</p>
             </div>
-            <div>
-                <input type="text" placeholder="Search Coupons" class="form-control bg-white">
-            </div>
         </div>
         <div class="card">
             <div class="card-body">
@@ -106,21 +103,56 @@
                                     <h3>No coupons added yet.</h3>
                                     <%}%>
                         </div>
-                    </div> <!-- .col// -->
-                </div> <!-- .row // -->
-            </div> <!-- card body .// -->
-        </div> <!-- card .// -->
-    </section> <!-- content-main end// -->
-
-    <div class="pagination-area mt-30 mb-50">
-        <nav aria-label="Page navigation example justify-content-center">
-            <ul class="pagination justify-content-center">
-                <li class="page-item"><a class="page-link active" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-            </ul>
-        </nav>
-    </div>
+                        <div class="pagination-area mt-15 mb-50 container">
+                            <nav aria-label="Page navigation example">
+                                <ul class="pagination justify-content-start">
+                                    <!-- Page Numbers -->
+                                    <% 
+                                    let startPage = Math.max(1, currentPage - 2);
+                                    let endPage = Math.min(totalPages, startPage + 4);
+                                    
+                                    if (endPage - startPage < 4) {
+                                        startPage = Math.max(1, endPage - 4);
+                                    }
+                                    
+                                    if (startPage > 1) { %>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=1">1</a>
+                                        </li>
+                                        <% if (startPage > 2) { %>
+                                            <li class="page-item disabled">
+                                                <span class="page-link">...</span>
+                                            </li>
+                                        <% } %>
+                                    <% } %>
+                    
+                                    <% for(let i = startPage; i <= endPage; i++) { %>
+                                        <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                                        </li>
+                                    <% } %>
+                    
+                                    <% if (endPage < totalPages) { %>
+                                        <% if (endPage < totalPages - 1) { %>
+                                            <li class="page-item disabled">
+                                                <span class="page-link">...</span>
+                                            </li>
+                                        <% } %>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=<%= totalPages %>"><%= totalPages %></a>
+                                        </li>
+                                    <% } %>
+                    
+                                    <!-- Next Button -->
+                                    
+                                </ul>
+                            </nav>
+                        </div><br>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section> 
     <br>
 
     <script>

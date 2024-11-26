@@ -11,6 +11,17 @@ const generateShortId = () => {
   return shortId;
 };
 
+const AddressSchema = new Schema({
+  addressType: { type: String, required: true },
+  name: { type: String, required: true },
+  city: { type: String, required: true },
+  streetAddress: { type: String, required: true },
+  state: { type: String, required: true },
+  pincode: { type: String, required: true },
+  phone: { type: String, required: true },
+  altPhone: { type: String },
+});
+
 const orderSchema = new Schema({
   orderId: {
     type: String,
@@ -52,8 +63,7 @@ const orderSchema = new Schema({
     required: true,
   },
   address: {
-    type: Schema.Types.ObjectId,
-    ref: "Address",
+    type: AddressSchema,
     require: true,
   },
   razorpayDetails: {

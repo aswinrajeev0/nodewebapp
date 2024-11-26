@@ -205,13 +205,16 @@ const placeOrderInitial = async (req, res) => {
           })
       }
 
+      const addressDoc = await Address.findOne({userId});
+      const address = addressDoc.addresses.find(addr => addr._id.toString() === addressId);
+
       const newOrder = new Order({
           orderedItems,
           totalPrice,
           discount: discount,
           finalAmount: finalPrice,
           user: userId,
-          address: addressId,
+          address: address,
           status: 'Pending',
           paymentMethod: payment_method,
           paymentStatus: 'Pending', 
@@ -362,7 +365,7 @@ const orderDetails = async (req, res) => {
     }
     const user = await User.findById(userId);
     const order = await Order.findOne({ _id: orderId });
-    const address = await Address.findOne({ "addresses._id": order.address }, { "addresses.$": 1 });
+    const address = order.address
 
     const products = await Promise.all(
       order.orderedItems.map(async (item) => {
@@ -370,7 +373,7 @@ const orderDetails = async (req, res) => {
       })
     );
 
-    res.render('order-details', { order, products, address: address.addresses[0], user });
+    res.render('order-details', { order, products, address: address, user });
   } catch (error) {
     console.error("Error getting order details", error);
     res.redirect('/page-not-found');
@@ -418,7 +421,7 @@ const getAllProducts = async (req,res) => {
     
     const limit = 12;
     const page = Math.max(1, parseInt(req.query.page) || 1);
-    const products = await Product.find()
+    const products = await Product.find({isBlocked:false})
     .limit(limit)
     .skip((page - 1) * limit);
 

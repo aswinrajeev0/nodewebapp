@@ -12,7 +12,7 @@ const getOrderPage = async (req,res) => {
         const page = Math.max(1, parseInt(req.query.page) || 1);
         const orders = await Order.find(filter)
             .populate('user')
-            .populate('orderedItems.product')
+            .populate('orderedItems.product').sort({createdAt:-1})
             .limit(limit)
             .skip((page - 1) * limit);
             const count = await Order.find(filter)
@@ -50,5 +50,5 @@ const updateOrderStatus = async (req, res) => {
 
 module.exports = {
     getOrderPage,
-    updateOrderStatus
+    updateOrderStatus,
 }

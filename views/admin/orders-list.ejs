@@ -17,9 +17,6 @@
                 <div>
                     <h2 class="content-title card-title">Order List </h2>
                 </div>
-                <div>
-                    <input type="text" placeholder="Search order ID" class="form-control bg-white">
-                </div>
             </div>
             <div class="card mb-4">
                 <header class="card-header">
@@ -108,14 +105,6 @@
             <div class="pagination-area mt-15 mb-50 container">
                 <nav aria-label="Page navigation example">
                     <ul class="pagination justify-content-start">
-                        <!-- Previous Button -->
-                        <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
-                            <a class="page-link d-flex justify-content-center align-items-center" 
-                            href="<%= currentPage === 1 ? '#' : `?page=${currentPage - 1}` %>"
-                            <%= currentPage === 1 ? 'aria-disabled="true"' : '' %>>
-                                <span class="material-icons">chevron_left</span>
-                            </a>
-                        </li>
     
                         <!-- Page Numbers -->
                         <% 
@@ -153,22 +142,12 @@
                                 <a class="page-link" href="?page=<%= totalPages %>"><%= totalPages %></a>
                             </li>
                         <% } %>
-    
-                        <!-- Next Button -->
-                        <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
-                            <a class="page-link d-flex justify-content-center align-items-center" 
-                            href="<%= currentPage === totalPages ? '#' : `?page=${currentPage + 1}` %>"
-                            <%= currentPage === totalPages ? 'aria-disabled="true"' : '' %>>
-                                <span class="material-icons">chevron_right</span>
-                            </a>
-                        </li>
                     </ul>
                 </nav>
             </div><br>
         </section>
         
 <%- include("../../views/partials/admin/footer") %>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <script>
     function updateOrderStatus(orderId, newStatus) {
         fetch(`/admin/update-order-status`, {
@@ -217,4 +196,5 @@
     function filterByStatus(status) {
         window.location.href = `/admin/orders?status=${status}`;
     }
+
 </script>
