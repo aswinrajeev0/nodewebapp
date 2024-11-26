@@ -260,7 +260,7 @@
             if (!username) {
                 document.getElementById('usernameError').textContent = 'Username is required';
                 isValid = false;
-            } else if (!/^[a-zA-Z]+$/.test(username)) {
+            } else if (!/^[a-zA-Z\s]+$/.test(username)) {
                 document.getElementById('usernameError').textContent = 'Username can only contain letters (no numbers or special characters)';
                 isValid = false;
             } else if (username.length < 2) {
