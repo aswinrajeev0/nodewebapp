@@ -7,7 +7,7 @@ const addToCart = async (req, res) => {
     try {
         const productId = req.query.id || req.body.productId;
         const user = req.session.user;
-        
+
         if (!user) {
             return res.redirect('/login');
         }
@@ -24,14 +24,13 @@ const addToCart = async (req, res) => {
 
             if (existingItemIndex >= 0) {
 
-                // const existingQuantity = cartDoc.items[existingItemIndex].quantity;
+                const existingQuantity = cartDoc.items[existingItemIndex].quantity;
 
-                // if (existingQuantity + quantity > 5) {
-                //     return res.status(400).json({ message: "You can only add up to 5 of this product to the cart." });
-                // }
+                if (existingQuantity + quantity < 5) {
+                    cartDoc.items[existingItemIndex].quantity += quantity;
+                    cartDoc.items[existingItemIndex].totalPrice += totalPrice;
+                }
 
-                cartDoc.items[existingItemIndex].quantity += quantity;
-                cartDoc.items[existingItemIndex].totalPrice += totalPrice;
             } else {
                 cartDoc.items.push({ productId, quantity, price: product.salePrice, totalPrice });
             }
@@ -64,12 +63,12 @@ const getCart = async (req, res) => {
         const cartItems = await Cart.findOne({ userId: userId }).populate('items.productId');
 
         if (!cartItems) {
-            return res.render('cart', { cart: null, products: [], totalAmount: 0, user:user });
+            return res.render('cart', { cart: null, products: [], totalAmount: 0, user: user });
         }
 
         const totalAmount = cartItems.items.reduce((sum, item) => sum + item.totalPrice, 0);
 
-        res.render('cart', { cart: cartItems, products: cartItems.items, totalAmount, user:user});
+        res.render('cart', { cart: cartItems, products: cartItems.items, totalAmount, user: user });
     } catch (error) {
         console.error(error);
         res.redirect('/page-not-found');
