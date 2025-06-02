@@ -592,6 +592,7 @@
                 if (!initialOrderData.success) {
                     throw new Error(initialOrderData.message || 'Failed to initialize order');
                 }
+                console.log(initialOrderData)
 
                 const options = {
                     key: initialOrderData.razorpayKey,

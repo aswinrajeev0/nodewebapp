@@ -230,7 +230,7 @@ const placeOrderInitial = async (req, res) => {
       }
 
       await newOrder.save();
-      res.status(200).json({ success: true, orderId: newOrder._id });
+      res.status(200).json({ success: true, orderId: newOrder._id, razorpayKey: process.env.RAZOR_KEY_ID });
   } catch (error) {
       console.error("Error placing initial order:", error);
       res.status(500).json({ success: false, message: 'Failed to save order. Please try again.' });
