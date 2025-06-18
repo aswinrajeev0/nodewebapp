@@ -81,14 +81,14 @@ const getAllProducts = async (req,res) => {
         
         const search = req.query.search || "";
         const page = req.query.page || 1;
-        const limit = 4;
+        const limit = 8;
         
         const productData = await Product.find({
              $or:[
                 {productName:{$regex:".*"+search+".*",$options:"i"}},
                 {brand:{$regex:".*"+search+".*",$options:"i"}}
              ]
-        }).limit(limit*1).skip((page-1)*limit).populate('category').exec();
+        }).sort({createdAt: -1}).limit(limit*1).skip((page-1)*limit).populate('category').exec();
         const count = await Product.find({
             $or:[
                 {productName:{$regex:".*"+search+".*",$options:"i"}},
@@ -183,12 +183,13 @@ const getEditProduct = async (req,res) => {
     try {
         
         const id = req.query.id;
-        const product = await Product.findOne({_id:id});
+        const product = await Product.findOne({_id:id}).populate("category", "name");
         const category = await Category.find({});
         const brand = await Brand.find({});
         res.render('edit-product',{
             message:"",
             product:product,
+            productCategory: product.category.name,
             cat:category,
             brand:brand,
         });

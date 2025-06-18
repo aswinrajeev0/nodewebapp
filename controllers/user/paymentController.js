@@ -335,13 +335,16 @@ const walletPayment = async (req, res) => {
             });
         }
 
+        const addressDoc = await Address.findOne({ userId });
+        const address = addressDoc.addresses.find(addr => addr._id.toString() === addressId);
+
         const newOrder = new Order({
             orderedItems,
             totalPrice,
             discount: discount,
             finalAmount: finalPrice,
             user: userId,
-            address: addressId,
+            address: address,
             status: 'Pending',
             paymentMethod: 'Wallet',
             paymentStatus: 'Completed',
@@ -353,20 +356,20 @@ const walletPayment = async (req, res) => {
 
         const walletData = {
             $inc: { balance: -newOrder.finalAmount },
-            $push: { 
-              transactions: {
-                type: "Purchase",
-                amount: newOrder.totalPrice,
-                orderId: newOrder._id
-              }
+            $push: {
+                transactions: {
+                    type: "Purchase",
+                    amount: newOrder.totalPrice,
+                    orderId: newOrder._id
+                }
             }
-          }
-      
-          await Wallet.findOneAndUpdate(
-            {userId:userId},
+        }
+
+        await Wallet.findOneAndUpdate(
+            { userId: userId },
             walletData,
             { upsert: true, new: true }
-          );
+        );
 
 
         res.status(200).json({ success: true, orderId: newOrder._id });

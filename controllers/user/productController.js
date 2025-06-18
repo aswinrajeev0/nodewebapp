@@ -60,7 +60,7 @@ const getCheckout = async (req, res) => {
     let totalPrice = 0;
 
     if (req.query.id) {
-      const product = await Product.findOne({_id:req.query.id,isBlocked:false});
+      const product = await Product.findOne({ _id: req.query.id, isBlocked: false });
       if (!product) {
         return res.redirect('/page-not-found');
       }
@@ -80,11 +80,11 @@ const getCheckout = async (req, res) => {
   }
 };
 
-const getCouponList = async (req,res) => {
+const getCouponList = async (req, res) => {
   try {
-    
+
     const user = req.session.user;
-    if(!user){
+    if (!user) {
       return res.redirect('/login');
     }
 
@@ -92,11 +92,11 @@ const getCouponList = async (req,res) => {
       isList: true,
       userId: { $ne: user },
     });
-    
-    res.render('coupon-list',{coupons});
+
+    res.render('coupon-list', { coupons });
 
   } catch (error) {
-    
+
   }
 }
 
@@ -126,7 +126,7 @@ const applyCoupon = async (req, res) => {
       });
     }
 
-    let discountAmount = (totalPrice*coupon.offerPercentage)/100;
+    let discountAmount = (totalPrice * coupon.offerPercentage) / 100;
 
     if (coupon.minimumPrice && totalPrice < coupon.minimumPrice) {
       return res.json({
@@ -176,97 +176,97 @@ const removeCoupon = async (req, res) => {
 
 const placeOrderInitial = async (req, res) => {
   try {
-      const { cart, totalPrice, addressId, singleProduct, payment_method, finalPrice, coupon, discount } = req.body;
-      const userId = req.session.user;
+    const { cart, totalPrice, addressId, singleProduct, payment_method, finalPrice, coupon, discount } = req.body;
+    const userId = req.session.user;
 
-      let orderedItems = [];
-      if (singleProduct) {
-          const product = JSON.parse(singleProduct);
-          orderedItems.push({
-              product: product._id,
-              quantity: 1,
-              price: product.salePrice,
-          });
-          await Product.findByIdAndUpdate(product._id, {
-            $inc: { quantity: -1 }
-        });
-        
-      } else if (cart) {
-          const cartItems = JSON.parse(cart);
-          orderedItems = cartItems.map(item => ({
-              product: item.productId,
-              quantity: item.quantity,
-              price: item.totalPrice / item.quantity,
-          }));
-          cartItems.forEach(async item=>{
-            await Product.findByIdAndUpdate(item.productId,{
-              $inc:{quantity:-item.quantity}
-            })
-          })
-      }
-
-      const addressDoc = await Address.findOne({userId});
-      const address = addressDoc.addresses.find(addr => addr._id.toString() === addressId);
-
-      const newOrder = new Order({
-          orderedItems,
-          totalPrice,
-          discount: discount,
-          finalAmount: finalPrice,
-          user: userId,
-          address: address,
-          status: 'Pending',
-          paymentMethod: payment_method,
-          paymentStatus: 'Pending', 
-          couponCode: coupon,
-          couponApplied: Boolean(coupon && discount)
+    let orderedItems = [];
+    if (singleProduct) {
+      const product = JSON.parse(singleProduct);
+      orderedItems.push({
+        product: product._id,
+        quantity: 1,
+        price: product.salePrice,
+      });
+      await Product.findByIdAndUpdate(product._id, {
+        $inc: { quantity: -1 }
       });
 
-      if (coupon) {
-        await Coupon.findOneAndUpdate(
-          { name: coupon },
-          { $push: { userId: userId } }
-        );
-      }
+    } else if (cart) {
+      const cartItems = JSON.parse(cart);
+      orderedItems = cartItems.map(item => ({
+        product: item.productId,
+        quantity: item.quantity,
+        price: item.totalPrice / item.quantity,
+      }));
+      cartItems.forEach(async item => {
+        await Product.findByIdAndUpdate(item.productId, {
+          $inc: { quantity: -item.quantity }
+        })
+      })
+    }
 
-      await newOrder.save();
-      res.status(200).json({ success: true, orderId: newOrder._id, razorpayKey: process.env.RAZOR_KEY_ID });
+    const addressDoc = await Address.findOne({ userId });
+    const address = addressDoc.addresses.find(addr => addr._id.toString() === addressId);
+
+    const newOrder = new Order({
+      orderedItems,
+      totalPrice,
+      discount: discount,
+      finalAmount: finalPrice,
+      user: userId,
+      address: address,
+      status: 'Pending',
+      paymentMethod: payment_method,
+      paymentStatus: 'Pending',
+      couponCode: coupon,
+      couponApplied: Boolean(coupon && discount)
+    });
+
+    if (coupon) {
+      await Coupon.findOneAndUpdate(
+        { name: coupon },
+        { $push: { userId: userId } }
+      );
+    }
+
+    await newOrder.save();
+    res.status(200).json({ success: true, orderId: newOrder._id, razorpayKey: process.env.RAZOR_KEY_ID });
   } catch (error) {
-      console.error("Error placing initial order:", error);
-      res.status(500).json({ success: false, message: 'Failed to save order. Please try again.' });
+    console.error("Error placing initial order:", error);
+    res.status(500).json({ success: false, message: 'Failed to save order. Please try again.' });
   }
 };
 
 
 const placeOrder = async (req, res) => {
   try {
-      const { orderId, paymentDetails, paymentSuccess } = req.body;
+    const { orderId, paymentDetails, paymentSuccess } = req.body;
 
-      const order = await Order.findById(orderId);
-      if (!order) {
-          return res.status(404).json({ success: false, message: 'Order not found' });
-      }
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
 
-      if (paymentSuccess) {
-          order.paymentStatus = 'Completed';
-      } else {
-          order.paymentStatus = 'Pending';
-      }
+    if (paymentSuccess) {
+      order.paymentStatus = 'Completed';
+    } else {
+      order.paymentStatus = 'Pending';
+    }
 
-      if (paymentDetails) {
-          order.paymentDetails = paymentDetails;
-      }
+    if (paymentDetails) {
+      order.paymentDetails = paymentDetails;
+    }
 
-      await order.save();
+    await order.save();
 
-      res.status(200).json({
-          success: true,
-          message: `Order ${paymentSuccess ? 'completed' : 'pending due to payment failure'}`,
-          orderId: order._id
-      });
+    res.status(200).json({
+      success: true,
+      message: `Order ${paymentSuccess ? 'completed' : 'pending due to payment failure'}`,
+      orderId: order._id
+    });
   } catch (error) {
-      console.error("Error updating order payment status:", error);
-      res.status(500).json({ success: false, message: 'Failed to update order. Please try again.' });
+    console.error("Error updating order payment status:", error);
+    res.status(500).json({ success: false, message: 'Failed to update order. Please try again.' });
   }
 };
 
@@ -278,7 +278,7 @@ const orderConfirm = async (req, res) => {
 
     const id = req.query.id
     const order = await Order.findById(id);
-    res.render('order-confirmation',{order});
+    res.render('order-confirmation', { order });
 
   } catch (error) {
     console.error("Error loading cofirmation page", error);
@@ -295,13 +295,13 @@ const getOrders = async (req, res) => {
       const limit = 10;
       const page = Math.max(1, parseInt(req.query.page) || 1);
       const orders = await Order.find({ user: userId })
-      .populate('orderedItems.product')
-      .sort({ createdAt: -1 })
-      .limit(limit)
-      .skip((page - 1) * limit);
+        .populate('orderedItems.product')
+        .sort({ createdAt: -1 })
+        .limit(limit)
+        .skip((page - 1) * limit);
       const count = await Order.find({ user: userId })
       if (orders.length > 0) {
-        res.render('orders', { orders, user ,totalPages:Math.ceil(count.length/limit), currentPage:page});
+        res.render('orders', { orders, user, totalPages: Math.ceil(count.length / limit), currentPage: page });
       } else {
         res.render('orders', { orders: [], message: "No orders found.", user });
       }
@@ -320,14 +320,23 @@ const cancelOrder = async (req, res) => {
     const userId = req.session.user;
     const id = req.query.id;
     const reason = req.query.reason;
-    await Order.findByIdAndUpdate(id, { $set: { status: 'Cancelled',cancellationReason:reason } });
-    const order = await Order.findOne({ user: userId,_id:id });
-    console.log(order.paymentMethod);
+    await Order.findByIdAndUpdate(id, { $set: { status: 'Cancelled', cancellationReason: reason } });
+    const order = await Order.findOne({ user: userId, _id: id });
+    for (const item of order.orderedItems) {
+      const productId = item.product._id;
+      const qtyToRestore = item.quantity;
 
-    if(order.paymentMethod && order.paymentMethod.trim().toLowerCase() === "online"){
+      await Product.findByIdAndUpdate(
+        productId,
+        { $inc: { quantity: qtyToRestore } },
+        { new: true }
+      );
+    }
+
+    if (order.paymentMethod && order.paymentMethod.trim().toLowerCase() === "online" && !order.paymentStatus === "pending") {
       const walletData = {
         $inc: { balance: order.totalPrice },
-        $push: { 
+        $push: {
           transactions: {
             type: "Refund",
             amount: order.totalPrice,
@@ -335,14 +344,14 @@ const cancelOrder = async (req, res) => {
           }
         }
       }
-  
+
       const walletUpdate = await Wallet.findOneAndUpdate(
-        {userId:userId},
+        { userId: userId },
         walletData,
         { upsert: true, new: true }
       );
-  
-      if(!walletUpdate){
+
+      if (!walletUpdate) {
         throw new Error("Failed to update wallet");
       }
     }
@@ -398,16 +407,17 @@ const searchProduct = async (req, res) => {
     const limit = 12;
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const products = await Product.find(searchCriteria)
-    .populate('category', 'name')
-    .limit(limit)
-    .skip((page - 1) * limit);
+      .populate('category', 'name')
+      .limit(limit)
+      .skip((page - 1) * limit);
 
     const count = await Product.countDocuments(searchCriteria);
 
-    res.render('search-results', { products, 
+    res.render('search-results', {
+      products,
       searchTerm: q,
-      totalPages:Math.ceil(count/limit),
-      currentPage:page
+      totalPages: Math.ceil(count / limit),
+      currentPage: page
     });
 
   } catch (error) {
@@ -416,69 +426,70 @@ const searchProduct = async (req, res) => {
   }
 }
 
-const getAllProducts = async (req,res) => {
+const getAllProducts = async (req, res) => {
   try {
-    
+
     const limit = 12;
     const page = Math.max(1, parseInt(req.query.page) || 1);
-    const products = await Product.find({isBlocked:false})
-    .limit(limit)
-    .skip((page - 1) * limit);
+    const products = await Product.find({ isBlocked: false })
+      .limit(limit)
+      .skip((page - 1) * limit);
 
     const count = await Product.countDocuments();
 
-    res.render('all-products',{products,
-      totalPages:Math.ceil(count/limit),
-      currentPage:page
+    res.render('all-products', {
+      products,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page
     })
 
   } catch (error) {
-    
+
   }
 }
 
-const getBrands = async (req,res) => {
+const getBrands = async (req, res) => {
   try {
-    
+
     const brands = await Brand.find();
-    res.render('brand-list',{brands});
+    res.render('brand-list', { brands });
 
   } catch (error) {
-    
+
   }
 }
 
 const returnOrder = async (req, res) => {
   try {
-      const { orderId, reason } = req.body;
-      const userId = req.session.user;
+    const { orderId, reason } = req.body;
+    const userId = req.session.user;
 
-      const orderData = await Order.findById(orderId);
-      if (!orderData) {
-          return res.status(404).json({ message: 'Order not found' });
-      }
+    const orderData = await Order.findById(orderId);
+    if (!orderData) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
 
-      await Order.findByIdAndUpdate(orderId,{$set:{status:'Return Request'}})
+    await Order.findByIdAndUpdate(orderId, { $set: { status: 'Return Request' } })
 
-      const Existingreturn = await Return.findOne({orderId});
-      if(Existingreturn){
-          return res.status(404).json({message: 'Return request already submited for this order'})
-      }
+    const Existingreturn = await Return.findOne({ orderId });
+    if (Existingreturn) {
+      return res.status(404).json({ message: 'Return request already submited for this order' })
+    }
 
-      const reasonData = new Return({
-          userId,
-          orderId,
-          reason,
-          refundAmount: orderData.finalAmount,
-      });
+    const reasonData = new Return({
+      userId,
+      orderId,
+      reason,
+      refundAmount: orderData.finalAmount,
+    });
 
-      await reasonData.save();
+    await reasonData.save();
 
-      return res.status(200).json({ message: "Return Request Submitted Successfully" });
+    return res.status(200).json({ message: "Return Request Submitted Successfully" });
 
   } catch (error) {
-      console.error("Error processing return request:", error);
-      return res.status(500).json({ message: 'Something went wrong, please try again later.' });
+    console.error("Error processing return request:", error);
+    return res.status(500).json({ message: 'Something went wrong, please try again later.' });
   }
 };
 
