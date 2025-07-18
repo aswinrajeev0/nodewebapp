@@ -97,9 +97,9 @@
                                 </span>
                             </h5>
                         </div>
-                        <%if(order.status == "Delivered"){%>
+                        <%if(order.status=="Delivered" ){%>
                             <a href="/download-invoice?id=<%= order._id %>" class="btn btn-primary">Download Invoice</a>
-                        <%}%>
+                            <%}%>
                     </div>
                 </div>
 
@@ -108,19 +108,22 @@
                     <div class="card-body">
                         <% for (let i=0; i < order.orderedItems.length; i++) { %>
                             <div class="product-item d-flex align-items-center mb-4">
-                                <img src="uploads/re-image/<%= products[i].productImage[0] %>"
-                                    alt="<%= products[i].productName %>" class="product-image me-3" width="80">
-                                <div class="product-details">
-                                    <h5>
-                                        <%= products[i].productName %>
-                                    </h5>
-                                    <p>Qty: <%= order.orderedItems[i].quantity %>
-                                    </p>
-                                </div>
-                                <div class="product-price ms-auto">
-                                    <h5>₹ <%= products[i].salePrice.toLocaleString() %>
-                                    </h5>
-                                </div>
+                                <% const imgSrc=products[i].productImage[0]?.startsWith('http') ?
+                                    products[i].productImage[0] : '/uploads/re-image/' + products[i].productImage[0]; %>
+
+                                    <img src="<%= imgSrc %>"
+                                        alt="<%= products[i].productName %>" class="product-image me-3" width="80">
+                                    <div class="product-details">
+                                        <h5>
+                                            <%= products[i].productName %>
+                                        </h5>
+                                        <p>Qty: <%= order.orderedItems[i].quantity %>
+                                        </p>
+                                    </div>
+                                    <div class="product-price ms-auto">
+                                        <h5>₹ <%= products[i].salePrice.toLocaleString() %>
+                                        </h5>
+                                    </div>
                             </div>
                             <% } %>
                     </div>

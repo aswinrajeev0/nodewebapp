@@ -84,91 +84,106 @@
                     <div class="col-12">
                         <div class="table-responsive">
 
-                            <%if(cart && cart.items.length>0){%>
-                                <table class="table shopping-summery text-center clean">
-                                    <thead>
-                                        <tr class="main-heading">
-                                            <th scope="col">Image</th>
-                                            <th scope="col">Name</th>
-                                            <th scope="col">Price</th>
-                                            <th scope="col">Quantity</th>
-                                            <th scope="col">Subtotal</th>
-                                            <th scope="col">Remove</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <%for(let i=0;i<cart.items.length;i++){%>
-                                            <tr>
-                                                <td class="image product-thumbnail"><img
-                                                        src="/uploads/re-image/<%= cart.items[i].productId.productImage[0] %>"
-                                                        alt="<%=cart.items[i].productId.productName%>"></td>
-                                                <td class="product-des product-name">
-                                                    <h5 class="product-name"><a href="/productdetails?id=<%=products[i].productId._id%>">
-                                                            <%=cart.items[i].productId.productName%>
-                                                        </a></h5>
-                                                </td>
-                                                <td class="price" data-title="Price"><span>₹ <%=
-                                                            cart.items[i].price.toLocaleString() %></span></td>
-                                                <td class="text-center" data-title="Stock">
-                                                    <%if(cart.items[i].productId.quantity > 0){%>
-                                                        <div class="quantity-control">
-                                                            <button type="button"
-                                                                onclick="updateQuantity('<%= cart.items[i].productId._id %>', -1,'<%= cart.items[i].productId.quantity %>')"
-                                                                class="btn-quantity">-</button>
-                                                            <span id="quantity-<%= cart.items[i].productId._id %>"
-                                                                class="quantity-display">
-                                                                <%= cart.items[i].quantity %>
-                                                            </span>
-                                                            <button type="button"
-                                                                onclick="updateQuantity('<%= cart.items[i].productId._id %>', 1,'<%= cart.items[i].productId.quantity %>')"
-                                                                class="btn-quantity">+</button>
-                                                        </div>
-                                                    <%}else{%>
-                                                        <span class="tex-danger">
-                                                            Out of stock
-                                                        </span>
-                                                    <%}%>
-                                                    
-                                                </td>
-                                                <td class="text-right" data-title="Cart">
-                                                    <span id="subtotal-<%= cart.items[i].productId._id %>">₹ <%=
-                                                            cart.items[i].totalPrice.toLocaleString() %></span>
-                                                </td>
+                            <% let hasOutOfStock=false; if (cart && cart.items.length> 0) {
+                                for (let item of cart.items) {
+                                if (item.productId.quantity <= 0) { hasOutOfStock=true; break; } } } %>
 
-                                                <td class="action" data-title="Remove">
-                                                    <form id="remove-form-<%= cart.items[i].productId._id %>"
-                                                        action="/remove-cart-item" method="POST">
-                                                        <input type="hidden" name="productId"
-                                                            value="<%= cart.items[i].productId._id %>">
-                                                        <button type="button" class="btn btn-danger"
-                                                            onclick="confirmRemove('<%= cart.items[i].productId._id %>')">
-                                                            <i class="fi-rs-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                </td>
-                                            </tr>
+
+                                    <%if(cart && cart.items.length>0){%>
+                                        <table class="table shopping-summery text-center clean">
+                                            <thead>
+                                                <tr class="main-heading">
+                                                    <th scope="col">Image</th>
+                                                    <th scope="col">Name</th>
+                                                    <th scope="col">Price</th>
+                                                    <th scope="col">Quantity</th>
+                                                    <th scope="col">Subtotal</th>
+                                                    <th scope="col">Remove</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <%for(let i=0;i<cart.items.length;i++){%>
+                                                    <tr>
+                                                        <td class="image product-thumbnail">
+                                                            <% const
+                                                                imgSrc=cart.items[i].productId.productImage[0]?.startsWith('http')
+                                                                ? cart.items[i].productId.productImage[0]
+                                                                : '/uploads/re-image/' +
+                                                                cart.items[i].productId.productImage[0]; %>
+                                                                <img src="<%= imgSrc %>"
+                                                                    alt="<%=cart.items[i].productId.productName%>">
+                                                        </td>
+                                                        <td class="product-des product-name">
+                                                            <h5 class="product-name"><a
+                                                                    href="/productdetails?id=<%=products[i].productId._id%>">
+                                                                    <%=cart.items[i].productId.productName%>
+                                                                </a></h5>
+                                                        </td>
+                                                        <td class="price" data-title="Price"><span>₹ <%=
+                                                                    cart.items[i].price.toLocaleString() %></span></td>
+                                                        <td class="text-center" data-title="Stock">
+                                                            <%if(cart.items[i].productId.quantity> 0){%>
+                                                                <div class="quantity-control">
+                                                                    <button type="button"
+                                                                        onclick="updateQuantity('<%= cart.items[i].productId._id %>', -1,'<%= cart.items[i].productId.quantity %>')"
+                                                                        class="btn-quantity">-</button>
+                                                                    <span
+                                                                        id="quantity-<%= cart.items[i].productId._id %>"
+                                                                        class="quantity-display">
+                                                                        <%= cart.items[i].quantity %>
+                                                                    </span>
+                                                                    <button type="button"
+                                                                        onclick="updateQuantity('<%= cart.items[i].productId._id %>', 1,'<%= cart.items[i].productId.quantity %>')"
+                                                                        class="btn-quantity">+</button>
+                                                                </div>
+                                                                <%}else{%>
+                                                                    <span class="tex-danger">
+                                                                        Out of stock
+                                                                    </span>
+                                                                    <%}%>
+
+                                                        </td>
+                                                        <td class="text-right" data-title="Cart">
+                                                            <span id="subtotal-<%= cart.items[i].productId._id %>">₹ <%=
+                                                                    cart.items[i].totalPrice.toLocaleString() %></span>
+                                                        </td>
+
+                                                        <td class="action" data-title="Remove">
+                                                            <form id="remove-form-<%= cart.items[i].productId._id %>"
+                                                                action="/remove-cart-item" method="POST">
+                                                                <input type="hidden" name="productId"
+                                                                    value="<%= cart.items[i].productId._id %>">
+                                                                <button type="button" class="btn btn-danger"
+                                                                    onclick="confirmRemove('<%= cart.items[i].productId._id %>')">
+                                                                    <i class="fi-rs-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                    <%}%>
+                                            </tbody>
+                                        </table>
+                                        <%}else{%>
+                                            <div class="empty-cart-container">
+                                                <div class="empty-cart-icon">
+                                                    <i class="fi-rs-shopping-cart"></i>
+                                                </div>
+                                                <h2 class="empty-cart-text">Your Cart is Empty</h2>
+                                                <p class="empty-cart-subtext">Looks like you haven't added anything to
+                                                    your cart
+                                                    yet.
+                                                </p>
+                                                <a href="/" class="shopping-btn">
+                                                    <i class="fi-rs-shopping-bag"></i>
+                                                    Start Shopping
+                                                </a>
+                                            </div>
                                             <%}%>
-                                    </tbody>
-                                </table>
-                                <%}else{%>
-                                    <div class="empty-cart-container">
-                                        <div class="empty-cart-icon">
-                                            <i class="fi-rs-shopping-cart"></i>
-                                        </div>
-                                        <h2 class="empty-cart-text">Your Cart is Empty</h2>
-                                        <p class="empty-cart-subtext">Looks like you haven't added anything to your cart
-                                            yet.
-                                        </p>
-                                        <a href="/" class="shopping-btn">
-                                            <i class="fi-rs-shopping-bag"></i>
-                                            Start Shopping
-                                        </a>
-                                    </div>
-                                    <%}%>
 
                         </div>
                         <div class="cart-action text-end">
-                            <a class="btn btn-success" href="/"><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
+                            <a class="btn btn-success" href="/"><i class="fi-rs-shopping-bag mr-10"></i>Continue
+                                Shopping</a>
                         </div>
                         <br>
                         <hr><br>
@@ -191,13 +206,19 @@
 
                                         </table>
                                     </div>
-                                    <%if(cart){%>
-                                        <a href="/checkout" class="btn btn-success"> <i class="fi-rs-box-alt mr-10"></i> Proceed To
-                                            CheckOut</a>
-                                        <%}else{%>
-                                            <a href="#" class="btn btn-success"> <i class="fi-rs-box-alt mr-10"></i> Proceed To
-                                                CheckOut</a>
-                                            <%}%>
+                                    <% if (cart && cart.items.length> 0) { %>
+                                        <% if (hasOutOfStock) { %>
+                                            <button class="btn btn-secondary" onclick="outOfStockWarning()"
+                                                title="Remove out-of-stock items to proceed">
+                                                <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut
+                                            </button>
+                                            <% } else { %>
+                                                <a href="/checkout" class="btn btn-success">
+                                                    <i class="fi-rs-box-alt mr-10"></i> Proceed To CheckOut
+                                                </a>
+                                                <% } %>
+                                                    <% } %>
+
                                 </div>
                             </div>
                         </div>
@@ -209,6 +230,16 @@
 
 
     <script>
+
+        function outOfStockWarning() {
+            Swal.fire({
+                icon: "warning",
+                title: "Out of Stock",
+                text: "You have out-of-stock items in your cart. Please remove them before proceeding to checkout."
+            });
+        }
+
+
         function confirmRemove(productId) {
             Swal.fire({
                 title: "Are you sure?",
@@ -239,7 +270,7 @@
                     text: "The minimum quantity is 1.",
                 });
                 return;
-            }else if(currentQuantity + change > maxQuantity){
+            } else if (currentQuantity + change > maxQuantity) {
                 Swal.fire({
                     icon: "warning",
                     title: "Maximum Quantity Reached"

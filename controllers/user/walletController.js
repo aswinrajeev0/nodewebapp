@@ -10,6 +10,11 @@ const getWallet = async (req,res) => {
         }
 
         const wallet = await Wallet.findOne({userId:userId});
+        if(!wallet){
+            await Wallet.create({
+                userId
+            })
+        }
         res.render('wallet',{wallet});
 
     } catch (error) {

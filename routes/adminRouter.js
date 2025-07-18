@@ -13,8 +13,8 @@ const saleReportController = require('../controllers/admin/salesReportController
 const returnController = require('../controllers/admin/returnController');
 const {userAuth,adminAuth} = require('../middlewares/auth')
 const multer = require('multer');
-const storage = require('../helpers/multer')
-const upload = multer({storage:storage});
+// const storage = require('../helpers/multer')
+const upload = require('../helpers/multer');
 
 router.use(express.static('public'));
 
@@ -27,16 +27,16 @@ router.get('/logout',adminController.logout)
 
 //customer management
 router.get('/users',adminAuth,customerController.customerInfo)
-router.get('/blockcustomer',adminAuth,customerController.customerBlocked);
-router.get('/unblockcustomer',adminAuth,customerController.customerUnblocked)
+router.patch('/blockcustomer',adminAuth,customerController.customerBlocked);
+router.patch('/unblockcustomer',adminAuth,customerController.customerUnblocked)
 
 //category management
 router.get('/category',adminAuth,categoryController.categoryInfo);
 router.post('/addcategory',adminAuth,categoryController.addCategory);
 router.post('/addcategoryoffer',adminAuth,categoryController.addCategoryOffer)
 router.post('/removecategoryoffer',adminAuth,categoryController.removeCategoryOffer)
-router.get('/listcategory',adminAuth,categoryController.getListCategory);
-router.get('/unlistcategory',adminAuth,categoryController.getUnlistCategory);
+router.patch('/listcategory',adminAuth,categoryController.listCategory);
+router.patch('/unlistcategory',adminAuth,categoryController.unlistCategory);
 router.get('/editcategory',adminAuth,categoryController.getEditCategory);
 router.post('/editcategory/:id',adminAuth,categoryController.editCategory)
 

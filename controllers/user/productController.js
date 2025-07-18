@@ -9,6 +9,7 @@ const Wallet = require('../../models/walletSchema');
 const Brand = require('../../models/brandSchema');
 const Return = require('../../models/returnSchema');
 const fs = require('fs');
+const PaymentLock = require('../../models/paymentLockSchema');
 
 
 const getProductDetails = async (req, res) => {
@@ -179,9 +180,19 @@ const placeOrderInitial = async (req, res) => {
     const { cart, totalPrice, addressId, singleProduct, payment_method, finalPrice, coupon, discount } = req.body;
     const userId = req.session.user;
 
+    const lock = await PaymentLock.create({ userId });
+
     let orderedItems = [];
     if (singleProduct) {
       const product = JSON.parse(singleProduct);
+
+      const dbProduct = await Product.findById(product._id);
+
+      if (!dbProduct || dbProduct.quantity < 1) {
+        await PaymentLock.deleteOne({ userId });
+        return res.status(400).json({ success: false, message: 'Insufficient stock for the selected product.' });
+      }
+
       orderedItems.push({
         product: product._id,
         quantity: 1,
@@ -193,6 +204,18 @@ const placeOrderInitial = async (req, res) => {
 
     } else if (cart) {
       const cartItems = JSON.parse(cart);
+
+      for (const item of cartItems) {
+        const dbProduct = await Product.findById(item.productId);
+        if (!dbProduct || dbProduct.quantity < item.quantity) {
+          await PaymentLock.deleteOne({ userId });
+          return res.status(400).json({
+            success: false,
+            message: `Insufficient stock for "${dbProduct?.name || 'a product'}". Available: ${dbProduct?.quantity || 0}, Requested: ${item.quantity}`
+          });
+        }
+      }
+
       orderedItems = cartItems.map(item => ({
         product: item.productId,
         quantity: item.quantity,
@@ -230,9 +253,14 @@ const placeOrderInitial = async (req, res) => {
     }
 
     await newOrder.save();
+    await PaymentLock.deleteOne({ userId });
     res.status(200).json({ success: true, orderId: newOrder._id, razorpayKey: process.env.RAZOR_KEY_ID });
   } catch (error) {
+    if (error.code === 11000) {
+      return res.status(429).json({ success: false, message: 'Payment already in progress. Please complete it before trying again.' });
+    }
     console.error("Error placing initial order:", error);
+    await PaymentLock.deleteOne({ userId });
     res.status(500).json({ success: false, message: 'Failed to save order. Please try again.' });
   }
 };
@@ -269,9 +297,6 @@ const placeOrder = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to update order. Please try again.' });
   }
 };
-
-
-
 
 const orderConfirm = async (req, res) => {
   try {

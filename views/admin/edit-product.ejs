@@ -55,8 +55,8 @@
                                         <label class="form-label">Brand</label>
                                         <select class="form-select border" name="brand">
                                             <%for(let i=0;i<brand.length;i++){%>
-                                                <option value="<%=brand[i].brandName%>" <%=product.brand===brand[i].brandName
-                                                    ? 'selected' : '' %>>
+                                                <option value="<%=brand[i].brandName%>"
+                                                    <%=product.brand===brand[i].brandName ? 'selected' : '' %>>
                                                     <%=brand[i].brandName%>
                                                 </option>
                                                 <%}%>
@@ -145,12 +145,17 @@
                                                         <td>
                                                             <input type="hidden" value="<%=product.productImage[i]%>"
                                                                 id="imageDatas">
-                                                            <img class="rounded" style="width: 50px; height: 60px;"
-                                                                src="/uploads/re-image/<%=product.productImage[i]%>"
-                                                                alt="">
-                                                            <i onclick="deleteSingleImage('<%=product.productImage[i]%>', '<%=product._id%>')"
-                                                                style="position: absolute; margin-left: .5rem; cursor: pointer;"
-                                                                class="fa-thin fa-x">&times;</i>
+                                                            <% const
+                                                                imgSrc=product.productImage[i]?.startsWith('http') ?
+                                                                product.productImage[i] : '/uploads/re-image/' +
+                                                                product.productImage[i]; %>
+
+                                                                <img class="rounded" style="width: 50px; height: 60px;"
+                                                                    src="<%= imgSrc %>"
+                                                                    alt="">
+                                                                <i onclick="deleteSingleImage('<%=product.productImage[i]%>', '<%=product._id%>')"
+                                                                    style="position: absolute; margin-left: .5rem; cursor: pointer;"
+                                                                    class="fa-thin fa-x">&times;</i>
 
                                                         </td>
                                                     </div>

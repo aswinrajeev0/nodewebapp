@@ -13,9 +13,14 @@ const addToCart = async (req, res) => {
         }
 
         const product = await Product.findById(productId);
-        const quantity = parseInt(req.body.quantity, 10) || 1;
 
-        const totalPrice = product.salePrice * quantity || product.salePrice;
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        const quantityToAdd = parseInt(req.body.quantity, 10) || 1;
+
+        const totalPrice = product.salePrice * quantityToAdd || product.salePrice;
 
         const cartDoc = await Cart.findOne({ userId: user });
 
@@ -26,13 +31,25 @@ const addToCart = async (req, res) => {
 
                 const existingQuantity = cartDoc.items[existingItemIndex].quantity;
 
+                if (existingQuantity + quantityToAdd > product.quantity) {
+                    return res.status(400).json({
+                        success: false,
+                        message: `Cannot add more than available stock (${product.quantity}). Already in cart: ${existingQuantity}`
+                    });
+                }
+
                 if (existingQuantity + quantity < 5) {
-                    cartDoc.items[existingItemIndex].quantity += quantity;
+                    cartDoc.items[existingItemIndex].quantity += quantityToAdd;
                     cartDoc.items[existingItemIndex].totalPrice += totalPrice;
                 }
 
             } else {
-                cartDoc.items.push({ productId, quantity, price: product.salePrice, totalPrice });
+                cartDoc.items.push({
+                    productId,
+                    quantity: quantityToAdd,
+                    price: product.salePrice,
+                    totalPrice
+                });
             }
             await cartDoc.save();
         } else {
@@ -43,7 +60,7 @@ const addToCart = async (req, res) => {
             await newCart.save();
         }
 
-        res.redirect('/cart');
+        res.status(200).json({success: true, message: "Product added to cart"});
     } catch (error) {
         console.error("Error adding to cart", error);
         res.status(500).json({ message: "Something went wrong" });

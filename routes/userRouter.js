@@ -9,7 +9,7 @@ const walletController = require('../controllers/user/walletController.js');
 const paymentController = require('../controllers/user/paymentController.js');
 const invoiceController = require('../controllers/user/invoiceController.js');
 const filterController = require('../controllers/user/filterController.js');
-const {userAuth} = require('../middlewares/auth.js')
+const { userAuth } = require('../middlewares/auth.js')
 const User = require('../models/userSchema.js');
 const passport = require('passport');
 const { loadCategories } = require('../middlewares/loadCategories');
@@ -19,7 +19,7 @@ router.use(express.static('public'));
 router.use(loadCategories);
 router.use(loadBrands);
 
-router.use(async(req, res, next) => {
+router.use(async (req, res, next) => {
     const userData = await User.findById(req.session.user);
     res.locals.user = userData || null;
     next();
@@ -45,15 +45,25 @@ router.use(async (req, res, next) => {
 router.get('/page-not-found', userController.pageNotFound)
 router.get('/', userController.loadHomepage)
 router.get('/sort', userController.sortProducts);
-router.get('/filter-by-category',userController.catFilter)
+router.get('/filter-by-category', userController.catFilter)
 router.get('/signup', userController.loadSignup)
 router.post('/signup', userController.signup)
 router.post('/verify-otp', userController.verifyOtp)
 router.post('/resend-otp', userController.resendOtp);
-router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }))
-router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/signup' }), (req, res) => {
-    res.redirect('/')
-})
+router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/auth/google/callback', (req, res, next) => {
+    passport.authenticate('google', { failureRedirect: '/signup' }, (err, user, info) => {
+        if (err || !user) {
+            return res.redirect('/signup');
+        }
+
+        req.logIn(user, (err) => {
+            if (err) return next(err);
+            req.session.user = user._id;
+            return res.redirect('/');
+        });
+    })(req, res, next);
+});
 
 //user authentication
 router.get('/login', userController.loadLogin)
@@ -79,11 +89,11 @@ router.get('/delete-address', profileController.deleteAddress);
 //product details
 router.get('/productdetails', productController.getProductDetails);
 
-router.get('/all-products',productController.getAllProducts);
-router.get('/brands',productController.getBrands);
+router.get('/all-products', productController.getAllProducts);
+router.get('/brands', productController.getBrands);
 
 // router.get('/filter-by-category-and-search',filterController.filterByCategoryAndSearch);
-router.get('/sort-and-search',filterController.sortAndSearch);
+router.get('/sort-and-search', filterController.sortAndSearch);
 
 //user cart
 router.get('/cart', cartController.getCart);
@@ -93,10 +103,10 @@ router.post('/update-cart-quantity', cartController.updateCart);
 
 router.get('/checkout', productController.getCheckout);
 router.post('/place-order', productController.placeOrder);
-router.post('/place-order-initial',productController.placeOrderInitial);
-router.post('/retry-payment',paymentController.retryPayment);
-router.get('/payment-failed',paymentController.paymentFailed);
-router.post('/wallet-payment',paymentController.walletPayment);
+router.post('/place-order-initial', productController.placeOrderInitial);
+router.post('/retry-payment', paymentController.retryPayment);
+router.get('/payment-failed', paymentController.paymentFailed);
+router.post('/wallet-payment', paymentController.walletPayment);
 
 router.post('/create-order', paymentController.createOrder);
 router.post('/verify-payment', paymentController.verifyPayment);
@@ -106,9 +116,9 @@ router.get('/get-address/:id', paymentController.getAddress);
 router.get('/order-confirmation', productController.orderConfirm);
 router.get('/orders', productController.getOrders);
 router.get('/cancel-order', productController.cancelOrder);
-router.post('/return-request',productController.returnOrder);
+router.post('/return-request', productController.returnOrder);
 router.get('/order-details', productController.orderDetails);
-router.get('/download-invoice',invoiceController.downloadInvoice)
+router.get('/download-invoice', invoiceController.downloadInvoice)
 
 //wishlist
 router.get('/wishlist', wishlistController.getWishList);
@@ -117,7 +127,7 @@ router.post('/remove-wishlist-item', wishlistController.removeItem);
 
 router.get('/search-product', productController.searchProduct);
 
-router.get('/coupons',productController.getCouponList);
+router.get('/coupons', productController.getCouponList);
 router.post('/apply-coupon', productController.applyCoupon);
 router.post('/remove-coupon', productController.removeCoupon);
 

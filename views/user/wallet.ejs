@@ -54,7 +54,7 @@
                                 <%for(let i=wallet.transactions.length-1;i>=0;i--){%>
                                     <tr>
                                         <td data-title="Date"><%=wallet.transactions[i].date.toLocaleDateString()%></td>
-                                        <td data-title="Transaction Type"><%=wallet.transactions[i].type%></td>
+                                        <td data-title="Transaction Type"><%=wallet?.transactions[i].type%></td>
                                         <%if(wallet.transactions[i].type === "Purchase"){%>
                                             <td data-title="Amount"><b class="text-danger" style="font-size: 25px;">-</b>&nbsp;<strong class="text-danger">₹<%=wallet.transactions[i].amount.toLocaleString()%></strong></td>
                                         <%}else{%>

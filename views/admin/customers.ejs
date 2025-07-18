@@ -90,16 +90,28 @@
             async function blockCustomer(userId) {
                 const result = await Swal.fire({
                     title: 'Are you sure?',
-                    text: "Do you want to unblock the user?",
+                    text: "Do you want to block the user?",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
                     cancelButtonColor: '#3085d6',
                     confirmButtonText: 'Yes'
-                })
+                });
 
                 if (result.isConfirmed) {
-                    window.location.href = `/admin/blockcustomer?id=${userId}`;
+                    const res = await fetch('/admin/blockcustomer', {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ id: userId })
+                    });
+
+                    const data = await res.json();
+
+                    if (data.status) {
+                        updateUserStatusUI(userId, true);
+                    }
                 }
             }
 
@@ -109,13 +121,41 @@
                     text: "Do you want to unblock the user?",
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#d33',
+                    confirmButtonColor: '#28a745',
                     cancelButtonColor: '#3085d6',
                     confirmButtonText: 'Yes'
-                })
+                });
 
                 if (result.isConfirmed) {
-                    window.location.href = `/admin/unblockcustomer?id=${userId}`;
+                    const res = await fetch('/admin/unblockcustomer', {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ id: userId })
+                    });
+
+                    const data = await res.json();
+
+                    if (data.status) {
+                        updateUserStatusUI(userId, false);
+                    }
                 }
+            }
+
+            function updateUserStatusUI(userId, isBlocked) {
+                const row = document.querySelector(`button[onclick*="${userId}"]`).closest('tr');
+                const statusCell = row.querySelector('td:nth-child(4)');
+                const actionCell = row.querySelector('td:nth-child(5)');
+
+                // Update status badge
+                statusCell.innerHTML = isBlocked
+                    ? '<span class="badge rounded-pill alert-danger">Blocked</span>'
+                    : '<span class="badge rounded-pill alert-success">Active</span>';
+
+                // Update action button
+                actionCell.innerHTML = isBlocked
+                    ? `<button class="btn btn-success" style="width: 80px;" onclick="unBlockCustomer('${userId}')">Unblock</button>`
+                    : `<button class="btn btn-danger text-white" style="width: 80px;" onclick="blockCustomer('${userId}')">Block</button>`;
             }
         </script>

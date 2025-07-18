@@ -29,9 +29,9 @@ const addBanner = async (req, res) => {
     try {
 
         const data = req.body;
-        const image = req.file;
+        const image = req.file.path;
         const newBanner = new Banner({
-            image: image.filename,
+            image: image,
             title: data.title,
             description: data.description,
             startDate: new Date(data.startDate + "T00:00:00"),

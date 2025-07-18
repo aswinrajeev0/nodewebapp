@@ -293,35 +293,42 @@
                                 <% if (cart && cart.items.length> 0) { %>
                                     <% cart.items.forEach(item=> { %>
                                         <div class="product-row">
-                                            <img src="/uploads/re-image/<%= item.productId.productImage[0] %>"
-                                                alt="<%= item.productId.productName %>" class="product-image">
-                                            <div class="product-details">
-                                                <h5 class="mb-1">
-                                                    <%= item.productId.productName %>
-                                                </h5>
-                                                <p class="mb-1">Quantity: <%= item.quantity %>
-                                                </p>
-                                                <p class="mb-0 text-success">₹<%= (item.productId.salePrice *
-                                                        item.quantity).toLocaleString() %>
-                                                </p>
-                                            </div>
+                                            <% const imgSrc=item.productId.productImage[0]?.startsWith('http') ?
+                                                item.productId.productImage[0] : '/uploads/re-image/' +
+                                                item.productId.productImage[0]; %>
+                                                <img src="<%= imgSrc %>" alt="<%= item.productId.productName %>"
+                                                    class="product-image">
+                                                <div class="product-details">
+                                                    <h5 class="mb-1">
+                                                        <%= item.productId.productName %>
+                                                    </h5>
+                                                    <p class="mb-1">Quantity: <%= item.quantity %>
+                                                    </p>
+                                                    <p class="mb-0 text-success">₹<%= (item.productId.salePrice *
+                                                            item.quantity).toLocaleString() %>
+                                                    </p>
+                                                </div>
                                         </div>
                                         <% }); %>
                                             <% } %>
 
                                                 <% if (product) { %>
                                                     <div class="product-row">
-                                                        <img src="/uploads/re-image/<%= product.productImage[0] %>"
-                                                            alt="<%= product.productName %>" class="product-image">
-                                                        <div class="product-details">
-                                                            <h5 class="mb-1">
-                                                                <%= product.productName %>
-                                                            </h5>
-                                                            <p class="mb-1">Quantity: 1</p>
-                                                            <p class="mb-0 text-success">₹<%=
-                                                                    product.salePrice.toLocaleString() %>
-                                                            </p>
-                                                        </div>
+                                                        <% const imgSrc=product.productImage[0]?.startsWith('http')
+                                                            ? product.productImage[0] : '/uploads/re-image/' +
+                                                            product.productImage[0]; %>
+
+                                                            <img src="<%= imgSrc %>"
+                                                                alt="<%= product.productName %>" class="product-image">
+                                                            <div class="product-details">
+                                                                <h5 class="mb-1">
+                                                                    <%= product.productName %>
+                                                                </h5>
+                                                                <p class="mb-1">Quantity: 1</p>
+                                                                <p class="mb-0 text-success">₹<%=
+                                                                        product.salePrice.toLocaleString() %>
+                                                                </p>
+                                                            </div>
                                                     </div>
                                                     <% } %>
                             </div>
@@ -634,6 +641,7 @@
 
                             window.location.href = `/order-confirmation?id=${initialOrderData.orderId}`;
                         } catch (error) {
+                            console.error(error)
                             window.location.href = `/payment-failed?error=${encodeURIComponent(error.message)}&id=${initialOrderData.orderId}`;
                         }
                     },
@@ -647,6 +655,7 @@
                 const razorpay = new Razorpay(options);
                 razorpay.open();
             } catch (error) {
+                console.error(error)
                 window.location.href = `/payment-failed?error=${encodeURIComponent(error.message)}`;
             }
         }
@@ -879,6 +888,3 @@
         }
 
     </script>
-
-
-    

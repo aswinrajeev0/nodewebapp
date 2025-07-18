@@ -4,6 +4,7 @@ const Order = require('../../models/orderSchema');
 const Address = require('../../models/addressSchema');
 const Wallet = require('../../models/walletSchema');
 const Product = require('../../models/productSchema');
+const PaymentLock = require('../../models/paymentLockSchema');
 const env = require('dotenv').config();
 
 const razorpay = new Razorpay({
@@ -107,10 +108,12 @@ const createOrder = async (req, res) => {
 
 const verifyPayment = async (req, res) => {
     try {
+        const userId = req.session.user;
         const {
             razorpay_order_id,
             razorpay_payment_id,
-            razorpay_signature
+            razorpay_signature,
+            orderId
         } = req.body;
 
         if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
@@ -135,6 +138,35 @@ const verifyPayment = async (req, res) => {
             .digest("hex");
 
         if (razorpay_signature !== expectedSign) {
+
+            const payment = await razorpay.payments.fetch(razorpay_payment_id);
+
+            if (payment.status === 'captured') {
+                const refundAmount = payment.amount / 100;
+                const walletData = {
+                    $inc: { balance: refundAmount },
+                    $push: {
+                        transactions: {
+                            type: "Refund",
+                            amount: refundAmount,
+                            orderId: orderId
+                        }
+                    }
+                }
+
+                await Wallet.findOneAndUpdate(
+                    { userId: userId },
+                    walletData,
+                    { upsert: true, new: true }
+                );
+            }
+
+            await Order.findByIdAndUpdate(orderId, {
+                paymentStatus: 'Pending',
+            });
+
+            await PaymentLock.deleteOne({ userId: req.session.user });
+
             return res.status(400).json({
                 success: false,
                 message: 'Invalid payment signature'
@@ -142,6 +174,34 @@ const verifyPayment = async (req, res) => {
         }
 
         if (req.session.razorpayOrderId !== razorpay_order_id) {
+            const payment = await razorpay.payments.fetch(razorpay_payment_id);
+
+            if (payment.status === 'captured') {
+                const refundAmount = payment.amount / 100;
+                const walletData = {
+                    $inc: { balance: refundAmount },
+                    $push: {
+                        transactions: {
+                            type: "Refund",
+                            amount: refundAmount,
+                            orderId: orderId
+                        }
+                    }
+                }
+
+                await Wallet.findOneAndUpdate(
+                    { userId: userId },
+                    walletData,
+                    { upsert: true, new: true }
+                );
+            }
+
+            await Order.findByIdAndUpdate(orderId, {
+                paymentStatus: 'Pending',
+            });
+
+            await PaymentLock.deleteOne({ userId });
+
             return res.status(400).json({
                 success: false,
                 message: 'Order verification failed'
@@ -149,13 +209,28 @@ const verifyPayment = async (req, res) => {
         }
 
         const payment = await razorpay.payments.fetch(razorpay_payment_id);
+        console.log(payment)
 
         if (payment.status !== 'captured') {
+            await Order.findByIdAndUpdate(orderId, {
+                paymentStatus: 'Pending',
+            });
+
+            await PaymentLock.deleteOne({ userId });
+
             return res.status(400).json({
                 success: false,
                 message: `Payment not captured. Current status: ${payment.status}`
             });
         }
+
+        await Order.findByIdAndUpdate(orderId, {
+            paymentStatus: 'Completed',
+            razorpayOrderId: razorpay_order_id,
+            razorpayPaymentId: razorpay_payment_id,
+        });
+
+        await PaymentLock.deleteOne({ userId });
 
         delete req.session.razorpayOrderId;
         delete req.session.razorpayOrderExpiry;
@@ -168,10 +243,20 @@ const verifyPayment = async (req, res) => {
 
     } catch (error) {
         console.error('Payment verification error:', error);
+
+        try {
+            await Order.findByIdAndUpdate(req.body.orderId, {
+                paymentStatus: 'Pending',
+            });
+
+            await PaymentLock.deleteOne({ userId: req.session.user });
+        } catch (cleanupErr) {
+            console.error('Cleanup error:', cleanupErr);
+        }
         res.status(500).json({
             success: false,
             message: 'Payment verification failed',
-            error: error.message
+            error: error.message,
         });
     }
 };

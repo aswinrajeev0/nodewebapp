@@ -1,89 +1,91 @@
 <%- include('../partials/user/header') %>
-<style>
-    .hero-slider-1 {
-    position: relative;
-    overflow: hidden;
-}
+    <style>
+        .hero-slider-1 {
+            position: relative;
+            overflow: hidden;
+        }
 
-.single-hero-slider {
-    position: relative;
-    height: 100vh;
-    background-size: cover;
-    background-position: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+        .single-hero-slider {
+            position: relative;
+            height: 100vh;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-.single-hero-slider .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5); /* Adjust transparency for visibility */
-    z-index: 1;
-}
+        .single-hero-slider .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            /* Adjust transparency for visibility */
+            z-index: 1;
+        }
 
-.text-content {
-    position: relative;
-    z-index: 2;
-    color: #fff;
-    text-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5);
-}
+        .text-content {
+            position: relative;
+            z-index: 2;
+            color: #fff;
+            text-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5);
+        }
 
-.text-content h1 {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-}
+        .text-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
 
-.text-content h3 {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-}
+        .text-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
 
-.text-content .btn {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    color: #fff;
-    background-color: #007bff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-}
+        .text-content .btn {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
 
-.text-content .btn:hover {
-    background-color: #0056b3;
-    transform: scale(1.05);
-}
+        .text-content .btn:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
 
-.banner-link {
-    display: block;
-    text-decoration: none;
-}
+        .banner-link {
+            display: block;
+            text-decoration: none;
+        }
 
-.slider-animated-1 {
-    animation: fadeIn 1s ease-in-out;
-}
+        .slider-animated-1 {
+            animation: fadeIn 1s ease-in-out;
+        }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
 
-</style>
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
     <main class="main">
         <section class="home-slider position-relative pt-50">
 
             <div class="hero-slider-1 dot-style-1 dot-style-1-position-1">
-                <% for (let i = 0; i < banner.length; i++) { %>
+                <% for (let i=0; i < banner.length; i++) { %>
                     <a href="<%= banner[i].link %>" target="_blank" class="banner-link">
-                        <div class="single-hero-slider single-animation-wrap" style="background-image: url('uploads/re-image/<%= banner[i].image %>');">
+                        <div class="single-hero-slider single-animation-wrap"
+                            style="background-image: url('<%= banner[i].image %>');">
                             <div class="overlay"></div>
                             <div class="container">
                                 <div class="row align-items-center slider-animated-1">
@@ -94,7 +96,8 @@
                                         <h3 class="animated fadeInUp" style="animation-delay: 0.3s;">
                                             <%= banner[i].description %>
                                         </h3>
-                                        <button class="btn btn-primary animated fadeInUp" style="animation-delay: 0.6s;">
+                                        <button class="btn btn-primary animated fadeInUp"
+                                            style="animation-delay: 0.6s;">
                                             Learn More
                                         </button>
                                     </div>
@@ -102,9 +105,9 @@
                             </div>
                         </div>
                     </a>
-                <% } %>
+                    <% } %>
             </div>
-            
+
 
 
             <div class="slider-arrow hero-slider-1-arrow"></div>
@@ -147,9 +150,12 @@
                                         <div class="product-img-action-wrap">
                                             <div class="product-img product-img-zoom">
                                                 <a href="/productdetails?id=<%= products[i]._id %>">
-                                                    <img class="default-img"
-                                                        src="/uploads/re-image/<%= products[i].productImage[0] %>"
-                                                        alt="<%= products[i].productName %>">
+                                                    <% const imgSrc=products[i].productImage[0]?.startsWith('http') ?
+                                                        products[i].productImage[0] : '/uploads/re-image/' +
+                                                        products[i].productImage[0]; %>
+
+                                                        <img class="default-img" src="<%= imgSrc %>"
+                                                            alt="<%= products[i].productName %>">
                                                 </a>
                                             </div>
                                             <!-- <div class="product-action-1">
@@ -165,8 +171,13 @@
                                             <div class="d-flex">
                                                 <h4 class="text pe-3">₹<%= products[i].salePrice.toLocaleString() %>
                                                 </h4>
-                                                <h6 class="text pe-3" style="text-decoration: line-through; color: rgb(164, 103, 103);">₹<%=products[i].regularPrice.toLocaleString()%></h6>
-                                                <h4><%=products[i].highestOffer%>%</h4>
+                                                <h6 class="text pe-3"
+                                                    style="text-decoration: line-through; color: rgb(164, 103, 103);">₹
+                                                    <%=products[i].regularPrice.toLocaleString()%>
+                                                </h6>
+                                                <h4>
+                                                    <%=products[i].highestOffer%>%
+                                                </h4>
                                             </div>
                                             <p>Rating: <%= products[i].rating !==undefined ? products[i].rating : 'N/A'
                                                     %>
@@ -189,7 +200,7 @@
 
                 <!--End tab-content-->
             </div>
-            
+
         </section>
 
     </main>
@@ -233,13 +244,18 @@
             }
 
             products.forEach(product => {
+
+                const image = (product.productImage[0].startsWith("http")
+                    ? product.productImage[0]
+                    : `/uploads/re-image/${product.productImage[0]}`)
+
                 const productHTML = `
                     <div class="col-lg-3 col-md-4 col-12 col-sm-6">
                         <div class="product-cart-wrap mb-30">
                             <div class="product-img-action-wrap">
                                 <div class="product-img product-img-zoom">
                                     <a href="/productdetails?id=${product._id}">
-                                        <img class="default-img" src="/uploads/re-image/${product.productImage[0]}" alt="${product.productName}">
+                                        <img class="default-img" src="${image}" alt="${product.productName}">
                                     </a>
                                 </div>
                                 <div class="product-action-1">

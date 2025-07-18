@@ -1,4 +1,5 @@
 <%- include('../partials/user/header') %>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         header {
             position: relative;
@@ -163,17 +164,22 @@
 
                             <%for(let i=0;i<product.productImage.length;i++){%>
                                 <figure class="border-radius-10">
-                                    <img src="/uploads/re-image/<%= product.productImage[i] %>"
-                                        alt="<%=product.productName%>">
+                                    <% const imgSrc=product.productImage[i]?.startsWith('http') ?
+                                        product.productImage[i] : '/uploads/re-image/' + product.productImage[i]; %>
+
+                                        <img src="<%= imgSrc %>" alt="<%=product.productName%>">
                                 </figure>
                                 <%}%>
                         </div>
                         <!-- THUMBNAILS -->
                         <div class="slider-nav-thumbnails pl-15 pr-15">
                             <%for(let i=0;i<product.productImage.length;i++){%>
-                                <div><img src="/uploads/re-image/<%= product.productImage[i] %>" alt="product image">
-                                </div>
-                                <%}%>
+                                <% const imgSrc=product.productImage[i]?.startsWith('http') ? product.productImage[i]
+                                    : '/uploads/re-image/' + product.productImage[i]; %>
+
+                                    <div><img src="<%= imgSrc %>" alt="product image">
+                                    </div>
+                                    <%}%>
                         </div>
                     </div>
                     <!-- End Gallery -->
@@ -212,18 +218,18 @@
                         </div>
                         <div class="clearfix product-price-cover text-center">
                             <div class="product-price primary-color">
-                              <ins><span class="text-brand">
-                                ₹ <%=finalSalePrice.toLocaleString() || product.salePrice.toLocaleString()%>
-                              </span></ins>
-                              <ins><span class="old-price font-md ml-15">
-                                ₹ <%=product.regularPrice.toLocaleString()%>
-                              </span></ins>
+                                <ins><span class="text-brand">
+                                        ₹ <%=finalSalePrice.toLocaleString() || product.salePrice.toLocaleString()%>
+                                    </span></ins>
+                                <ins><span class="old-price font-md ml-15">
+                                        ₹ <%=product.regularPrice.toLocaleString()%>
+                                    </span></ins>
                                 <span class="save-price font-md color3 ml-15">
-                                  <%=highestOffer%>%
+                                    <%=highestOffer%>%
                                 </span>
                             </div>
-                          </div>
-                          
+                        </div>
+
                         <div class="bt-1 border-color-1 mt-15 mb-15"></div>
                         <div class="short-desc mb-30 text-center">
                             <p class="font-sm">
@@ -250,11 +256,8 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <form action="/add-to-cart?id=<%= product._id %>" method="POST"
-                                        style="display: inline; " onsubmit="syncQuantity()">
-                                        <input type="hidden" name="quantity" id="cart-quantity" value="1">
-                                        <button type="submit" class="btn btn-success">Add to cart</button>
-                                    </form>
+                                    <button type="button" class="btn btn-success"
+                                        onclick="addToCart('<%= product._id %>')">Add to cart</button>
 
                                     <button type="button" aria-label="Add To Wishlist" class="action-btn hover-up"
                                         onclick="addToWishlist('<%=product._id%>')">
@@ -301,8 +304,10 @@
                 <div class="col-md-3 col-sm-6 mb-4">
                     <div class="card">
                         <a href="/productdetails?id=<%= recommended._id %>">
-                            <img src="/uploads/re-image/<%= recommended.productImage[0] %>" class="card-img-top"
-                                alt="<%= recommended.productName %>">
+                            <% const imgSrc=recommended.productImage[0]?.startsWith('http') ?
+                                recommended.productImage[0] : '/uploads/re-image/' + recommended.productImage[0]; %>
+
+                                <img src="<%= imgSrc %>" class="card-img-top" alt="<%= recommended.productName %>">
                         </a>
                         <div class="card-body text-center">
                             <h5 class="card-title">
@@ -357,6 +362,46 @@
                         }
                     })
                     .catch(error => console.error('Error:', error))
+            }
+
+            async function addToCart(productId) {
+                const quantity = parseInt(document.getElementById('qty-val').value);
+
+                try {
+                    const response = await fetch(`/add-to-cart?id=${productId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ quantity })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Added to cart!',
+                            text: 'Product successfully added to your cart.',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: data.message || 'Failed to add product to cart.'
+                        });
+                    }
+
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops!',
+                        text: 'Something went wrong. Please try again.'
+                    });
+                    console.error('Error adding to cart:', error);
+                }
             }
 
         </script>
