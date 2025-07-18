@@ -152,22 +152,22 @@
 
                             <div class="mb-4">
                                 <label class="form-label">Description</label>
-                                <textarea placeholder="Type here" name="description" class="form-control border"
+                                <textarea placeholder="Type here" name="description" id="description" class="form-control border"
                                     rows="4"></textarea>
-                                <div id="description" class="error-message"></div>
+                                <div id="description-error" class="error-message"></div>
                             </div>
 
 
                             <div class="mb-4">
                                 <label for="startingDate" class="form-label">Start Date</label>
-                                <input type="date" name="startDate" class="form-control" required id="startingDate" />
+                                <input type="date" name="startDate" class="form-control" id="startingDate" />
                                 <div id="error-start-date" class="error-message"></div>
                             </div>
 
 
                             <div class="mb-4">
                                 <label for="expiringDate" class="form-label">End Date</label>
-                                <input type="date" name="endDate" class="form-control" id="expiringDate" required />
+                                <input type="date" name="endDate" class="form-control" id="expiringDate" />
                                 <div id="error-end-date" class="error-message"></div>
                             </div>
 
@@ -252,22 +252,14 @@
         });
 
         function validateForm() {
-
-
             resetErrorMessages();
 
+            let isValid = true;
 
-            var isValid = true;
-
-
-
-
-            var productName = document.getElementById("product_name").value;
-
+            const productName = document.getElementById("product_name").value;
 
             const sDate = document.getElementsByName('startDate')[0].value;
             const eDate = document.getElementsByName('endDate')[0].value;
-
 
             if (!sDate) {
                 displayErrorMessage("error-start-date", 'Starting date is required');
@@ -279,7 +271,6 @@
                 displayErrorMessage("error-end-date", 'End date is required');
                 isValid = false;
             }
-
 
             const sDateObj = new Date(sDate);
             const eDateObj = new Date(eDate);
@@ -295,14 +286,14 @@
                 displayErrorMessage("productName-error", "Product Name is required");
                 isValid = false;
             }
-            var description = document.getElementsByName('description')[0].value;
+            let description = document.getElementById('description').value;
             if (description === "") {
                 displayErrorMessage("description-error", "Description is required");
                 isValid = false;
             }
 
 
-            var link = document.getElementsByName('link')[0].value;
+            let link = document.getElementsByName('link')[0].value;
             if (link === "") {
                 displayErrorMessage("link-error", "Link is required");
                 isValid = false;
@@ -318,20 +309,19 @@
                 isValid = false;
             }
 
-
             return isValid;
         }
 
 
         function displayErrorMessage(elementId, message) {
-            var errorElement = document.getElementById(elementId);
+            const errorElement = document.getElementById(elementId);
             errorElement.innerText = message;
             errorElement.style.display = "block";
         }
 
 
         function resetErrorMessages() {
-            var errorElements = document.querySelectorAll(".error-message");
+            const errorElements = document.querySelectorAll(".error-message");
             errorElements.forEach(function (element) {
                 element.innerText = "";
                 element.style.display = "none";

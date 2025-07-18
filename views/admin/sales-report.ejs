@@ -4,7 +4,10 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4>Sales Report</h4>
             <div class="export-buttons">
-                <button class="btn btn-primary me-2" onclick="exportToPDF()">
+                <!-- <button class="btn btn-primary me-2" onclick="exportToPDF()">
+                    <i class="material-icons md-file_download"></i> Export PDF
+                </button> -->
+                <button class="btn btn-primary me-2" onclick="downloadPDF()">
                     <i class="material-icons md-file_download"></i> Export PDF
                 </button>
                 <button class="btn btn-success" onclick="exportToExcel()">
@@ -21,10 +24,10 @@
                 <div class="input-group" style="width: 200px;">
                     <select class="form-control" name="dateRange" id="dateRangeSelect">
                         <option value="">Select Date Range</option>
-                        <option value="today">Today</option>
-                        <option value="week">This Week</option>
-                        <option value="month">This Month</option>
-                        <option value="year">This Year</option>
+                        <option value="today" <%=dateRange==='today' ? 'selected' : '' %>>Today</option>
+                        <option value="week" <%=dateRange==='week' ? 'selected' : '' %>>This Week</option>
+                        <option value="month" <%=dateRange==='month' ? 'selected' : '' %>>This Month</option>
+                        <option value="year" <%=dateRange==='year' ? 'selected' : '' %>>This Year</option>
                     </select>
                 </div>
             </div>
@@ -33,9 +36,11 @@
             <div class="mb-4 d-flex gap-3">
                 <form class="d-flex align-items-center">
                     <label for="startDate" class="me-2">Start Date:</label>
-                    <input type="date" id="startDate" name="startDate" class="form-control me-3">
+                    <input type="date" id="startDate" name="startDate" class="form-control me-3"
+                        value="<%= startDate || '' %>">
                     <label for="endDate" class="me-2">End Date:</label>
-                    <input type="date" id="endDate" name="endDate" class="form-control me-3">
+                    <input type="date" id="endDate" name="endDate" class="form-control me-3"
+                        value="<%= endDate || '' %>">
                 </form>
             </div>
         </div>
@@ -49,7 +54,7 @@
                         </span>
                         <div class="text">
                             <h6 class="mb-1">Total Sales</h6>
-                            <span>₹45,000</span>
+                            <span>₹<%= totalSales.toLocaleString() %></span>
                         </div>
                     </article>
                 </div>
@@ -77,7 +82,7 @@
                         </span>
                         <div class="text">
                             <h6 class="mb-1">Total Discount</h6>
-                            <span>₹5,000</span>
+                            <span>₹<%= totalDiscount.toLocaleString() %></span>
                         </div>
                     </article>
                 </div>
@@ -90,7 +95,7 @@
                         </span>
                         <div class="text">
                             <h6 class="mb-1">Total Customers</h6>
-                            <span>85</span>
+                            <span><%= totalCustomers %></span>
                         </div>
                     </article>
                 </div>
@@ -111,8 +116,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% let k = (currentPage - 1) * 10 + 1; %>
-                        <% for (let i=orders.length - 1; i>= 0; i--) { %>
+                    <% let k=(currentPage - 1) * 10 + 1; %>
+                        <% for (let i=0; i<orders.length; i++) { %>
                             <tr>
                                 <td>
                                     <%= k++ %>
@@ -125,7 +130,7 @@
                                     <ul>
                                         <% orders[i].orderedItems.forEach(item=> { %>
                                             <li>
-                                                <%= item.product.productName %>
+                                                <%= item.product?.productName %>
                                             </li>
                                             <% }) %>
                                     </ul>
@@ -140,7 +145,7 @@
                                     </ul>
                                 </td>
                                 <td>
-                                    <%= orders[i].createdAt.toLocaleDateString() %>
+                                    <%= orders[i].createdAt.toISOString().split('T')[0] %>
                                 </td>
                                 </td>
 
@@ -160,41 +165,38 @@
             <ul class="pagination justify-content-start">
 
                 <!-- Page Numbers -->
-                <% 
-                let startPage = Math.max(1, currentPage - 2);
-                let endPage = Math.min(totalPages, startPage + 4);
-                
-                if (endPage - startPage < 4) {
-                    startPage = Math.max(1, endPage - 4);
-                }
-                
-                if (startPage > 1) { %>
+                <% let startPage=Math.max(1, currentPage - 2); let endPage=Math.min(totalPages, startPage + 4); if
+                    (endPage - startPage < 4) { startPage=Math.max(1, endPage - 4); } if (startPage> 1) { %>
                     <li class="page-item">
                         <a class="page-link" href="?page=1">1</a>
                     </li>
-                    <% if (startPage > 2) { %>
+                    <% if (startPage> 2) { %>
                         <li class="page-item disabled">
                             <span class="page-link">...</span>
                         </li>
-                    <% } %>
-                <% } %>
+                        <% } %>
+                            <% } %>
 
-                <% for(let i = startPage; i <= endPage; i++) { %>
-                    <li class="page-item <%= i === currentPage ? 'active' : '' %>">
-                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
-                    </li>
-                <% } %>
+                                <% for(let i=startPage; i <=endPage; i++) { %>
+                                    <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                        <a class="page-link" href="?page=<%= i %>">
+                                            <%= i %>
+                                        </a>
+                                    </li>
+                                    <% } %>
 
-                <% if (endPage < totalPages) { %>
-                    <% if (endPage < totalPages - 1) { %>
-                        <li class="page-item disabled">
-                            <span class="page-link">...</span>
-                        </li>
-                    <% } %>
-                    <li class="page-item">
-                        <a class="page-link" href="?page=<%= totalPages %>"><%= totalPages %></a>
-                    </li>
-                <% } %>
+                                        <% if (endPage < totalPages) { %>
+                                            <% if (endPage < totalPages - 1) { %>
+                                                <li class="page-item disabled">
+                                                    <span class="page-link">...</span>
+                                                </li>
+                                                <% } %>
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="?page=<%= totalPages %>">
+                                                            <%= totalPages %>
+                                                        </a>
+                                                    </li>
+                                                    <% } %>
             </ul>
         </nav>
     </div><br>
@@ -204,6 +206,41 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
 
     <script>
+
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (startDateInput && endDateInput) {
+                startDateInput.addEventListener('change', applyBackendDateFilter);
+                endDateInput.addEventListener('change', applyBackendDateFilter);
+            }
+        });
+
+        function applyBackendDateFilter() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            let query = new URLSearchParams(window.location.search);
+            if (startDate) query.set('startDate', startDate);
+            if (endDate) query.set('endDate', endDate);
+            query.set('page', 1); // reset to page 1 on filter
+
+            window.location.href = `/admin/sales-report?${query.toString()}`;
+        }
+
+        function downloadPDF() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            let url = '/admin/sales-report/pdf';
+            if (startDate && endDate) {
+                url += `?startDate=${startDate}&endDate=${endDate}`;
+            }
+
+            window.open(url, '_blank');
+        }
+
         function exportToPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
@@ -273,135 +310,176 @@
                 </div>
             </div>`;
 
-        function initializeDateFilter() {
-            const startDateInput = document.getElementById('startDate');
-            const endDateInput = document.getElementById('endDate');
-            const table = document.getElementById('salesTable');
-            const tbody = table.getElementsByTagName('tbody')[0];
-            const rows = tbody.getElementsByTagName('tr');
-            const dateRangeSelect = document.getElementById('dateRangeSelect');
+        function handleDateRangeSelection(e) {
+            console.log("Date range selection")
+            const today = new Date();
+            const startDate = new Date(today);
 
-            function parseDate(dateStr) {
-                if (!dateStr) return null;
-
-                let date = new Date(dateStr);
-                if (!isNaN(date)) return date;
-
-                const parts = dateStr.split('/');
-                if (parts.length === 3) {
-                    return new Date(parts[2], parts[1] - 1, parts[0]);
-                }
-
-                return null;
+            switch (this.value) {
+                case 'today':
+                    startDateInput.value = today.toISOString().split('T')[0];
+                    endDateInput.value = today.toISOString().split('T')[0];
+                    break;
+                case 'week':
+                    startDate.setDate(today.getDate() - 7);
+                    startDateInput.value = startDate.toISOString().split('T')[0];
+                    endDateInput.value = today.toISOString().split('T')[0];
+                    break;
+                case 'month':
+                    startDate.setMonth(today.getMonth() - 1);
+                    startDateInput.value = startDate.toISOString().split('T')[0];
+                    endDateInput.value = today.toISOString().split('T')[0];
+                    break;
+                case 'year':
+                    startDate.setFullYear(today.getFullYear() - 1);
+                    startDateInput.value = startDate.toISOString().split('T')[0];
+                    endDateInput.value = today.toISOString().split('T')[0];
+                    break;
+                default:
+                    startDateInput.value = '';
+                    endDateInput.value = '';
+                    break;
             }
 
-            function formatCurrency(amount) {
-                return '₹' + amount.toLocaleString('en-IN', {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0
-                });
-            }
-
-            function filterTable() {
-                let startDate = startDateInput.value ? new Date(startDateInput.value) : null;
-                let endDate = endDateInput.value ? new Date(endDateInput.value) : null;
-
-                if (startDate) startDate.setHours(0, 0, 0, 0);
-                if (endDate) endDate.setHours(23, 59, 59, 999);
-
-                let visibleRows = 0;
-                let totalSales = 0;
-                let totalDiscount = 0;
-                const uniqueCustomers = new Set();
-
-                for (const row of rows) {
-                    const dateCell = row.cells[4].textContent.trim();
-                    const rowDate = parseDate(dateCell);
-
-                    if (!rowDate) continue;
-
-                    let showRow = true;
-                    if (startDate && rowDate < startDate) showRow = false;
-                    if (endDate && rowDate > endDate) showRow = false;
-
-                    row.style.display = showRow ? '' : 'none';
-
-                    if (showRow) {
-                        visibleRows++;
-                        const finalAmount = parseFloat(row.cells[6].textContent.replace(/[₹,]/g, '')) || 0;
-                        const discount = parseFloat(row.cells[5].textContent.replace(/[₹,]/g, '')) || 0;
-                        const customer = row.cells[1].textContent.trim();
-
-                        totalSales += finalAmount;
-                        totalDiscount += discount;
-                        uniqueCustomers.add(customer);
-                    }
-                }
-
-                const summaryCards = document.querySelectorAll('.card.card-body .text');
-                summaryCards.forEach(card => {
-                    const title = card.querySelector('h6').textContent.trim();
-                    const valueSpan = card.querySelector('span');
-
-                    switch (title) {
-                        case 'Total Sales':
-                            valueSpan.textContent = formatCurrency(totalSales);
-                            break;
-                        case 'Total Orders':
-                            valueSpan.textContent = visibleRows;
-                            break;
-                        case 'Total Discount':
-                            valueSpan.textContent = formatCurrency(totalDiscount);
-                            break;
-                        case 'Total Customers':
-                            valueSpan.textContent = uniqueCustomers.size;
-                            break;
-                    }
-                });
-            }
-
-            function handleDateRangeSelection(e) {
-                const today = new Date();
-                // today.setHours(0, 0, 0, 0);
-
-                const startDate = new Date(today);
-
-                switch (this.value) {
-                    case 'today':
-                        startDateInput.value = today.toISOString().split('T')[0];
-                        endDateInput.value = today.toISOString().split('T')[0];
-                        break;
-                    case 'week':
-                        startDate.setDate(today.getDate() - 7);
-                        startDateInput.value = startDate.toISOString().split('T')[0];
-                        endDateInput.value = today.toISOString().split('T')[0];
-                        break;
-                    case 'month':
-                        startDate.setMonth(today.getMonth() - 1);
-                        startDateInput.value = startDate.toISOString().split('T')[0];
-                        endDateInput.value = today.toISOString().split('T')[0];
-                        break;
-                    case 'year':
-                        startDate.setFullYear(today.getFullYear() - 1);
-                        startDateInput.value = startDate.toISOString().split('T')[0];
-                        endDateInput.value = today.toISOString().split('T')[0];
-                        break;
-                    default:
-                        startDateInput.value = '';
-                        endDateInput.value = '';
-                        break;
-                }
-                filterTable();
-            }
-
-            dateRangeSelect.addEventListener('change', handleDateRangeSelection);
-            startDateInput.addEventListener('change', filterTable);
-            endDateInput.addEventListener('change', filterTable);
-
-            filterTable();
+            // Now apply the backend filter instead of frontend
+            applyBackendDateFilter();
         }
 
-        document.addEventListener('DOMContentLoaded', initializeDateFilter);
+        // function initializeDateFilter() {
+        //     const startDateInput = document.getElementById('startDate');
+        //     const endDateInput = document.getElementById('endDate');
+        //     const table = document.getElementById('salesTable');
+        //     const tbody = table.getElementsByTagName('tbody')[0];
+        //     const rows = tbody.getElementsByTagName('tr');
+        //     const dateRangeSelect = document.getElementById('dateRangeSelect');
+
+        //     function parseDate(dateStr) {
+        //         return new Date(dateStr);
+        //     }
+
+        //     function formatCurrency(amount) {
+        //         return '₹' + amount.toLocaleString('en-IN', {
+        //             minimumFractionDigits: 0,
+        //             maximumFractionDigits: 0
+        //         });
+        //     }
+
+        //     // function filterTable() {
+        //     //     let startDate = startDateInput.value ? new Date(startDateInput.value) : null;
+        //     //     let endDate = endDateInput.value ? new Date(endDateInput.value) : null;
+
+        //     //     if (startDate) startDate.setHours(0, 0, 0, 0);
+        //     //     if (endDate) endDate.setHours(23, 59, 59, 999);
+
+        //     //     let visibleRows = 0;
+        //     //     let totalSales = 0;
+        //     //     let totalDiscount = 0;
+        //     //     const uniqueCustomers = new Set();
+
+        //     //     for (const row of rows) {
+        //     //         const dateCell = row.cells[4].textContent.trim();
+        //     //         const rowDate = parseDate(dateCell);
+
+        //     //         if (!rowDate) continue;
+
+        //     //         let showRow = true;
+        //     //         if (startDate && rowDate < startDate) showRow = false;
+        //     //         if (endDate && rowDate > endDate) showRow = false;
+
+        //     //         row.style.display = showRow ? '' : 'none';
+
+        //     //         if (showRow) {
+        //     //             visibleRows++;
+        //     //             const finalAmount = parseFloat(row.cells[6].textContent.replace(/[₹,]/g, '')) || 0;
+        //     //             const discount = parseFloat(row.cells[5].textContent.replace(/[₹,]/g, '')) || 0;
+        //     //             const customer = row.cells[1].textContent.trim();
+
+        //     //             totalSales += finalAmount;
+        //     //             totalDiscount += discount;
+        //     //             uniqueCustomers.add(customer);
+        //     //         }
+        //     //     }
+
+        //         const summaryCards = document.querySelectorAll('.card.card-body .text');
+        //         summaryCards.forEach(card => {
+        //             const title = card.querySelector('h6').textContent.trim();
+        //             const valueSpan = card.querySelector('span');
+
+        //             switch (title) {
+        //                 case 'Total Sales':
+        //                     valueSpan.textContent = formatCurrency(totalSales);
+        //                     break;
+        //                 case 'Total Orders':
+        //                     valueSpan.textContent = visibleRows;
+        //                     break;
+        //                 case 'Total Discount':
+        //                     valueSpan.textContent = formatCurrency(totalDiscount);
+        //                     break;
+        //                 case 'Total Customers':
+        //                     valueSpan.textContent = uniqueCustomers.size;
+        //                     break;
+        //             }
+        //         });
+        //     }
+
+        //     function handleDateRangeSelection(e) {
+        //         const today = new Date();
+        //         // today.setHours(0, 0, 0, 0);
+
+        //         const startDate = new Date(today);
+
+        //         switch (this.value) {
+        //             case 'today':
+        //                 startDateInput.value = today.toISOString().split('T')[0];
+        //                 endDateInput.value = today.toISOString().split('T')[0];
+        //                 break;
+        //             case 'week':
+        //                 startDate.setDate(today.getDate() - 7);
+        //                 startDateInput.value = startDate.toISOString().split('T')[0];
+        //                 endDateInput.value = today.toISOString().split('T')[0];
+        //                 break;
+        //             case 'month':
+        //                 startDate.setMonth(today.getMonth() - 1);
+        //                 startDateInput.value = startDate.toISOString().split('T')[0];
+        //                 endDateInput.value = today.toISOString().split('T')[0];
+        //                 break;
+        //             case 'year':
+        //                 startDate.setFullYear(today.getFullYear() - 1);
+        //                 startDateInput.value = startDate.toISOString().split('T')[0];
+        //                 endDateInput.value = today.toISOString().split('T')[0];
+        //                 break;
+        //             default:
+        //                 startDateInput.value = '';
+        //                 endDateInput.value = '';
+        //                 break;
+        //         }
+        //         filterTable();
+        //     }
+
+        //     // dateRangeSelect.addEventListener('change', handleDateRangeSelection);
+        //     // startDateInput.addEventListener('change', filterTable);
+        //     // endDateInput.addEventListener('change', filterTable);
+
+        //     // filterTable();
+        // }
+
+        // document.addEventListener('DOMContentLoaded', initializeDateFilter);
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            const dateRangeSelect = document.getElementById('dateRangeSelect');
+
+            if (startDateInput && endDateInput) {
+                startDateInput.addEventListener('change', applyBackendDateFilter);
+                endDateInput.addEventListener('change', applyBackendDateFilter);
+            }
+
+            if (dateRangeSelect) {
+                dateRangeSelect.addEventListener('change', handleDateRangeSelection);
+            }
+        });
+
 
     </script>
 

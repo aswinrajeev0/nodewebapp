@@ -4,7 +4,7 @@
 
         <form class="searchform" method="get" action="/admin/users">
             <div class="input-group">
-                <input type="text" class="form-control" name="search" placeholder="Search Users">
+                <input type="text" class="form-control" name="search" value="<%= searchQuery || '' %>" placeholder="Search Users">
                 <button class="btn btn-light bg" type="submit""> <i class=" material-icons md-search"></i></button>
             </div>
         </form>

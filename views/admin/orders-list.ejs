@@ -61,7 +61,7 @@
                                         <td>
                                             <ul style="padding-left: 15px; margin: 0;">
                                                 <% orders[i].orderedItems.forEach(item => { %>
-                                                    <li><%= item.product.productName %></li>
+                                                    <li><%= item.product?.productName %></li>
                                                 <% }) %>
                                             </ul>
                                         </td>

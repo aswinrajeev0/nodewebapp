@@ -37,7 +37,8 @@ const customerInfo = async (req, res) => {
         res.render('customers', {
             data: userData,
             totalPages: Math.ceil(count / limit),
-            currentPage: page
+            currentPage: page,
+            searchQuery: search || ""
         })
 
     } catch (error) {
@@ -47,7 +48,7 @@ const customerInfo = async (req, res) => {
 
 const customerBlocked = async (req, res) => {
     try {
-        const { id } = req.body; // Now using req.body instead of req.query
+        const { id } = req.body;
         await User.updateOne({ _id: id }, { $set: { isBlocked: true } });
         res.status(200).json({ status: true, message: 'User blocked successfully' });
     } catch (error) {

@@ -15,22 +15,23 @@
 			<div class="card-body">
 				<div class="row">
 					<div class="col-md-3">
-						<form method="post" action="/admin/addbrand" enctype="multipart/form-data">
+						<form action="/admin/addbrand" method="post" enctype="multipart/form-data" id="addBrandForm">
 							<div class="mb-4">
-								<label for="brand_name" class="form-label">Brand Name</label>
-								<input type="text" name="name" placeholder="Type here" class="form-control" id="brand_name" />
+								<label for="brand_name" class="form-label">Brand name</label>
+								<input type="text" name="name" id="brand_name" class="form-control"
+									placeholder="Type here" />
+								<div id="brandNameError" class="text-danger small mt-1"></div>
 							</div>
+
 							<div class="mb-4">
-								<label for="brand_image" class="form-label">Brand Image</label>
-								<div class="input-upload">
-									<img src="" alt="" id="preview" style="max-width: 100%; max-height: 150px;" />
-									<input class="form-control border mt-2" name="image" type="file" onchange="previewImage(event)" />
-								</div>
+								<label class="form-label">Upload brand image</label>
+								<img src="" alt="" id="preview" style="max-width: 100%; max-height: 150px;" />
+								<input class="form-control border" name="image" type="file" id="brand_image" onchange="previewImage(event)" />
+								<div id="brandImageError" class="text-danger small mt-1"></div>
 							</div>
+
 							<div class="d-grid">
-								<button class="btn btn-primary" type="submit">
-									Add Brand
-								</button>
+								<button class="btn btn-primary" type="submit">Submit</button>
 							</div>
 						</form>
 					</div>
@@ -55,18 +56,21 @@
 											<td class="text-start">
 												<div class="d-flex align-items-center justify-content-center"
 													style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
-													<% const imgSrc=brand.brandImage?.startsWith('http') ? brand.brandImage : '/uploads/re-image/'
-														+ brand.brandImage; %>
+													<% const imgSrc=brand.brandImage?.startsWith('http') ?
+														brand.brandImage : '/uploads/re-image/' + brand.brandImage; %>
 
-														<img src="<%= imgSrc %>" alt="<%=brand.brandName%>" class="img-fluid rounded-circle"
+														<img src="<%= imgSrc %>" alt="<%=brand.brandName%>"
+															class="img-fluid rounded-circle"
 															style="width: 100%; height: auto;" />
 												</div>
 											</td>
 											<td class="text-start">
 												<%if(brand.isBlocked){%>
-													<span class="badge rounded-pill alert-danger" style="width: 60px">Blocked</span>
+													<span class="badge rounded-pill alert-danger"
+														style="width: 60px">Blocked</span>
 													<%}else{%>
-														<span class="badge rounded-pill alert-success" style="width: 60px">Active</span>
+														<span class="badge rounded-pill alert-success"
+															style="width: 60px">Active</span>
 														<%}%>
 											</td>
 											<td class="text-end">
@@ -83,7 +87,8 @@
 														<% } %>
 
 															<button class="btn btn-danger" style="width: 90px;">
-																<a href="/admin/deletebrand?id=<%= brand._id %>" class="text-white">Delete</a>
+																<a href="/admin/deletebrand?id=<%= brand._id %>"
+																	class="text-white">Delete</a>
 															</button>
 											</td>
 
@@ -113,6 +118,43 @@
 	</section>
 
 	<script>
+		document.getElementById('addBrandForm').addEventListener('submit', function (e) {
+			let isValid = true;
+
+			const brandNameInput = document.getElementById('brand_name');
+			const brandImageInput = document.getElementById('brand_image');
+
+			const brandNameError = document.getElementById('brandNameError');
+			const brandImageError = document.getElementById('brandImageError');
+
+			// Clear previous errors
+			brandNameError.textContent = '';
+			brandImageError.textContent = '';
+
+			// Validate brand name
+			if (brandNameInput.value.trim() === '') {
+				brandNameError.textContent = 'Brand name is required.';
+				isValid = false;
+			}
+
+			// Validate image input
+			const file = brandImageInput.files[0];
+			if (!file) {
+				brandImageError.textContent = 'Please upload a brand image.';
+				isValid = false;
+			} else {
+				const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+				if (!allowedTypes.includes(file.type)) {
+					brandImageError.textContent = 'Only JPG or PNG files are allowed.';
+					isValid = false;
+				}
+			}
+
+			if (!isValid) {
+				e.preventDefault();
+			}
+		});
+
 		function previewImage(event) {
 			const reader = new FileReader();
 			reader.onload = function () {
