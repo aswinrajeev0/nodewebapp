@@ -55,12 +55,17 @@ const addToCart = async (req, res) => {
         } else {
             const newCart = new Cart({
                 userId: user,
-                items: [{ productId, quantity, price: product.salePrice, totalPrice }]
+                items: [{
+                    productId,
+                    quantity: quantityToAdd,
+                    price: product.salePrice,
+                    totalPrice
+                }]
             });
             await newCart.save();
         }
 
-        res.status(200).json({success: true, message: "Product added to cart"});
+        res.status(200).json({ success: true, message: "Product added to cart" });
     } catch (error) {
         console.error("Error adding to cart", error);
         res.status(500).json({ message: "Something went wrong" });
